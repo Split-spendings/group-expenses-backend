@@ -29,10 +29,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-		<!-- Replacing Tomcat server with Undertow server -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <!-- Replacing Tomcat server with Undertow server -->
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>

@@ -1,41 +1,45 @@
 package com.splitspendings.groupexpensesbackend.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.splitspendings.groupexpensesbackend.model.enums.NotificationCategory;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+import java.time.ZonedDateTime;
 
 @Entity
-public class Notification implements Serializable {
+@Table(name = "notification")
+@Getter
+@Setter
+public class Notification {
+
+    public static final int TITLE_MIN_LENGTH = 1;
+    public static final int TITLE_MAX_LENGTH = 100;
+    public static final int CONTENT_MIN_LENGTH = 1;
+    public static final int CONTENT_MAX_LENGTH = 100;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name="app_user_id", nullable=false)
-    private AppUser user;
-
-    @Column(nullable = false)
-    private String notificationCategoryId;
-
-    @Column(nullable = false)
+    @Column(name = "title", nullable = false, length = TITLE_MAX_LENGTH)
     private String title;
 
-    @Column(nullable = false)
+    @Column(name = "content", nullable = false, length = CONTENT_MAX_LENGTH)
     private String content;
 
-    @Column(nullable = false)
-    private LocalDateTime dateTimeCreated;
+    @Column(name = "seen", nullable = false)
+    private Boolean seen = false;
 
-    @Column(nullable = false)
-    private boolean seen;
+    @Column(name = "time_created", nullable = false)
+    private ZonedDateTime timeCreated = ZonedDateTime.now();
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "notification_category", length = NotificationCategory.MAX_LENGTH)
+    private NotificationCategory notificationCategory;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "notified_app_user_id", foreignKey = @ForeignKey(name = "fk_notified_app_user"))
+    private AppUser notifiedAppUser;
 }
 

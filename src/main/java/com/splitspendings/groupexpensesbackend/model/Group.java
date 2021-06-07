@@ -1,52 +1,49 @@
 package com.splitspendings.groupexpensesbackend.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.splitspendings.groupexpensesbackend.model.enums.InviteOption;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-
 @Entity
-@Table(name = "\"Group\"")
-class Group implements Serializable{
+@Table(name = "user_group")
+@Getter
+@Setter
+public class Group {
+
+    public static final int NAME_MIN_LENGTH = 1;
+    public static final int NAME_MAX_LENGTH = 100;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String title;
+    @Column(name = "group_name", nullable = false, length = NAME_MAX_LENGTH)
+    private String name;
 
-    @ManyToOne
-    @JoinColumn(name="owner_id", nullable=false)
+    @Column(name = "time_created", nullable = false)
+    private ZonedDateTime timeCreated = ZonedDateTime.now();
+
+    @Column(name = "last_time_opened", nullable = false)
+    private ZonedDateTime lastTimeOpened = ZonedDateTime.now();
+
+    @Column(name = "last_time_closed")
+    private ZonedDateTime lastTimeClosed;
+
+    @Column(name = "personal", nullable = false)
+    private Boolean personal;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "invite_option", nullable = false, length = InviteOption.MAX_LENGTH)
+    private InviteOption inviteOption;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "owner_id", foreignKey = @ForeignKey(name = "fk_group_owner"))
     private AppUser owner;
 
-    @Column(nullable = false)
-    private boolean personal;
-
-    @Column(nullable = false)
-    private LocalDateTime dateTimeOpened;
-
-    @Column
-    private LocalDateTime dateTimeClosed;
-
-    @Column
-    @Basic(fetch = FetchType.LAZY)
-    private byte[] avatar;
-
-    @Column
-    private String inviteOption;
-
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
-    private Set<GroupAppUser> memberList;
-
-
-
-
+    @OneToMany(mappedBy = "group")
+    private Set<GroupMembership> groupMemberships;
 }

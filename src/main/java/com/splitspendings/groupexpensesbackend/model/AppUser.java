@@ -1,106 +1,75 @@
 package com.splitspendings.groupexpensesbackend.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-//import org.springframework.security.core.GrantedAuthority;
-//import org.springframework.security.core.userdetails.UserDetails;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
-import java.io.Serializable;
-//import java.util.Collection;
-import java.util.HashSet;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-
 @Entity
-public class AppUser implements Serializable/*, UserDetails */{
+@Table(name = "app_user",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "unique_app_user_login_name",
+                        columnNames = {"login_name"})})
+@Getter
+@Setter
+public class AppUser {
+
+    public static final int NAMES_MIN_LENGTH = 1;
+    public static final int NAMES_MAX_LENGTH = 50;
+    public static final int EMAIL_MIN_LENGTH = 3;
+    public static final int EMAIL_MAX_LENGTH = 320;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-    private AppUserSettings settings;
+    @Column(name = "login_name", nullable = false, length = NAMES_MAX_LENGTH)
+    private String loginName;
 
-    @Column(nullable = false, unique = true)
-    private String username;
-
-    @JsonIgnore
-    @Column(nullable = false)
-    private String password;
-
-
-    @Column(nullable = false, unique = true)
+    @Column(name = "email", nullable = false, length = EMAIL_MAX_LENGTH)
     private String email;
 
-    @Column
+    @Column(name = "first_name", nullable = false, length = NAMES_MAX_LENGTH)
     private String firstName;
 
-    @Column
+    @Column(name = "last_name", nullable = false, length = NAMES_MAX_LENGTH)
     private String lastName;
 
-    @Column
-    private byte[] avatar;
+    @Column(name = "time_registered", nullable = false)
+    private ZonedDateTime timeRegistered = ZonedDateTime.now();
 
-    @OneToMany(mappedBy = "user")
-    private Set<Notification> notifications;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
-    private Set<Group> ownedGroups;
-
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+    @ManyToMany
     @JoinTable(
             name = "blocked_user",
-            joinColumns = { @JoinColumn(name = "app_user_id") },
-            inverseJoinColumns = { @JoinColumn(name = "blocked_user_id") }
+            joinColumns = {@JoinColumn(name = "blocked_by_app_user_id", foreignKey = @ForeignKey(name = "fk_blocked_by_app_user"))},
+            inverseJoinColumns = {@JoinColumn(name = "blocked_app_user_id", foreignKey = @ForeignKey(name = "fk_blocked_app_user"))}
     )
-    private Set<AppUser> blockedUserSet = new HashSet<>();
+    private Set<AppUser> blockedAppUsers;
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+    @ManyToMany
     @JoinTable(
-            name = "friend_user",
-            joinColumns = { @JoinColumn(name = "app_user_id") },
-            inverseJoinColumns = { @JoinColumn(name = "friend_user_id") }
+            name = "friendship",
+            joinColumns = {@JoinColumn(name = "friend_app_user_id", foreignKey = @ForeignKey(name = "fk_friend_1"))},
+            inverseJoinColumns = {@JoinColumn(name = "friend2_app_user_id", foreignKey = @ForeignKey(name = "fk_friend_2"))}
     )
-    private Set<AppUser> friendUserSet = new HashSet<>();
+    private Set<AppUser> friends;
 
-/*
-    @JsonIgnore
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
+    @ManyToMany(mappedBy = "blockedAppUsers")
+    private Set<AppUser> blockedByAppUsers;
 
-    @JsonIgnore
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    @ManyToMany(mappedBy = "friends")
+    private Set<AppUser> friendsReverse;
 
-    @JsonIgnore
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+    @OneToMany(mappedBy = "owner")
+    private Set<Group> ownedGroups;
 
-    @JsonIgnore
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+    @OneToMany(mappedBy = "notifiedAppUser")
+    private Set<Notification> notifications;
 
-    @JsonIgnore
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }*/
+    @OneToOne(mappedBy = "appUser")
+    private AppUserSettings appUserSettings;
 }
 

@@ -1,0 +1,7 @@
+package com.splitspendings.groupexpensesbackend.repository;
+
+import com.splitspendings.groupexpensesbackend.model.AppUser;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AppUserRepository extends JpaRepository<AppUser, Long> {
+}
