@@ -23,7 +23,6 @@ public class AppUserSettings {
     public static final int CURRENCY_CODE_MAX_LENGTH = 4;
 
     @Id
-    @Column(name = "app_user_id")
     private Long id;
 
     @Column(name = "language_code", nullable = false, length = LANGUAGE_CODE_MAX_LENGTH)
@@ -44,12 +43,15 @@ public class AppUserSettings {
     private GroupInviteOption groupInviteOption;
 
     @ElementCollection
-    @CollectionTable(name="app_user_notification_category", foreignKey = @ForeignKey(name = "fk_notification_category_app_user"))
+    @CollectionTable(
+            name = "app_user_notification_category",
+            joinColumns = @JoinColumn(name = "app_user_id"),
+            foreignKey = @ForeignKey(name = "fk_notification_category_app_user"))
     @Enumerated(EnumType.STRING)
     @Column(name = "notification_category", length = NotificationCategory.MAX_LENGTH)
     private Set<NotificationCategory> notificationCategories;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "app_user_id", foreignKey = @ForeignKey(name = "fk_app_user_settings"))
     private AppUser appUser;
