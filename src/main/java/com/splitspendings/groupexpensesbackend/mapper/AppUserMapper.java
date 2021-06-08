@@ -1,6 +1,6 @@
 package com.splitspendings.groupexpensesbackend.mapper;
 
-import com.splitspendings.groupexpensesbackend.dto.appUser.AppUserDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import org.mapstruct.Mapper;
 

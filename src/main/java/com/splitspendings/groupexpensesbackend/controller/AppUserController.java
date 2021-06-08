@@ -1,6 +1,7 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
-import com.splitspendings.groupexpensesbackend.dto.appUser.AppUserDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserGroupsDto;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -29,5 +30,10 @@ public class AppUserController {
     @GetMapping("/login-name/{loginName}")
     public AppUserDto appUserByLoginName(@PathVariable String loginName) {
         return appUserService.appUserByLoginName(loginName);
+    }
+
+    @GetMapping("/{id}/groups")
+    public AppUserGroupsDto appUserGroups(@PathVariable UUID id) {
+        return appUserService.appUserGroups(id);
     }
 }

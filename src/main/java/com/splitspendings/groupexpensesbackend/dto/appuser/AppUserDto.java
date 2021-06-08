@@ -1,4 +1,4 @@
-package com.splitspendings.groupexpensesbackend.dto.appUser;
+package com.splitspendings.groupexpensesbackend.dto.appuser;
 
 import lombok.Data;
 
