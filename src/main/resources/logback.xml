@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="group-expenses-backend" level="DEBUG"/>
+    <logger name="com.splitspendings.groupexpensesbackend" level="DEBUG"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>

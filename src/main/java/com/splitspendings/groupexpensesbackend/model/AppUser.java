@@ -6,6 +6,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "app_user",
@@ -23,8 +24,8 @@ public class AppUser {
     public static final int EMAIL_MAX_LENGTH = 320;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    private UUID id;
 
     @Column(name = "login_name", nullable = false, length = NAMES_MAX_LENGTH)
     private String loginName;

@@ -14,6 +14,7 @@ import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class DatabaseLoader implements CommandLineRunner {
     private final GroupRepository groupRepository;
     private final GroupMembershipRepository groupMembershipRepository;
 
+    @Transactional
     @Override
     public void run(String... args) throws Exception {
 

@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "app_user_settings")
@@ -23,7 +24,12 @@ public class AppUserSettings {
     public static final int CURRENCY_CODE_MAX_LENGTH = 4;
 
     @Id
-    private Long id;
+    private UUID id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "app_user_id", foreignKey = @ForeignKey(name = "fk_app_user_settings"))
+    private AppUser appUser;
 
     @Column(name = "language_code", nullable = false, length = LANGUAGE_CODE_MAX_LENGTH)
     private String languageCode;
@@ -50,9 +56,4 @@ public class AppUserSettings {
     @Enumerated(EnumType.STRING)
     @Column(name = "notification_category", length = NotificationCategory.MAX_LENGTH)
     private Set<NotificationCategory> notificationCategories;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "app_user_id", foreignKey = @ForeignKey(name = "fk_app_user_settings"))
-    private AppUser appUser;
 }
