@@ -4,9 +4,7 @@ import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.AppUserSettings;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
-import com.splitspendings.groupexpensesbackend.model.enums.GroupInviteOption;
-import com.splitspendings.groupexpensesbackend.model.enums.InviteOption;
-import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
+import com.splitspendings.groupexpensesbackend.model.enums.*;
 import com.splitspendings.groupexpensesbackend.repository.AppUserRepository;
 import com.splitspendings.groupexpensesbackend.repository.AppUserSettingsRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
@@ -44,17 +42,17 @@ public class DatabaseLoader implements CommandLineRunner {
 
         AppUserSettings appUserSettings1 = new AppUserSettings();
         appUserSettings1.setAppUser(appUser1);
-        appUserSettings1.setDefaultCurrencyCode("PLN");
-        appUserSettings1.setLanguageCode("PL");
-        appUserSettings1.setTheme("dark");
+        appUserSettings1.setDefaultCurrency(Currency.PLN);
+        appUserSettings1.setLanguage(Language.PL);
+        appUserSettings1.setTheme(Theme.DARK);
         appUserSettings1.setGroupInviteOption(GroupInviteOption.ANYONE);
         appUserSettings1.setNotificationOption(NotificationOption.ALL);
 
         AppUserSettings appUserSettings2 = new AppUserSettings();
         appUserSettings2.setAppUser(appUser2);
-        appUserSettings2.setDefaultCurrencyCode("USD");
-        appUserSettings2.setLanguageCode("EN");
-        appUserSettings2.setTheme("light");
+        appUserSettings2.setDefaultCurrency(Currency.USD);
+        appUserSettings2.setLanguage(Language.EN);
+        appUserSettings2.setTheme(Theme.LIGHT);
         appUserSettings2.setGroupInviteOption(GroupInviteOption.NOBODY);
         appUserSettings2.setNotificationOption(NotificationOption.NONE);
 
@@ -76,6 +74,7 @@ public class DatabaseLoader implements CommandLineRunner {
 
         groupRepository.save(group1);
         groupRepository.save(group2);
+
 
         GroupMembership groupMembership1 = new GroupMembership();
         groupMembership1.setGroup(group1);

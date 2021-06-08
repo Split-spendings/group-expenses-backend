@@ -1,8 +1,6 @@
 package com.splitspendings.groupexpensesbackend.model;
 
-import com.splitspendings.groupexpensesbackend.model.enums.GroupInviteOption;
-import com.splitspendings.groupexpensesbackend.model.enums.NotificationCategory;
-import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
+import com.splitspendings.groupexpensesbackend.model.enums.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,13 +14,6 @@ import java.util.UUID;
 @Setter
 public class AppUserSettings {
 
-    public static final int LANGUAGE_CODE_MIN_LENGTH = 1;
-    public static final int LANGUAGE_CODE_MAX_LENGTH = 5;
-    public static final int THEME_MIN_LENGTH = 1;
-    public static final int THEME_MAX_LENGTH = 50;
-    public static final int CURRENCY_CODE_MIN_LENGTH = 2;
-    public static final int CURRENCY_CODE_MAX_LENGTH = 4;
-
     @Id
     private UUID id;
 
@@ -31,14 +22,17 @@ public class AppUserSettings {
     @JoinColumn(name = "app_user_id", foreignKey = @ForeignKey(name = "fk_app_user_settings"))
     private AppUser appUser;
 
-    @Column(name = "language_code", nullable = false, length = LANGUAGE_CODE_MAX_LENGTH)
-    private String languageCode;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "language_code", nullable = false, length = Language.MAX_LENGTH)
+    private Language language;
 
-    @Column(name = "theme", nullable = false, length = THEME_MAX_LENGTH)
-    private String theme;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "theme", nullable = false, length = Theme.MAX_LENGTH)
+    private Theme theme;
 
-    @Column(name = "default_currency_code", nullable = false, length = CURRENCY_CODE_MAX_LENGTH)
-    private String defaultCurrencyCode;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "default_currency_code", nullable = false, length = Currency.MAX_LENGTH)
+    private Currency defaultCurrency;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "notification_option", nullable = false, length = NotificationOption.MAX_LENGTH)
