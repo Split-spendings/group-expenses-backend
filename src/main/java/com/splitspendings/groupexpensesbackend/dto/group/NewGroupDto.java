@@ -6,7 +6,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.UUID;
 
 @Data
 public class NewGroupDto {
@@ -20,9 +19,6 @@ public class NewGroupDto {
 
     @NotNull
     private InviteOption inviteOption;
-
-    @NotNull
-    private UUID ownerId;
 
     public void trim() {
         if(name != null) {

@@ -3,17 +3,17 @@ package com.splitspendings.groupexpensesbackend.controller;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/groups")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "identity")
+@Slf4j
 public class GroupController {
-
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final GroupService groupService;
 

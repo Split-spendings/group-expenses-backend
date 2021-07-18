@@ -10,9 +10,9 @@ import com.splitspendings.groupexpensesbackend.repository.GroupMembershipReposit
 import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
+import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,9 +28,8 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class GroupServiceImpl implements GroupService {
-
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final Validator validator;
 
@@ -39,8 +38,8 @@ public class GroupServiceImpl implements GroupService {
 
     private final GroupMapper groupMapper;
 
+    private final IdentityService identityService;
     private final AppUserService appUserService;
-
 
     private void trimAndValidateNewGroupDto(NewGroupDto newGroupDto) {
         newGroupDto.trim();
@@ -69,8 +68,7 @@ public class GroupServiceImpl implements GroupService {
     public GroupInfoDto createGroup(NewGroupDto newGroupDto) {
         trimAndValidateNewGroupDto(newGroupDto);
 
-        //UUID currentAppUserId = identityService.currentUserID();
-        UUID currentAppUserId = newGroupDto.getOwnerId();
+        UUID currentAppUserId = identityService.currentUserID();
         AppUser currentAppUser = appUserService.appUserModelById(currentAppUserId);
 
         Group newGroup = groupMapper.newGroupDtoToGroup(newGroupDto);

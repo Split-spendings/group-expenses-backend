@@ -1,26 +1,33 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
-import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
-import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserGroupsDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.*;
+import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsWithIdDto;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/users")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "identity")
+@Slf4j
 public class AppUserController {
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-
     private final AppUserService appUserService;
+
+    @GetMapping
+    public AppUserFullInfoDto profile(){
+        return appUserService.profile();
+    }
+
+    @GetMapping("/settings")
+    public AppUserSettingsWithIdDto settings(){
+        return appUserService.settings();
+    }
 
     @GetMapping("/{id}")
     public AppUserDto appUserById(@PathVariable UUID id) {
@@ -32,8 +39,13 @@ public class AppUserController {
         return appUserService.appUserByLoginName(loginName);
     }
 
-    @GetMapping("/{id}/groups")
-    public AppUserGroupsDto appUserGroups(@PathVariable UUID id) {
-        return appUserService.appUserGroups(id);
+    @PostMapping
+    public AppUserFullInfoWithSettingsDto createAppUser(@RequestBody NewAppUserDto newAppUserDto) {
+        return appUserService.createAppUser(newAppUserDto);
+    }
+
+    @GetMapping("/groups")
+    public AppUserGroupsDto appUserGroups() {
+        return appUserService.appUserGroups();
     }
 }
