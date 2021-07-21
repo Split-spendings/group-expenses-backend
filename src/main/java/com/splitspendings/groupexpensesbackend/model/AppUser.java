@@ -24,7 +24,6 @@ public class AppUser {
     public static final int EMAIL_MAX_LENGTH = 320;
 
     @Id
-    @GeneratedValue
     private UUID id;
 
     @Column(name = "login_name", nullable = false, length = NAMES_MAX_LENGTH)

@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "group_membership",
@@ -44,4 +45,7 @@ public class GroupMembership {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "app_user_id", foreignKey = @ForeignKey(name = "fk_membership_user"))
     private AppUser appUser;
+
+    @OneToMany(mappedBy = "groupMembership")
+    private Set<GroupInvitation> invitationsSent;
 }
