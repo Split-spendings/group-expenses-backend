@@ -48,4 +48,9 @@ public class AppUserController {
     public AppUserGroupsDto appUserGroups() {
         return appUserService.appUserGroups();
     }
+
+    @PatchMapping("login-name")
+    public AppUserFullInfoDto updateAppUserLoginName(@RequestBody UpdateLoginNameDto updateLoginNameDto) {
+        return appUserService.updateAppUserLoginName(updateLoginNameDto);
+    }
 }

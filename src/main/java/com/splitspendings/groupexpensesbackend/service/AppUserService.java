@@ -31,4 +31,6 @@ public interface AppUserService {
     AppUserFullInfoWithSettingsDto createAppUser(NewAppUserDto newAppUserDto);
 
     AppUserGroupsDto appUserGroups();
+
+    AppUserFullInfoDto updateAppUserLoginName(UpdateLoginNameDto updateLoginNameDto);
 }

@@ -159,4 +159,32 @@ public class AppUserServiceImpl implements AppUserService {
         appUserGroupsDto.setGroups(groupInfoDtoList);
         return appUserGroupsDto;
     }
+
+    @Override
+    public AppUserFullInfoDto updateAppUserLoginName(UpdateLoginNameDto updateLoginNameDto) {
+        updateLoginNameDto.trim();
+
+        Set<ConstraintViolation<UpdateLoginNameDto>> violations = validator.validate(updateLoginNameDto);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
+        UUID id = identityService.currentUserID();
+
+        Optional<AppUser> appUserOptionalByLoginName = appUserRepository.findByLoginName(updateLoginNameDto.getLoginName());
+        if (appUserOptionalByLoginName.isPresent()) {
+            if(appUserOptionalByLoginName.get().getId().equals(id)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current user already has the provided login name");
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Login name is used by another user");
+            }
+        }
+
+        AppUser existingAppUser = appUserModelById(id);
+
+        existingAppUser = appUserMapper.copyFromUpdateLoginNameDtoToAppUser(updateLoginNameDto, existingAppUser);
+
+        AppUser updatedAppUser = appUserRepository.save(existingAppUser);
+        return appUserMapper.appUserToAppUserFullInfoDto(updatedAppUser);
+    }
 }

@@ -23,4 +23,6 @@ public interface AppUserMapper {
     AppUserFullInfoDto appUserToAppUserFullInfoDto(AppUser appUser);
 
     AppUserFullInfoWithSettingsDto appUserToAppUserFullInfoWithSettingsDto(AppUser appUser);
+
+    AppUser copyFromUpdateLoginNameDtoToAppUser(UpdateLoginNameDto updateLoginNameDto, @MappingTarget AppUser appUser);
 }
