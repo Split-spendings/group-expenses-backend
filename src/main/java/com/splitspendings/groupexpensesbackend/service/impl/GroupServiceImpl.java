@@ -5,13 +5,18 @@ import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
+import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupmembership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
+import com.splitspendings.groupexpensesbackend.mapper.GroupInviteMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMembershipMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
+import com.splitspendings.groupexpensesbackend.model.GroupInvite;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
+import com.splitspendings.groupexpensesbackend.repository.GroupInviteRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
@@ -43,10 +48,12 @@ public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
     private final GroupMembershipRepository groupMembershipRepository;
+    private final GroupInviteRepository groupInviteRepository;
 
     private final GroupMapper groupMapper;
     private final AppUserMapper appUserMapper;
     private final GroupMembershipMapper groupMembershipMapper;
+    private final GroupInviteMapper groupInviteMapper;
 
     private final IdentityService identityService;
     private final AppUserService appUserService;
@@ -135,5 +142,41 @@ public class GroupServiceImpl implements GroupService {
         groupMembershipService.verifyCurrentUserActiveMembership(id);
         GroupMembership groupMembership = groupMembershipService.groupActiveMembershipModel(appUserId, id);
         return groupMembershipMapper.groupMembershipToGroupMembershipDto(groupMembership);
+    }
+
+    @Override
+    public GroupInviteDto createGroupInvite(NewGroupInviteDto newGroupInviteDto) {
+        Set<ConstraintViolation<NewGroupInviteDto>> violations = validator.validate(newGroupInviteDto);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
+        Long groupId = newGroupInviteDto.getGroupId();
+        UUID invitedAppUserId = newGroupInviteDto.getInvitedAppUserId();
+        UUID currentAppUserId = identityService.currentUserID();
+
+        if(invitedAppUserId.equals(currentAppUserId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot invite self in a group");
+        }
+
+        GroupMembership invitedByGroupMembership = groupMembershipService.groupActiveMembershipModel(currentAppUserId, groupId);
+
+        if (groupMembershipService.isAppUserActiveMemberOfGroup(invitedAppUserId, groupId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invited user is already an active group member");
+        }
+
+        AppUser invitedAppUser = appUserService.appUserModelById(invitedAppUserId);
+
+        Optional<GroupInvite> existingGroupInvite = groupInviteRepository.findByInvitedAppUserAndInvitedByGroupMembership(invitedAppUser, invitedByGroupMembership);
+        if (existingGroupInvite.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already invited by the current user");
+        }
+
+        GroupInvite newGroupInvite = new GroupInvite();
+        newGroupInvite.setInvitedAppUser(invitedAppUser);
+        newGroupInvite.setInvitedByGroupMembership(invitedByGroupMembership);
+
+        GroupInvite createdGroupInvite = groupInviteRepository.save(newGroupInvite);
+        return groupInviteMapper.groupInviteToGroupInviteDto(createdGroupInvite);
     }
 }

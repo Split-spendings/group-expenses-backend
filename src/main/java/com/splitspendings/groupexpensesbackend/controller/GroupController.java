@@ -4,6 +4,8 @@ import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
+import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupmembership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -45,5 +47,10 @@ public class GroupController {
     @GetMapping("{id}/members/{appUserId}")
     public GroupMembershipDto groupMembership(@PathVariable Long id, @PathVariable UUID appUserId) {
         return groupService.groupMembership(id, appUserId);
+    }
+
+    @PostMapping("invite")
+    public GroupInviteDto createGroupInvite(@RequestBody NewGroupInviteDto newGroupInviteDto) {
+        return groupService.createGroupInvite(newGroupInviteDto);
     }
 }

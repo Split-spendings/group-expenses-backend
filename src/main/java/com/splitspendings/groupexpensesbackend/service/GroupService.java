@@ -4,6 +4,8 @@ import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
+import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupmembership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.model.Group;
 
@@ -22,4 +24,6 @@ public interface GroupService {
     GroupActiveMembersDto groupActiveMembersById(Long id);
 
     GroupMembershipDto groupMembership(Long id, UUID appUserId);
+
+    GroupInviteDto createGroupInvite(NewGroupInviteDto newGroupInviteDto);
 }
