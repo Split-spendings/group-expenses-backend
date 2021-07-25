@@ -2,6 +2,7 @@ package com.splitspendings.groupexpensesbackend.controller;
 
 import com.splitspendings.groupexpensesbackend.dto.appuser.*;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsWithIdDto;
+import com.splitspendings.groupexpensesbackend.dto.appusersettings.UpdateAppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,11 @@ public class AppUserController {
     @PatchMapping("login-name")
     public AppUserFullInfoDto updateAppUserLoginName(@RequestBody UpdateLoginNameDto updateLoginNameDto) {
         return appUserService.updateAppUserLoginName(updateLoginNameDto);
+    }
+
+    @PatchMapping("settings")
+    public AppUserSettingsWithIdDto updateAppUserSettings(@RequestBody UpdateAppUserSettingsDto updateAppUserSettingsDto) {
+        return appUserService.updateAppUserSettings(updateAppUserSettingsDto);
     }
 
     @GetMapping("invites")

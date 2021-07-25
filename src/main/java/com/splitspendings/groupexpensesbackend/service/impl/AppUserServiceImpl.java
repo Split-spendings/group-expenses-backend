@@ -3,6 +3,7 @@ package com.splitspendings.groupexpensesbackend.service.impl;
 import com.splitspendings.groupexpensesbackend.dto.appuser.*;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsWithIdDto;
+import com.splitspendings.groupexpensesbackend.dto.appusersettings.UpdateAppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
@@ -190,6 +191,23 @@ public class AppUserServiceImpl implements AppUserService {
 
         AppUser updatedAppUser = appUserRepository.save(existingAppUser);
         return appUserMapper.appUserToAppUserFullInfoDto(updatedAppUser);
+    }
+
+    @Override
+    public AppUserSettingsWithIdDto updateAppUserSettings(UpdateAppUserSettingsDto updateAppUserSettingsDto) {
+        Set<ConstraintViolation<UpdateAppUserSettingsDto>> violations = validator.validate(updateAppUserSettingsDto);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
+        UUID id = identityService.currentUserID();
+
+        AppUserSettings existingAppUserSettings = appUserModelById(id).getAppUserSettings();
+
+        existingAppUserSettings = appUserSettingsMapper.copyFromUpdateAppUserSettingsDtoToAppUserSettings(updateAppUserSettingsDto, existingAppUserSettings);
+
+        AppUserSettings updatedAppUserSettings = appUserSettingsRepository.save(existingAppUserSettings);
+        return appUserSettingsMapper.appUserSettingsToAppUserSettingsWithIdDto(updatedAppUserSettings);
     }
 
     @Override
