@@ -4,12 +4,15 @@ import com.splitspendings.groupexpensesbackend.dto.appuser.*;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsWithIdDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserSettingsMapper;
+import com.splitspendings.groupexpensesbackend.mapper.GroupInviteMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.AppUserSettings;
 import com.splitspendings.groupexpensesbackend.model.Group;
+import com.splitspendings.groupexpensesbackend.model.GroupInvite;
 import com.splitspendings.groupexpensesbackend.repository.AppUserRepository;
 import com.splitspendings.groupexpensesbackend.repository.AppUserSettingsRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
@@ -45,6 +48,7 @@ public class AppUserServiceImpl implements AppUserService {
     private final AppUserMapper appUserMapper;
     private final AppUserSettingsMapper appUserSettingsMapper;
     private final GroupMapper groupMapper;
+    private final GroupInviteMapper groupInviteMapper;
 
     private final IdentityService identityService;
 
@@ -186,5 +190,17 @@ public class AppUserServiceImpl implements AppUserService {
 
         AppUser updatedAppUser = appUserRepository.save(existingAppUser);
         return appUserMapper.appUserToAppUserFullInfoDto(updatedAppUser);
+    }
+
+    @Override
+    public AppUserReceivedGroupInvitesDto appUserReceivedGroupInvites() {
+        AppUser currentAppUser = appUserModelById(identityService.currentUserID());
+
+        Set<GroupInvite> groupInvites = currentAppUser.getGroupInvitesReceived();
+        List<GroupInviteDto> groupInviteDtoList = groupInviteMapper.groupInviteSetToGroupInviteDtoList(groupInvites);
+
+        AppUserReceivedGroupInvitesDto appUserInvites = new AppUserReceivedGroupInvitesDto();
+        appUserInvites.setReceivedGroupInvites(groupInviteDtoList);
+        return appUserInvites;
     }
 }

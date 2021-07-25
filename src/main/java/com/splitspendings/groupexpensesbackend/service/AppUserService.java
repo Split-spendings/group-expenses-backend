@@ -33,4 +33,6 @@ public interface AppUserService {
     AppUserGroupsDto appUserGroups();
 
     AppUserFullInfoDto updateAppUserLoginName(UpdateLoginNameDto updateLoginNameDto);
+
+    AppUserReceivedGroupInvitesDto appUserReceivedGroupInvites();
 }

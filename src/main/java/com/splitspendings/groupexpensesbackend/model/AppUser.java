@@ -69,6 +69,9 @@ public class AppUser {
     @OneToMany(mappedBy = "notifiedAppUser")
     private Set<Notification> notifications;
 
+    @OneToMany(mappedBy = "invitedAppUser")
+    private Set<GroupInvite> groupInvitesReceived;
+
     @OneToOne(mappedBy = "appUser")
     private AppUserSettings appUserSettings;
 }

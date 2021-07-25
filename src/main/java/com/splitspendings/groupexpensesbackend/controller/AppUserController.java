@@ -53,4 +53,9 @@ public class AppUserController {
     public AppUserFullInfoDto updateAppUserLoginName(@RequestBody UpdateLoginNameDto updateLoginNameDto) {
         return appUserService.updateAppUserLoginName(updateLoginNameDto);
     }
+
+    @GetMapping("invites")
+    public AppUserReceivedGroupInvitesDto  appUserReceivedGroupInvites() {
+        return appUserService.appUserReceivedGroupInvites();
+    }
 }
