@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface GroupMembershipService {
 
-    GroupMembership groupMembershipModel(UUID appUserId, Long groupID);
+    GroupMembership groupActiveMembershipModel(UUID appUserId, Long groupID);
 
     boolean isAppUserActiveMemberOfGroup(UUID appUserId, Long groupID);
 

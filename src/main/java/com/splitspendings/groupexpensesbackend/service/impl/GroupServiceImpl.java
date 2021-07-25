@@ -5,8 +5,10 @@ import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.groupmembership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
+import com.splitspendings.groupexpensesbackend.mapper.GroupMembershipMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
@@ -44,6 +46,7 @@ public class GroupServiceImpl implements GroupService {
 
     private final GroupMapper groupMapper;
     private final AppUserMapper appUserMapper;
+    private final GroupMembershipMapper groupMembershipMapper;
 
     private final IdentityService identityService;
     private final AppUserService appUserService;
@@ -125,5 +128,12 @@ public class GroupServiceImpl implements GroupService {
         GroupActiveMembersDto groupMembersDto = groupMapper.groupToGroupActiveMembersDto(group);
         groupMembersDto.setMembers(appUserDtoList);
         return groupMembersDto;
+    }
+
+    @Override
+    public GroupMembershipDto groupMembership(Long id, UUID appUserId) {
+        groupMembershipService.verifyCurrentUserActiveMembership(id);
+        GroupMembership groupMembership = groupMembershipService.groupActiveMembershipModel(appUserId, id);
+        return groupMembershipMapper.groupMembershipToGroupMembershipDto(groupMembership);
     }
 }

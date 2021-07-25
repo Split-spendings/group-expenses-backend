@@ -25,10 +25,10 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     private final IdentityService identityService;
 
     @Override
-    public GroupMembership groupMembershipModel(UUID appUserId, Long groupID) {
+    public GroupMembership groupActiveMembershipModel(UUID appUserId, Long groupID) {
         Optional<GroupMembership> groupMembership = groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupID, appUserId);
         if (groupMembership.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not a member of a group");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not an active member of a group");
         }
         return groupMembership.get();
     }
@@ -41,13 +41,15 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     @Override
     public void verifyActiveMembership(UUID appUserId, Long groupId) {
         if(!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a member of a group");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not an active member of a group");
         }
     }
 
     @Override
     public void verifyCurrentUserActiveMembership(Long groupId) {
         UUID appUserId = identityService.currentUserID();
-        verifyActiveMembership(appUserId, groupId);
+        if(!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current user is not an active member of a group");
+        }
     }
 }
