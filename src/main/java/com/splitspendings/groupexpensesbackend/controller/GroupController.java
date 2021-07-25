@@ -1,5 +1,6 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
+import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
@@ -31,5 +32,10 @@ public class GroupController {
     @PatchMapping("{id}")
     public GroupInfoDto updateGroupInfo(@PathVariable Long id, @RequestBody UpdateGroupInfoDto updateGroupInfoDto) {
         return groupService.updateGroupInfo(id, updateGroupInfoDto);
+    }
+
+    @GetMapping("{id}/members")
+    public GroupActiveMembersDto groupActiveMembers(@PathVariable Long id) {
+        return groupService.groupActiveMembersById(id);
     }
 }

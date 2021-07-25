@@ -1,8 +1,11 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
@@ -23,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -39,6 +43,7 @@ public class GroupServiceImpl implements GroupService {
     private final GroupMembershipRepository groupMembershipRepository;
 
     private final GroupMapper groupMapper;
+    private final AppUserMapper appUserMapper;
 
     private final IdentityService identityService;
     private final AppUserService appUserService;
@@ -105,5 +110,20 @@ public class GroupServiceImpl implements GroupService {
 
         Group updatedGroup = groupRepository.save(existingGroup);
         return groupMapper.groupToGroupInfoDto(updatedGroup);
+    }
+
+    @Override
+    public GroupActiveMembersDto groupActiveMembersById(Long id) {
+        groupMembershipService.verifyCurrentUserActiveMembership(id);
+
+        Group group = groupModelById(id);
+
+        List<AppUser> appUserList = groupMembershipRepository.queryActiveMembersOfGroupWithId(id);
+
+        List<AppUserDto> appUserDtoList = appUserMapper.appUserListToAppUserDtoList(appUserList);
+
+        GroupActiveMembersDto groupMembersDto = groupMapper.groupToGroupActiveMembersDto(group);
+        groupMembersDto.setMembers(appUserDtoList);
+        return groupMembersDto;
     }
 }

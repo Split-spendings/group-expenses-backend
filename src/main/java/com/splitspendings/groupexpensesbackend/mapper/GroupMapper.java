@@ -1,5 +1,6 @@
 package com.splitspendings.groupexpensesbackend.mapper;
 
+import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
@@ -19,4 +20,6 @@ public interface GroupMapper {
     Group newGroupDtoToGroup(NewGroupDto newGroupDto);
 
     Group copyUpdateGroupInfoDtoToGroup(UpdateGroupInfoDto updateGroupInfoDto, @MappingTarget Group group);
+
+    GroupActiveMembersDto groupToGroupActiveMembersDto(Group group);
 }
