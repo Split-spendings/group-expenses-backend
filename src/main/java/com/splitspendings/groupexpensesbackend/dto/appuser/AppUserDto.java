@@ -13,5 +13,5 @@ public class AppUserDto {
     private String email;
     private String firstName;
     private String lastName;
-    private ZonedDateTime timeRegistered = ZonedDateTime.now();
+    private ZonedDateTime timeRegistered;
 }

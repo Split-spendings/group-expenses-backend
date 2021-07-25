@@ -46,8 +46,8 @@ public class AppUserController {
     }
 
     @GetMapping("/groups")
-    public AppUserGroupsDto appUserGroups() {
-        return appUserService.appUserGroups();
+    public AppUserGroupsDto appUserActiveGroups() {
+        return appUserService.appUserActiveGroups();
     }
 
     @PatchMapping("login-name")

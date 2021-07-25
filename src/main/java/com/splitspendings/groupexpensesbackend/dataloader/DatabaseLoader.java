@@ -1,15 +1,9 @@
 package com.splitspendings.groupexpensesbackend.dataloader;
 
 import com.splitspendings.groupexpensesbackend.dataloader.factory.AppUserFactory;
-import com.splitspendings.groupexpensesbackend.model.AppUser;
-import com.splitspendings.groupexpensesbackend.model.AppUserSettings;
-import com.splitspendings.groupexpensesbackend.model.Group;
-import com.splitspendings.groupexpensesbackend.model.GroupMembership;
+import com.splitspendings.groupexpensesbackend.model.*;
 import com.splitspendings.groupexpensesbackend.model.enums.*;
-import com.splitspendings.groupexpensesbackend.repository.AppUserRepository;
-import com.splitspendings.groupexpensesbackend.repository.AppUserSettingsRepository;
-import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
-import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
+import com.splitspendings.groupexpensesbackend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -36,6 +30,7 @@ public class DatabaseLoader implements CommandLineRunner {
     private final AppUserSettingsRepository appUserSettingsRepository;
     private final GroupRepository groupRepository;
     private final GroupMembershipRepository groupMembershipRepository;
+    private final GroupInviteRepository groupInviteRepository;
 
     private Map<String, UUID> loadAppUserIds(String path) {
         Map<String, UUID> idMap = new HashMap<>();
@@ -139,5 +134,12 @@ public class DatabaseLoader implements CommandLineRunner {
 
         groupMembershipRepository.save(groupMembership1);
         groupMembershipRepository.save(groupMembership2);
+
+        GroupInvite groupInvite1 = new GroupInvite();
+        groupInvite1.setMessage("hello");
+        groupInvite1.setInvitedAppUser(appUser2);
+        groupInvite1.setInvitedByGroupMembership(groupMembership1);
+
+        groupInviteRepository.save(groupInvite1);
     }
 }

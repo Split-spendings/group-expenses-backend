@@ -34,20 +34,20 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     }
 
     @Override
-    public boolean isAppUserMemberOfGroup(UUID appUserId, Long groupID) {
+    public boolean isAppUserActiveMemberOfGroup(UUID appUserId, Long groupID) {
         return groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupID, appUserId).isPresent();
     }
 
     @Override
-    public void verifyMembership(UUID appUserId, Long groupId) {
-        if(!isAppUserMemberOfGroup(appUserId, groupId)) {
+    public void verifyActiveMembership(UUID appUserId, Long groupId) {
+        if(!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a member of a group");
         }
     }
 
     @Override
-    public void verifyCurrentUserMembership(Long groupId) {
+    public void verifyCurrentUserActiveMembership(Long groupId) {
         UUID appUserId = identityService.currentUserID();
-        verifyMembership(appUserId, groupId);
+        verifyActiveMembership(appUserId, groupId);
     }
 }

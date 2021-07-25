@@ -2,6 +2,7 @@ package com.splitspendings.groupexpensesbackend.dto.appuser;
 
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.NewAppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
+import com.splitspendings.groupexpensesbackend.util.TrimUtil;
 import lombok.Data;
 
 import javax.validation.Valid;
@@ -21,7 +22,7 @@ public class NewAppUserDto {
 
     public void trim() {
         if (loginName != null) {
-            loginName = loginName.trim();
+            loginName = TrimUtil.trimAndRemoveExtraSpaces(loginName);
         }
     }
 }

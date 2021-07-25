@@ -2,6 +2,7 @@ package com.splitspendings.groupexpensesbackend.service.impl;
 
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
+import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
@@ -9,6 +10,7 @@ import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
+import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import lombok.RequiredArgsConstructor;
@@ -40,15 +42,7 @@ public class GroupServiceImpl implements GroupService {
 
     private final IdentityService identityService;
     private final AppUserService appUserService;
-
-    private void trimAndValidateNewGroupDto(NewGroupDto newGroupDto) {
-        newGroupDto.trim();
-
-        Set<ConstraintViolation<NewGroupDto>> violations = validator.validate(newGroupDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
-    }
+    private final GroupMembershipService groupMembershipService;
 
     @Override
     public Group groupModelById(Long id) {
@@ -66,7 +60,12 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupInfoDto createGroup(NewGroupDto newGroupDto) {
-        trimAndValidateNewGroupDto(newGroupDto);
+        newGroupDto.trim();
+
+        Set<ConstraintViolation<NewGroupDto>> violations = validator.validate(newGroupDto);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
 
         UUID currentAppUserId = identityService.currentUserID();
         AppUser currentAppUser = appUserService.appUserModelById(currentAppUserId);
@@ -87,5 +86,24 @@ public class GroupServiceImpl implements GroupService {
         groupMembershipRepository.save(groupMembership);
 
         return groupMapper.groupToGroupInfoDto(createdGroup);
+    }
+
+    @Override
+    public GroupInfoDto updateGroupInfo(Long id, UpdateGroupInfoDto updateGroupInfoDto) {
+        updateGroupInfoDto.trim();
+
+        Set<ConstraintViolation<UpdateGroupInfoDto>> violations = validator.validate(updateGroupInfoDto);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
+        groupMembershipService.verifyCurrentUserActiveMembership(id);
+
+        Group existingGroup = groupModelById(id);
+
+        existingGroup = groupMapper.copyUpdateGroupInfoDtoToGroup(updateGroupInfoDto, existingGroup);
+
+        Group updatedGroup = groupRepository.save(existingGroup);
+        return groupMapper.groupToGroupInfoDto(updatedGroup);
     }
 }

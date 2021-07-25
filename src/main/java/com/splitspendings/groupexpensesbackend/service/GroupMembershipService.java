@@ -8,9 +8,9 @@ public interface GroupMembershipService {
 
     GroupMembership groupMembershipModel(UUID appUserId, Long groupID);
 
-    boolean isAppUserMemberOfGroup(UUID appUserId, Long groupID);
+    boolean isAppUserActiveMemberOfGroup(UUID appUserId, Long groupID);
 
-    void verifyMembership(UUID appUserId, Long groupId);
+    void verifyActiveMembership(UUID appUserId, Long groupId);
 
-    void verifyCurrentUserMembership(Long groupId);
+    void verifyCurrentUserActiveMembership(Long groupId);
 }

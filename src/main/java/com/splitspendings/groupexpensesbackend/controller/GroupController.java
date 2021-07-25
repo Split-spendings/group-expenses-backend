@@ -2,6 +2,7 @@ package com.splitspendings.groupexpensesbackend.controller;
 
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
+import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -25,5 +26,10 @@ public class GroupController {
     @PostMapping
     public GroupInfoDto createGroup(@RequestBody NewGroupDto newGroupDto) {
         return groupService.createGroup(newGroupDto);
+    }
+
+    @PatchMapping("{id}")
+    public GroupInfoDto updateGroupInfo(@PathVariable Long id, @RequestBody UpdateGroupInfoDto updateGroupInfoDto) {
+        return groupService.updateGroupInfo(id, updateGroupInfoDto);
     }
 }

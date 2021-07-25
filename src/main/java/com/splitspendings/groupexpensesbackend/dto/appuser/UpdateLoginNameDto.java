@@ -1,6 +1,7 @@
 package com.splitspendings.groupexpensesbackend.dto.appuser;
 
 import com.splitspendings.groupexpensesbackend.model.AppUser;
+import com.splitspendings.groupexpensesbackend.util.TrimUtil;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -15,7 +16,7 @@ public class UpdateLoginNameDto {
 
     public void trim() {
         if (loginName != null) {
-            loginName = loginName.trim();
+            loginName = TrimUtil.trimAndRemoveExtraSpaces(loginName);
         }
     }
 }
