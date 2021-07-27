@@ -64,4 +64,9 @@ public class GroupController {
     public void declineGroupInvite(@PathVariable Long id) {
         groupService.declineGroupInvite(id);
     }
+
+    @PatchMapping("{id}/leave")
+    public void leaveGroup(@PathVariable Long id) {
+        groupService.leaveGroup(id);
+    }
 }

@@ -243,4 +243,16 @@ public class GroupServiceImpl implements GroupService {
         identityService.verifyAuthorization(groupInvite.getInvitedAppUser().getId());
         groupInviteRepository.delete(groupInvite);
     }
+
+    @Override
+    public void leaveGroup(Long id) {
+        Optional<GroupMembership> groupMembershipOptional = groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(id, identityService.currentUserID());
+        if(groupMembershipOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a member of a group");
+        }
+        GroupMembership groupMembership = groupMembershipOptional.get();
+        groupMembership.setActive(false);
+        groupMembership.setLastTimeLeft(ZonedDateTime.now());
+        groupMembershipRepository.save(groupMembership);
+    }
 }

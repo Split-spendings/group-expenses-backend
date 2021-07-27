@@ -188,6 +188,7 @@ public class DatabaseLoader implements CommandLineRunner {
         groupMembershipRepository.save(groupMembership5);
         groupMembershipRepository.save(groupMembership6);
 
+
         GroupInvite groupInvite1 = new GroupInvite();
         groupInvite1.setMessage("hello");
         groupInvite1.setInvitedAppUser(appUser2);

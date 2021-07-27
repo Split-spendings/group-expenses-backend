@@ -34,4 +34,6 @@ public interface GroupService {
     GroupInviteAcceptedDto acceptGroupInvite(Long inviteId);
 
     void declineGroupInvite(Long id);
+
+    void leaveGroup(Long id);
 }
