@@ -59,4 +59,9 @@ public class GroupController {
     public GroupInviteAcceptedDto acceptGroupInvite(@PathVariable Long inviteId) {
         return groupService.acceptGroupInvite(inviteId);
     }
+
+    @DeleteMapping("invite/{id}")
+    public void declineGroupInvite(@PathVariable Long id) {
+        groupService.declineGroupInvite(id);
+    }
 }

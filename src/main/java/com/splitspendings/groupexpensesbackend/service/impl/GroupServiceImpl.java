@@ -236,4 +236,11 @@ public class GroupServiceImpl implements GroupService {
         groupInviteAcceptedDto.setGroupMembership(groupMembershipMapper.groupMembershipToGroupMembershipDto(groupMembership));
         return groupInviteAcceptedDto;
     }
+
+    @Override
+    public void declineGroupInvite(Long id) {
+        GroupInvite groupInvite = groupInviteModelById(id);
+        identityService.verifyAuthorization(groupInvite.getInvitedAppUser().getId());
+        groupInviteRepository.delete(groupInvite);
+    }
 }

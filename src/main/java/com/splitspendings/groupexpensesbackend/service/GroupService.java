@@ -32,4 +32,6 @@ public interface GroupService {
     GroupInvite groupInviteModelById(Long inviteId);
 
     GroupInviteAcceptedDto acceptGroupInvite(Long inviteId);
+
+    void declineGroupInvite(Long id);
 }
