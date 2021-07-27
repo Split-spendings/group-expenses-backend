@@ -61,7 +61,7 @@ public class AppUserController {
     }
 
     @GetMapping("invites")
-    public AppUserReceivedGroupInvitesDto  appUserReceivedGroupInvites() {
+    public AppUserReceivedGroupInvitesDto appUserReceivedGroupInvites() {
         return appUserService.appUserReceivedGroupInvites();
     }
 }

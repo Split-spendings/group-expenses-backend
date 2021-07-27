@@ -21,4 +21,6 @@ public interface GroupMembershipRepository extends JpaRepository<GroupMembership
 
     @Query("select gm.appUser from GroupMembership gm where gm.group.id = :group_id and gm.active=true")
     List<AppUser> queryActiveMembersOfGroupWithId(@Param("group_id") Long groupId);
+
+    Optional<GroupMembership> findByGroupAndAppUser(Group group, AppUser appUser);
 }

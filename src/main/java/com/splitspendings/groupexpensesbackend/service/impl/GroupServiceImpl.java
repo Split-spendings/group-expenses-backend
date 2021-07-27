@@ -5,9 +5,11 @@ import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteAcceptedDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupmembership.GroupMembershipDto;
+import com.splitspendings.groupexpensesbackend.exception.InvalidGroupInviteException;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupInviteMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
@@ -33,6 +35,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -178,5 +181,59 @@ public class GroupServiceImpl implements GroupService {
 
         GroupInvite createdGroupInvite = groupInviteRepository.save(newGroupInvite);
         return groupInviteMapper.groupInviteToGroupInviteDto(createdGroupInvite);
+    }
+
+    @Override
+    public GroupInvite groupInviteModelById(Long inviteId) {
+        Optional<GroupInvite> groupInvite = groupInviteRepository.findById(inviteId);
+        if (groupInvite.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Group invite not found");
+        }
+        return groupInvite.get();
+    }
+
+    @Override
+    @Transactional(noRollbackFor = InvalidGroupInviteException.class)
+    public GroupInviteAcceptedDto acceptGroupInvite(Long inviteId) {
+        GroupInvite groupInvite = groupInviteModelById(inviteId);
+
+        AppUser invitedAppUser = groupInvite.getInvitedAppUser();
+        identityService.verifyAuthorization(invitedAppUser.getId());
+
+        GroupMembership invitedByGroupMembership = groupInvite.getInvitedByGroupMembership();
+
+        if(!invitedByGroupMembership.getActive()) {
+            groupInviteRepository.delete(groupInvite);
+            throw new InvalidGroupInviteException(HttpStatus.BAD_REQUEST, "User who made an invite is no longer an active group member");
+        }
+
+        Group group = invitedByGroupMembership.getGroup();
+
+        groupInviteRepository.deleteAllByInvitedByGroupMembershipGroupAndInvitedAppUser(group, invitedAppUser);
+
+        Optional<GroupMembership> groupMembershipOptional = groupMembershipRepository.findByGroupAndAppUser(group, invitedAppUser);
+        GroupMembership groupMembership;
+
+        if(groupMembershipOptional.isPresent() && !groupMembershipOptional.get().getActive()) {
+            groupMembership = groupMembershipOptional.get();
+            groupMembership.setActive(true);
+            groupMembership.setLastTimeJoined(ZonedDateTime.now());
+        } else if(groupMembershipOptional.isEmpty()){
+            groupMembership = new GroupMembership();
+            groupMembership.setAppUser(invitedAppUser);
+            groupMembership.setGroup(group);
+            groupMembership.setActive(true);
+            groupMembership.setHasAdminRights(false);
+            groupMembership.setFirstTimeJoined(ZonedDateTime.now());
+            groupMembership.setLastTimeJoined(ZonedDateTime.now());
+        } else {
+            throw new InvalidGroupInviteException(HttpStatus.BAD_REQUEST, "Invited user is already an active member of a group");
+        }
+
+        groupMembershipRepository.save(groupMembership);
+
+        GroupInviteAcceptedDto groupInviteAcceptedDto = new GroupInviteAcceptedDto();
+        groupInviteAcceptedDto.setGroupMembership(groupMembershipMapper.groupMembershipToGroupMembershipDto(groupMembership));
+        return groupInviteAcceptedDto;
     }
 }

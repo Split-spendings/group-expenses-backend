@@ -4,6 +4,7 @@ import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteAcceptedDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupmembership.GroupMembershipDto;
@@ -52,5 +53,10 @@ public class GroupController {
     @PostMapping("invite")
     public GroupInviteDto createGroupInvite(@RequestBody NewGroupInviteDto newGroupInviteDto) {
         return groupService.createGroupInvite(newGroupInviteDto);
+    }
+
+    @PatchMapping("invite/{inviteId}")
+    public GroupInviteAcceptedDto acceptGroupInvite(@PathVariable Long inviteId) {
+        return groupService.acceptGroupInvite(inviteId);
     }
 }
