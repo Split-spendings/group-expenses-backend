@@ -1,6 +1,7 @@
 package com.splitspendings.groupexpensesbackend.dataloader;
 
 import com.splitspendings.groupexpensesbackend.dataloader.factory.AppUserFactory;
+import com.splitspendings.groupexpensesbackend.dataloader.factory.GroupFactory;
 import com.splitspendings.groupexpensesbackend.model.*;
 import com.splitspendings.groupexpensesbackend.model.enums.*;
 import com.splitspendings.groupexpensesbackend.repository.*;
@@ -25,6 +26,7 @@ public class DatabaseLoader implements CommandLineRunner {
     private static final String ADMINS_PATH = "gitignored/test_admin_IDs.txt";
 
     private final AppUserFactory appUserFactory;
+    private final GroupFactory groupFactory;
 
     private final AppUserRepository appUserRepository;
     private final AppUserSettingsRepository appUserSettingsRepository;
@@ -110,20 +112,17 @@ public class DatabaseLoader implements CommandLineRunner {
         appUserSettingsRepository.save(adminAppUserSettings1);
 
 
-        Group group1 = new Group();
-        group1.setName("group_1");
+        Group group1 = groupFactory.generate();
         group1.setOwner(appUser1);
         group1.setPersonal(false);
         group1.setInviteOption(InviteOption.ALL_ACTIVE_MEMBERS);
 
-        Group group2 = new Group();
-        group2.setName("group_2");
+        Group group2 = groupFactory.generate();
         group2.setOwner(appUser2);
         group2.setPersonal(true);
         group2.setInviteOption(InviteOption.OWNER_ONLY);
 
-        Group group3 = new Group();
-        group3.setName("group_3");
+        Group group3 = groupFactory.generate();
         group3.setOwner(appUser3);
         group3.setPersonal(false);
         group3.setInviteOption(InviteOption.OWNER_ONLY);
