@@ -3,13 +3,17 @@ package com.splitspendings.groupexpensesbackend.service.impl;
 import com.splitspendings.groupexpensesbackend.dto.appuser.*;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsWithIdDto;
+import com.splitspendings.groupexpensesbackend.dto.appusersettings.UpdateAppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserSettingsMapper;
+import com.splitspendings.groupexpensesbackend.mapper.GroupInviteMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.AppUserSettings;
 import com.splitspendings.groupexpensesbackend.model.Group;
+import com.splitspendings.groupexpensesbackend.model.GroupInvite;
 import com.splitspendings.groupexpensesbackend.repository.AppUserRepository;
 import com.splitspendings.groupexpensesbackend.repository.AppUserSettingsRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
@@ -45,6 +49,7 @@ public class AppUserServiceImpl implements AppUserService {
     private final AppUserMapper appUserMapper;
     private final AppUserSettingsMapper appUserSettingsMapper;
     private final GroupMapper groupMapper;
+    private final GroupInviteMapper groupInviteMapper;
 
     private final IdentityService identityService;
 
@@ -150,7 +155,7 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public AppUserGroupsDto appUserGroups() {
+    public AppUserGroupsDto appUserActiveGroups() {
         UUID currentUserId = identityService.currentUserID();
         List<Group> appUserGroups = groupMembershipRepository.queryGroupsWithAppUserActiveMembership(currentUserId);
         List<GroupInfoDto> groupInfoDtoList = groupMapper.groupListToGroupInfoDtoList(appUserGroups);
@@ -158,5 +163,62 @@ public class AppUserServiceImpl implements AppUserService {
         appUserGroupsDto.setId(currentUserId);
         appUserGroupsDto.setGroups(groupInfoDtoList);
         return appUserGroupsDto;
+    }
+
+    @Override
+    public AppUserFullInfoDto updateAppUserLoginName(UpdateLoginNameDto updateLoginNameDto) {
+        updateLoginNameDto.trim();
+
+        Set<ConstraintViolation<UpdateLoginNameDto>> violations = validator.validate(updateLoginNameDto);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
+        UUID id = identityService.currentUserID();
+
+        Optional<AppUser> appUserOptionalByLoginName = appUserRepository.findByLoginName(updateLoginNameDto.getLoginName());
+        if (appUserOptionalByLoginName.isPresent()) {
+            if(appUserOptionalByLoginName.get().getId().equals(id)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current user already has the provided login name");
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Login name is used by another user");
+            }
+        }
+
+        AppUser existingAppUser = appUserModelById(id);
+
+        existingAppUser = appUserMapper.copyFromUpdateLoginNameDtoToAppUser(updateLoginNameDto, existingAppUser);
+
+        AppUser updatedAppUser = appUserRepository.save(existingAppUser);
+        return appUserMapper.appUserToAppUserFullInfoDto(updatedAppUser);
+    }
+
+    @Override
+    public AppUserSettingsWithIdDto updateAppUserSettings(UpdateAppUserSettingsDto updateAppUserSettingsDto) {
+        Set<ConstraintViolation<UpdateAppUserSettingsDto>> violations = validator.validate(updateAppUserSettingsDto);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
+        UUID id = identityService.currentUserID();
+
+        AppUserSettings existingAppUserSettings = appUserModelById(id).getAppUserSettings();
+
+        existingAppUserSettings = appUserSettingsMapper.copyFromUpdateAppUserSettingsDtoToAppUserSettings(updateAppUserSettingsDto, existingAppUserSettings);
+
+        AppUserSettings updatedAppUserSettings = appUserSettingsRepository.save(existingAppUserSettings);
+        return appUserSettingsMapper.appUserSettingsToAppUserSettingsWithIdDto(updatedAppUserSettings);
+    }
+
+    @Override
+    public AppUserReceivedGroupInvitesDto appUserReceivedGroupInvites() {
+        AppUser currentAppUser = appUserModelById(identityService.currentUserID());
+
+        Set<GroupInvite> groupInvites = currentAppUser.getGroupInvitesReceived();
+        List<GroupInviteDto> groupInviteDtoList = groupInviteMapper.groupInviteSetToGroupInviteDtoList(groupInvites);
+
+        AppUserReceivedGroupInvitesDto appUserInvites = new AppUserReceivedGroupInvitesDto();
+        appUserInvites.setReceivedGroupInvites(groupInviteDtoList);
+        return appUserInvites;
     }
 }

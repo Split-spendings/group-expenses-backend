@@ -2,6 +2,7 @@ package com.splitspendings.groupexpensesbackend.service;
 
 import com.splitspendings.groupexpensesbackend.dto.appuser.*;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsWithIdDto;
+import com.splitspendings.groupexpensesbackend.dto.appusersettings.UpdateAppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.AppUserSettings;
 
@@ -30,5 +31,11 @@ public interface AppUserService {
 
     AppUserFullInfoWithSettingsDto createAppUser(NewAppUserDto newAppUserDto);
 
-    AppUserGroupsDto appUserGroups();
+    AppUserGroupsDto appUserActiveGroups();
+
+    AppUserFullInfoDto updateAppUserLoginName(UpdateLoginNameDto updateLoginNameDto);
+
+    AppUserSettingsWithIdDto updateAppUserSettings(UpdateAppUserSettingsDto updateAppUserSettingsDto);
+
+    AppUserReceivedGroupInvitesDto appUserReceivedGroupInvites();
 }

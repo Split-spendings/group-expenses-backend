@@ -46,6 +46,6 @@ public class GroupMembership {
     @JoinColumn(name = "app_user_id", foreignKey = @ForeignKey(name = "fk_membership_user"))
     private AppUser appUser;
 
-    @OneToMany(mappedBy = "groupMembership")
-    private Set<GroupInvitation> invitationsSent;
+    @OneToMany(mappedBy = "invitedByGroupMembership")
+    private Set<GroupInvite> invitesSent;
 }

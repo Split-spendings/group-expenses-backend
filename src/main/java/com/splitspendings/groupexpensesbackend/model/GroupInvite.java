@@ -8,13 +8,13 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "group_invitation",
+@Table(name = "group_invite",
         uniqueConstraints = {@UniqueConstraint(
-                name = "unique_group_invitation_invited_user_invited_by",
+                name = "unique_group_invite_invited_user_invited_by",
                 columnNames = {"invited_app_user_id", "invited_by_group_membership_id"})})
 @Getter
 @Setter
-public class GroupInvitation {
+public class GroupInvite {
 
     public static final int MESSAGE_MAX_LENGTH = 320;
 
@@ -29,10 +29,10 @@ public class GroupInvitation {
     private ZonedDateTime timeCreated = ZonedDateTime.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name="invited_app_user_id", foreignKey = @ForeignKey(name = "fk_group_invitation_invited_user"))
+    @JoinColumn(name="invited_app_user_id", foreignKey = @ForeignKey(name = "fk_group_invite_invited_user"))
     private AppUser invitedAppUser;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name="invited_by_group_membership_id", foreignKey = @ForeignKey(name = "fk_group_invitation_invited_by"))
-    private GroupMembership groupMembership;
+    @JoinColumn(name="invited_by_group_membership_id", foreignKey = @ForeignKey(name = "fk_group_invite_invited_by"))
+    private GroupMembership invitedByGroupMembership;
 }

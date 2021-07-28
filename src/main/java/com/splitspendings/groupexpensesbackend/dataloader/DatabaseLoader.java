@@ -1,15 +1,10 @@
 package com.splitspendings.groupexpensesbackend.dataloader;
 
 import com.splitspendings.groupexpensesbackend.dataloader.factory.AppUserFactory;
-import com.splitspendings.groupexpensesbackend.model.AppUser;
-import com.splitspendings.groupexpensesbackend.model.AppUserSettings;
-import com.splitspendings.groupexpensesbackend.model.Group;
-import com.splitspendings.groupexpensesbackend.model.GroupMembership;
+import com.splitspendings.groupexpensesbackend.dataloader.factory.GroupFactory;
+import com.splitspendings.groupexpensesbackend.model.*;
 import com.splitspendings.groupexpensesbackend.model.enums.*;
-import com.splitspendings.groupexpensesbackend.repository.AppUserRepository;
-import com.splitspendings.groupexpensesbackend.repository.AppUserSettingsRepository;
-import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
-import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
+import com.splitspendings.groupexpensesbackend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -31,11 +26,13 @@ public class DatabaseLoader implements CommandLineRunner {
     private static final String ADMINS_PATH = "gitignored/test_admin_IDs.txt";
 
     private final AppUserFactory appUserFactory;
+    private final GroupFactory groupFactory;
 
     private final AppUserRepository appUserRepository;
     private final AppUserSettingsRepository appUserSettingsRepository;
     private final GroupRepository groupRepository;
     private final GroupMembershipRepository groupMembershipRepository;
+    private final GroupInviteRepository groupInviteRepository;
 
     private Map<String, UUID> loadAppUserIds(String path) {
         Map<String, UUID> idMap = new HashMap<>();
@@ -68,10 +65,12 @@ public class DatabaseLoader implements CommandLineRunner {
 
         AppUser appUser1 = appUserFactory.generate();
         AppUser appUser2 = appUserFactory.generate();
+        AppUser appUser3 = appUserFactory.generate();
         AppUser adminAppUser1 = appUserFactory.generate();
 
         appUser1.setId(usersIdMap.get(ID + 1));
         appUser2.setId(usersIdMap.get(ID + 2));
+        appUser3.setId(usersIdMap.get(ID + 3));
         adminAppUser1.setId(adminsIdMap.get(ID + 1));
 
 
@@ -91,6 +90,14 @@ public class DatabaseLoader implements CommandLineRunner {
         appUserSettings2.setGroupInviteOption(GroupInviteOption.NOBODY);
         appUserSettings2.setNotificationOption(NotificationOption.NONE);
 
+        AppUserSettings appUserSettings3 = new AppUserSettings();
+        appUserSettings3.setAppUser(appUser3);
+        appUserSettings3.setDefaultCurrency(Currency.USD);
+        appUserSettings3.setLanguage(Language.EN);
+        appUserSettings3.setTheme(Theme.LIGHT);
+        appUserSettings3.setGroupInviteOption(GroupInviteOption.ANYONE);
+        appUserSettings3.setNotificationOption(NotificationOption.NONE);
+
         AppUserSettings adminAppUserSettings1 = new AppUserSettings();
         adminAppUserSettings1.setAppUser(adminAppUser1);
         adminAppUserSettings1.setDefaultCurrency(Currency.PLN);
@@ -101,23 +108,28 @@ public class DatabaseLoader implements CommandLineRunner {
 
         appUserSettingsRepository.save(appUserSettings1);
         appUserSettingsRepository.save(appUserSettings2);
+        appUserSettingsRepository.save(appUserSettings3);
         appUserSettingsRepository.save(adminAppUserSettings1);
 
 
-        Group group1 = new Group();
-        group1.setName("group_1");
+        Group group1 = groupFactory.generate();
         group1.setOwner(appUser1);
         group1.setPersonal(false);
         group1.setInviteOption(InviteOption.ALL_ACTIVE_MEMBERS);
 
-        Group group2 = new Group();
-        group2.setName("group_2");
+        Group group2 = groupFactory.generate();
         group2.setOwner(appUser2);
         group2.setPersonal(true);
         group2.setInviteOption(InviteOption.OWNER_ONLY);
 
+        Group group3 = groupFactory.generate();
+        group3.setOwner(appUser3);
+        group3.setPersonal(false);
+        group3.setInviteOption(InviteOption.OWNER_ONLY);
+
         groupRepository.save(group1);
         groupRepository.save(group2);
+        groupRepository.save(group3);
 
 
         GroupMembership groupMembership1 = new GroupMembership();
@@ -137,7 +149,71 @@ public class DatabaseLoader implements CommandLineRunner {
         groupMembership2.setLastTimeJoined(groupMembership2.getFirstTimeJoined());
         groupMembership2.setLastTimeLeft(groupMembership2.getFirstTimeJoined().plusWeeks(1));
 
+        GroupMembership groupMembership3 = new GroupMembership();
+        groupMembership3.setGroup(group3);
+        groupMembership3.setAppUser(appUser3);
+        groupMembership3.setActive(true);
+        groupMembership3.setHasAdminRights(true);
+        groupMembership3.setFirstTimeJoined(groupMembership1.getTimeCreated());
+        groupMembership3.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
+
+        GroupMembership groupMembership4 = new GroupMembership();
+        groupMembership4.setGroup(group3);
+        groupMembership4.setAppUser(appUser1);
+        groupMembership4.setActive(false);
+        groupMembership4.setHasAdminRights(false);
+        groupMembership4.setFirstTimeJoined(groupMembership1.getTimeCreated());
+        groupMembership4.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
+
+        GroupMembership groupMembership5 = new GroupMembership();
+        groupMembership5.setGroup(group3);
+        groupMembership5.setAppUser(appUser2);
+        groupMembership5.setActive(true);
+        groupMembership5.setHasAdminRights(false);
+        groupMembership5.setFirstTimeJoined(groupMembership1.getTimeCreated());
+        groupMembership5.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
+
+        GroupMembership groupMembership6 = new GroupMembership();
+        groupMembership6.setGroup(group1);
+        groupMembership6.setAppUser(appUser3);
+        groupMembership6.setActive(true);
+        groupMembership6.setHasAdminRights(false);
+        groupMembership6.setFirstTimeJoined(groupMembership1.getTimeCreated());
+        groupMembership6.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
+
         groupMembershipRepository.save(groupMembership1);
         groupMembershipRepository.save(groupMembership2);
+        groupMembershipRepository.save(groupMembership3);
+        groupMembershipRepository.save(groupMembership4);
+        groupMembershipRepository.save(groupMembership5);
+        groupMembershipRepository.save(groupMembership6);
+
+
+        GroupInvite groupInvite1 = new GroupInvite();
+        groupInvite1.setMessage("hello");
+        groupInvite1.setInvitedAppUser(appUser2);
+        groupInvite1.setInvitedByGroupMembership(groupMembership1);
+
+        GroupInvite groupInvite2 = new GroupInvite();
+        groupInvite2.setInvitedAppUser(appUser1);
+        groupInvite2.setInvitedByGroupMembership(groupMembership2);
+
+        GroupInvite groupInvite3 = new GroupInvite();
+        groupInvite3.setInvitedAppUser(appUser1);
+        groupInvite3.setInvitedByGroupMembership(groupMembership3);
+
+        GroupInvite groupInvite4 = new GroupInvite();
+        groupInvite4.setInvitedAppUser(appUser2);
+        groupInvite4.setInvitedByGroupMembership(groupMembership3);
+
+        GroupInvite groupInvite5 = new GroupInvite();
+        groupInvite5.setInvitedAppUser(appUser2);
+        groupInvite5.setInvitedByGroupMembership(groupMembership6);
+
+        groupInviteRepository.save(groupInvite1);
+        groupInviteRepository.save(groupInvite2);
+        groupInviteRepository.save(groupInvite3);
+        groupInviteRepository.save(groupInvite4);
+        groupInviteRepository.save(groupInvite5);
     }
 }

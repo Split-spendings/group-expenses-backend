@@ -1,8 +1,17 @@
 package com.splitspendings.groupexpensesbackend.service;
 
+import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
+import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteAcceptedDto;
+import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
+import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
+import com.splitspendings.groupexpensesbackend.dto.groupmembership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.model.Group;
+import com.splitspendings.groupexpensesbackend.model.GroupInvite;
+
+import java.util.UUID;
 
 public interface GroupService {
 
@@ -11,4 +20,20 @@ public interface GroupService {
     GroupInfoDto groupInfoById(Long id);
 
     GroupInfoDto createGroup(NewGroupDto newGroupDto);
+
+    GroupInfoDto updateGroupInfo(Long id, UpdateGroupInfoDto updateGroupInfoDto);
+
+    GroupActiveMembersDto groupActiveMembersById(Long id);
+
+    GroupMembershipDto groupMembership(Long id, UUID appUserId);
+
+    GroupInviteDto createGroupInvite(NewGroupInviteDto newGroupInviteDto);
+
+    GroupInvite groupInviteModelById(Long inviteId);
+
+    GroupInviteAcceptedDto acceptGroupInvite(Long inviteId);
+
+    void declineGroupInvite(Long id);
+
+    void leaveGroup(Long id);
 }
