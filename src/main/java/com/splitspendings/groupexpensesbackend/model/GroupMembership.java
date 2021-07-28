@@ -48,4 +48,8 @@ public class GroupMembership {
 
     @OneToMany(mappedBy = "invitedByGroupMembership")
     private Set<GroupInvite> invitesSent;
+
+    @OneToMany(mappedBy = "groupMembership")
+    private Set<Spending> spendings;
+
 }
