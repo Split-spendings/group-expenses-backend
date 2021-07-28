@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -28,11 +29,11 @@ public class DatabaseLoader implements CommandLineRunner {
     private final AppUserFactory appUserFactory;
     private final GroupFactory groupFactory;
 
-    private final AppUserRepository appUserRepository;
     private final AppUserSettingsRepository appUserSettingsRepository;
     private final GroupRepository groupRepository;
     private final GroupMembershipRepository groupMembershipRepository;
     private final GroupInviteRepository groupInviteRepository;
+    private final SpendingRepository spendingRepository;
 
     private Map<String, UUID> loadAppUserIds(String path) {
         Map<String, UUID> idMap = new HashMap<>();
@@ -215,5 +216,13 @@ public class DatabaseLoader implements CommandLineRunner {
         groupInviteRepository.save(groupInvite3);
         groupInviteRepository.save(groupInvite4);
         groupInviteRepository.save(groupInvite5);
+
+        var spending1 = new Spending();
+        spending1.setGroupMembership(groupMembership1);
+        spending1.setCurrency(Currency.EUR);
+        spending1.setExchangeRate(new BigDecimal("31.02"));
+        spending1.setTotalSpending(new BigDecimal("123.50"));
+        spending1.setTitle("Dummy spenging1");
+        spendingRepository.save(spending1);
     }
 }
