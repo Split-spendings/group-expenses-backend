@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "item_category")
@@ -31,4 +32,7 @@ public class ItemCategory {
 
     @Column(name = "visible", nullable = false)
     private Boolean visible = true;
+
+    @OneToMany(mappedBy = "itemCategory")
+    private Set<Item> items;
 }

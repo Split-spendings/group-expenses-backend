@@ -51,4 +51,7 @@ public class Spending {
 
     @OneToMany(mappedBy = "spending")
     private Set<SpendingComment> comments;
+
+    @OneToMany(mappedBy = "spending")
+    private Set<Item> items;
 }
