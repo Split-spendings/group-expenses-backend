@@ -75,6 +75,9 @@ public class AppUser {
     @OneToMany(mappedBy = "appUser")
     private Set<SpendingComment> commentsLeft;
 
+    @OneToMany(mappedBy = "createdBy")
+    private Set<ItemCategory> createdCategories;
+
     @OneToOne(mappedBy = "appUser")
     private AppUserSettings appUserSettings;
 }
