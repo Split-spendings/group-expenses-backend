@@ -35,7 +35,7 @@ public class DatabaseLoader implements CommandLineRunner {
     private final GroupInviteRepository groupInviteRepository;
     private final SpendingRepository spendingRepository;
     private final SpendingCommentRepository spendingCommentRepository;
-
+    private final ItemCategoryRepository itemCategoryRepository;
 
     private Map<String, UUID> loadAppUserIds(String path) {
         Map<String, UUID> idMap = new HashMap<>();
@@ -219,7 +219,7 @@ public class DatabaseLoader implements CommandLineRunner {
         groupInviteRepository.save(groupInvite4);
         groupInviteRepository.save(groupInvite5);
 
-        var spending1 = new Spending();
+        Spending spending1 = new Spending();
         spending1.setGroupMembership(groupMembership1);
         spending1.setCurrency(Currency.EUR);
         spending1.setExchangeRate(new BigDecimal("31.02"));
@@ -227,10 +227,21 @@ public class DatabaseLoader implements CommandLineRunner {
         spending1.setTitle("Dummy spending1");
         spendingRepository.save(spending1);
 
-        var spendingComment1 = new SpendingComment();
+        SpendingComment spendingComment1 = new SpendingComment();
         spendingComment1.setSpending(spending1);
         spendingComment1.setMessage("Dummy comment 1");
         spendingComment1.setAppUser(appUser1);
         spendingCommentRepository.save(spendingComment1);
+
+        ItemCategory itemCategory1 = new ItemCategory();
+        itemCategory1.setGroup(group1);
+        itemCategory1.setTitle("Dummy category 1");
+        itemCategory1.setCreatedBy(appUser1);
+
+        ItemCategory itemCategory2 = new ItemCategory();
+        itemCategory2.setTitle("Default category 1");
+
+        itemCategoryRepository.save(itemCategory1);
+        itemCategoryRepository.save(itemCategory2);
     }
 }
