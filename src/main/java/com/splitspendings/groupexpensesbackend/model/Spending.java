@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "spending")
@@ -47,4 +48,7 @@ public class Spending {
 
     @Column(name = "time_payed")
     private ZonedDateTime timePayed = ZonedDateTime.now();
+
+    @OneToMany(mappedBy = "spending")
+    private Set<SpendingComment> comments;
 }
