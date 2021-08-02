@@ -36,6 +36,7 @@ public class DatabaseLoader implements CommandLineRunner {
     private final SpendingRepository spendingRepository;
     private final SpendingCommentRepository spendingCommentRepository;
     private final ItemCategoryRepository itemCategoryRepository;
+    private final ItemRepository itemRepository;
 
     private Map<String, UUID> loadAppUserIds(String path) {
         Map<String, UUID> idMap = new HashMap<>();
@@ -243,5 +244,13 @@ public class DatabaseLoader implements CommandLineRunner {
 
         itemCategoryRepository.save(itemCategory1);
         itemCategoryRepository.save(itemCategory2);
+
+        Item item1 = new Item();
+        item1.setItemCategory(itemCategory1);
+        item1.setSpending(spending1);
+        item1.setMessage("Dummy item 1");
+        item1.setPrice(new BigDecimal("30.50"));
+
+        itemRepository.save(item1);
     }
 }
