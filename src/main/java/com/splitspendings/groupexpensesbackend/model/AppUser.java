@@ -72,6 +72,9 @@ public class AppUser {
     @OneToMany(mappedBy = "invitedAppUser")
     private Set<GroupInvite> groupInvitesReceived;
 
+    @OneToMany(mappedBy = "appUser")
+    private Set<SpendingComment> commentsLeft;
+
     @OneToOne(mappedBy = "appUser")
     private AppUserSettings appUserSettings;
 }
