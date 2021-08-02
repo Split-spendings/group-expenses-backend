@@ -34,6 +34,8 @@ public class DatabaseLoader implements CommandLineRunner {
     private final GroupMembershipRepository groupMembershipRepository;
     private final GroupInviteRepository groupInviteRepository;
     private final SpendingRepository spendingRepository;
+    private final SpendingCommentRepository spendingCommentRepository;
+
 
     private Map<String, UUID> loadAppUserIds(String path) {
         Map<String, UUID> idMap = new HashMap<>();
@@ -222,7 +224,13 @@ public class DatabaseLoader implements CommandLineRunner {
         spending1.setCurrency(Currency.EUR);
         spending1.setExchangeRate(new BigDecimal("31.02"));
         spending1.setTotalSpending(new BigDecimal("123.50"));
-        spending1.setTitle("Dummy spenging1");
+        spending1.setTitle("Dummy spending1");
         spendingRepository.save(spending1);
+
+        var spendingComment1 = new SpendingComment();
+        spendingComment1.setSpending(spending1);
+        spendingComment1.setMessage("Dummy comment 1");
+        spendingComment1.setAppUser(appUser1);
+        spendingCommentRepository.save(spendingComment1);
     }
 }
