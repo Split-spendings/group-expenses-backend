@@ -1,8 +1,8 @@
 package com.splitspendings.groupexpensesbackend.model;
 
-import com.splitspendings.groupexpensesbackend.model.enums.HistoryOption;
+import com.splitspendings.groupexpensesbackend.model.enums.GroupTheme;
 import com.splitspendings.groupexpensesbackend.model.enums.NotificationCategory;
-import com.splitspendings.groupexpensesbackend.model.enums.ThemeOption;
+import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class GroupMembershipSettings {
+
     @Id
     private Long id;
 
@@ -22,21 +23,20 @@ public class GroupMembershipSettings {
     @JoinColumn(name = "group_membership_id", foreignKey = @ForeignKey(name = "fk_group_membership_settings"))
     private GroupMembership groupMembership;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "group_theme", nullable = false, length = GroupTheme.MAX_LENGTH)
+    private GroupTheme groupTheme;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "notification_option", nullable = false, length = NotificationOption.MAX_LENGTH)
+    private NotificationOption notificationOption;
+
     @ElementCollection
     @CollectionTable(
-            name = "group_notification_category",
+            name = "group_membership_notification_category",
             joinColumns = @JoinColumn(name = "group_membership_id"),
-            foreignKey = @ForeignKey(name = "fk_notification_category_group"))
+            foreignKey = @ForeignKey(name = "fk_notification_category_group_membership"))
     @Enumerated(EnumType.STRING)
     @Column(name = "notification_category", length = NotificationCategory.MAX_LENGTH)
     private Set<NotificationCategory> notificationCategories;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "history_option", nullable = false, length = HistoryOption.MAX_LENGTH)
-    private HistoryOption historyOption;
-
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "theme_option", nullable = false, length = ThemeOption.MAX_LENGTH)
-    private ThemeOption themeOption;
 }

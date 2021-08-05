@@ -11,34 +11,22 @@ import java.util.Set;
 
 @Entity
 @Table(name = "spending")
-
 @Getter
 @Setter
 public class Spending {
 
     public static final int TITLE_MIN_LENGTH = 1;
-    public static final int TITLE_MAX_LENGTH = 50;
+    public static final int TITLE_MAX_LENGTH = 100;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "group_membership_id", foreignKey = @ForeignKey(name = "fk_spending_membership"))
-    private GroupMembership groupMembership;
-
     @Column(name = "title", nullable = false, length = TITLE_MAX_LENGTH)
     private String title;
 
-    @Column(name = "total", nullable = false)
-    private BigDecimal totalSpending;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "currency_code", nullable = false, length = Currency.MAX_LENGTH)
-    private Currency currency;
-
-    @Column(name = "exchange_rate")
-    private BigDecimal exchangeRate;
+    @Column(name = "total_amount", nullable = false)
+    private BigDecimal totalAmount;
 
     @Column(name = "receipt_photo")
     private byte[] receiptPhoto;
@@ -48,6 +36,14 @@ public class Spending {
 
     @Column(name = "time_payed")
     private ZonedDateTime timePayed = ZonedDateTime.now();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "currency_code", nullable = false, length = Currency.MAX_LENGTH)
+    private Currency currency;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "added_by_group_membership_id", foreignKey = @ForeignKey(name = "fk_spending_added_by_membership"))
+    private GroupMembership addedByGroupMembership;
 
     @OneToMany(mappedBy = "spending")
     private Set<SpendingComment> comments;

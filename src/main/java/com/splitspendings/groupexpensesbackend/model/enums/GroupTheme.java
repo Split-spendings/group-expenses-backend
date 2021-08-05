@@ -1,6 +1,8 @@
 package com.splitspendings.groupexpensesbackend.model.enums;
 
-public enum ThemeOption {
+public enum GroupTheme {
+
     DEFAULT;
-    public static final int MAX_LENGTH = 10;
+
+    public static final int MAX_LENGTH = 7;
 }

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -38,6 +39,7 @@ public class DatabaseLoader implements CommandLineRunner {
     private final ItemCategoryRepository itemCategoryRepository;
     private final ItemRepository itemRepository;
     private final ShareRepository shareRepository;
+    private final GroupMembershipSettingsRepository groupMembershipSettingsRepository;
 
     private Map<String, UUID> loadAppUserIds(String path) {
         Map<String, UUID> idMap = new HashMap<>();
@@ -109,7 +111,8 @@ public class DatabaseLoader implements CommandLineRunner {
         adminAppUserSettings1.setLanguage(Language.PL);
         adminAppUserSettings1.setTheme(Theme.DARK);
         adminAppUserSettings1.setGroupInviteOption(GroupInviteOption.ANYONE);
-        adminAppUserSettings1.setNotificationOption(NotificationOption.ALL);
+        adminAppUserSettings1.setNotificationOption(NotificationOption.SELECTED);
+        adminAppUserSettings1.setNotificationCategories(Set.of(NotificationCategory.NEW_COMMENT, NotificationCategory.NEW_SPENDING));
 
         appUserSettingsRepository.save(appUserSettings1);
         appUserSettingsRepository.save(appUserSettings2);
@@ -194,6 +197,46 @@ public class DatabaseLoader implements CommandLineRunner {
         groupMembershipRepository.save(groupMembership6);
 
 
+        GroupMembershipSettings groupMembershipSettings1 = new GroupMembershipSettings();
+        groupMembershipSettings1.setGroupMembership(groupMembership1);
+        groupMembershipSettings1.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings1.setNotificationOption(NotificationOption.SELECTED);
+        groupMembershipSettings1.setNotificationCategories(Set.of(NotificationCategory.NEW_SPENDING));
+
+        GroupMembershipSettings groupMembershipSettings2 = new GroupMembershipSettings();
+        groupMembershipSettings2.setGroupMembership(groupMembership2);
+        groupMembershipSettings2.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings2.setNotificationOption(NotificationOption.SELECTED);
+        groupMembershipSettings2.setNotificationCategories(Set.of(NotificationCategory.NEW_SPENDING));
+
+        GroupMembershipSettings groupMembershipSettings3 = new GroupMembershipSettings();
+        groupMembershipSettings3.setGroupMembership(groupMembership3);
+        groupMembershipSettings3.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings3.setNotificationOption(NotificationOption.ALL);
+
+        GroupMembershipSettings groupMembershipSettings4 = new GroupMembershipSettings();
+        groupMembershipSettings4.setGroupMembership(groupMembership4);
+        groupMembershipSettings4.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings4.setNotificationOption(NotificationOption.ALL);
+
+        GroupMembershipSettings groupMembershipSettings5 = new GroupMembershipSettings();
+        groupMembershipSettings5.setGroupMembership(groupMembership5);
+        groupMembershipSettings5.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings5.setNotificationOption(NotificationOption.ALL);
+
+        GroupMembershipSettings groupMembershipSettings6 = new GroupMembershipSettings();
+        groupMembershipSettings6.setGroupMembership(groupMembership6);
+        groupMembershipSettings6.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings6.setNotificationOption(NotificationOption.ALL);
+
+        groupMembershipSettingsRepository.save(groupMembershipSettings1);
+        groupMembershipSettingsRepository.save(groupMembershipSettings2);
+        groupMembershipSettingsRepository.save(groupMembershipSettings3);
+        groupMembershipSettingsRepository.save(groupMembershipSettings4);
+        groupMembershipSettingsRepository.save(groupMembershipSettings5);
+        groupMembershipSettingsRepository.save(groupMembershipSettings6);
+
+
         GroupInvite groupInvite1 = new GroupInvite();
         groupInvite1.setMessage("hello");
         groupInvite1.setInvitedAppUser(appUser2);
@@ -221,24 +264,29 @@ public class DatabaseLoader implements CommandLineRunner {
         groupInviteRepository.save(groupInvite4);
         groupInviteRepository.save(groupInvite5);
 
+
         Spending spending1 = new Spending();
-        spending1.setGroupMembership(groupMembership1);
+        spending1.setAddedByGroupMembership(groupMembership1);
         spending1.setCurrency(Currency.EUR);
-        spending1.setExchangeRate(new BigDecimal("31.02"));
-        spending1.setTotalSpending(new BigDecimal("123.50"));
+        spending1.setTotalAmount(new BigDecimal("123.50"));
         spending1.setTitle("Dummy spending1");
+
         spendingRepository.save(spending1);
+
 
         SpendingComment spendingComment1 = new SpendingComment();
         spendingComment1.setSpending(spending1);
         spendingComment1.setMessage("Dummy comment 1");
-        spendingComment1.setAppUser(appUser1);
+        spendingComment1.setAddedByAppUser(appUser1);
+
         spendingCommentRepository.save(spendingComment1);
+
 
         ItemCategory itemCategory1 = new ItemCategory();
         itemCategory1.setGroup(group1);
         itemCategory1.setTitle("Dummy category 1");
-        itemCategory1.setCreatedBy(appUser1);
+        itemCategory1.setCreatedByAppUser(appUser1);
+
 
         ItemCategory itemCategory2 = new ItemCategory();
         itemCategory2.setTitle("Default category 1");
@@ -246,19 +294,21 @@ public class DatabaseLoader implements CommandLineRunner {
         itemCategoryRepository.save(itemCategory1);
         itemCategoryRepository.save(itemCategory2);
 
+
         Item item1 = new Item();
         item1.setItemCategory(itemCategory1);
         item1.setSpending(spending1);
-        item1.setMessage("Dummy item 1");
+        item1.setTitle("Dummy item 1");
         item1.setPrice(new BigDecimal("30.50"));
 
         itemRepository.save(item1);
 
+
         Share share1 = new Share();
         share1.setAmount(new BigDecimal("20.02"));
         share1.setItem(item1);
-        share1.setPaidBy(appUser1);
-        share1.setPaidFor(appUser2);
+        share1.setPaidByAppUser(appUser1);
+        share1.setPaidForAppUser(appUser2);
 
         shareRepository.save(share1);
     }
