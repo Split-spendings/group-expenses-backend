@@ -46,4 +46,7 @@ public class Group {
 
     @OneToMany(mappedBy = "group")
     private Set<GroupMembership> groupMemberships;
+
+    @OneToMany(mappedBy = "group")
+    private Set<ItemCategory> createdCategories;
 }

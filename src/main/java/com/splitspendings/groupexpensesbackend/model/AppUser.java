@@ -72,6 +72,18 @@ public class AppUser {
     @OneToMany(mappedBy = "invitedAppUser")
     private Set<GroupInvite> groupInvitesReceived;
 
+    @OneToMany(mappedBy = "addedByAppUser")
+    private Set<SpendingComment> commentsLeft;
+
+    @OneToMany(mappedBy = "createdByAppUser")
+    private Set<ItemCategory> createdItemCategories;
+
+    @OneToMany(mappedBy = "paidByAppUser")
+    private Set<Share> paidShares;
+
+    @OneToMany(mappedBy = "paidForAppUser")
+    private Set<Share> debtShares;
+
     @OneToOne(mappedBy = "appUser")
     private AppUserSettings appUserSettings;
 }
