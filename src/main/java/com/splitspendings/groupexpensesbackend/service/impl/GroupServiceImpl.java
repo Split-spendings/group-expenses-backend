@@ -220,6 +220,7 @@ public class GroupServiceImpl implements GroupService {
             groupMembership = groupMembershipOptional.get();
             groupMembership.setActive(true);
             groupMembership.setLastTimeJoined(ZonedDateTime.now());
+            groupMembershipRepository.save(groupMembership);
         } else if(groupMembershipOptional.isEmpty()){
             groupMembership = new GroupMembership();
             groupMembership.setAppUser(invitedAppUser);
@@ -228,11 +229,11 @@ public class GroupServiceImpl implements GroupService {
             groupMembership.setHasAdminRights(false);
             groupMembership.setFirstTimeJoined(ZonedDateTime.now());
             groupMembership.setLastTimeJoined(ZonedDateTime.now());
+            groupMembershipRepository.save(groupMembership);
+            groupMembershipService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(groupMembership);
         } else {
             throw new InvalidGroupInviteException(HttpStatus.BAD_REQUEST, "Invited user is already an active member of a group");
         }
-
-        groupMembershipRepository.save(groupMembership);
 
         GroupInviteAcceptedDto groupInviteAcceptedDto = new GroupInviteAcceptedDto();
         groupInviteAcceptedDto.setGroupMembership(groupMembershipMapper.groupMembershipToGroupMembershipDto(groupMembership));
