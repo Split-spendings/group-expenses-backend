@@ -287,7 +287,6 @@ public class DatabaseLoader implements CommandLineRunner {
         itemCategory1.setTitle("Dummy category 1");
         itemCategory1.setCreatedByAppUser(appUser1);
 
-
         ItemCategory itemCategory2 = new ItemCategory();
         itemCategory2.setTitle("Default category 1");
 

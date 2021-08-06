@@ -1,7 +1,11 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
+import com.splitspendings.groupexpensesbackend.model.GroupMembershipSettings;
+import com.splitspendings.groupexpensesbackend.model.enums.GroupTheme;
+import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
+import com.splitspendings.groupexpensesbackend.repository.GroupMembershipSettingsRepository;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +25,7 @@ import java.util.UUID;
 public class GroupMembershipServiceImpl implements GroupMembershipService {
 
     private final GroupMembershipRepository groupMembershipRepository;
+    private final GroupMembershipSettingsRepository groupMembershipSettingsRepository;
 
     private final IdentityService identityService;
 
@@ -51,5 +56,20 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
         if(!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current user is not an active member of a group");
         }
+    }
+
+    @Override
+    public GroupMembershipSettings createDefaultGroupMembershipSettings() {
+        GroupMembershipSettings groupMembershipSettings = new GroupMembershipSettings();
+        groupMembershipSettings.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings.setNotificationOption(NotificationOption.ALL);
+        return groupMembershipSettings;
+    }
+
+    @Override
+    public GroupMembershipSettings createAndSaveDefaultGroupMembershipSettingsForGroupMembership(GroupMembership groupMembership) {
+        GroupMembershipSettings defaultGroupMembershipSettings = createDefaultGroupMembershipSettings();
+        defaultGroupMembershipSettings.setGroupMembership(groupMembership);
+        return groupMembershipSettingsRepository.save(defaultGroupMembershipSettings);
     }
 }

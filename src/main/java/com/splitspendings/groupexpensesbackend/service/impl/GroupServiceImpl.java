@@ -101,7 +101,9 @@ public class GroupServiceImpl implements GroupService {
         groupMembership.setFirstTimeJoined(groupMembership.getTimeCreated());
         groupMembership.setLastTimeJoined(groupMembership.getTimeCreated());
 
-        groupMembershipRepository.save(groupMembership);
+        GroupMembership createdGroupMembership = groupMembershipRepository.save(groupMembership);
+
+        groupMembershipService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(createdGroupMembership);
 
         return groupMapper.groupToGroupInfoDto(createdGroup);
     }
