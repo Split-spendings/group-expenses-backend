@@ -49,4 +49,7 @@ public class Group {
 
     @OneToMany(mappedBy = "group")
     private Set<ItemCategory> createdCategories;
+
+    @OneToMany(mappedBy = "group")
+    private Set<SpendingLimit> spendingLimits;
 }
