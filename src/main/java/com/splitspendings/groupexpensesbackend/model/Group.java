@@ -13,7 +13,6 @@ import java.util.Set;
 @Getter
 @Setter
 public class Group {
-
     public static final int NAME_MIN_LENGTH = 1;
     public static final int NAME_MAX_LENGTH = 100;
 
@@ -49,4 +48,13 @@ public class Group {
 
     @OneToMany(mappedBy = "group")
     private Set<ItemCategory> createdCategories;
+
+    @OneToMany(mappedBy = "group")
+    private Set<SpendingLimit> spendingLimits;
+
+    @OneToMany(mappedBy = "group")
+    private Set<UserBalance> userBalances;
+
+    @OneToMany(mappedBy = "group")
+    private Set<Payoff> payoffs;
 }
