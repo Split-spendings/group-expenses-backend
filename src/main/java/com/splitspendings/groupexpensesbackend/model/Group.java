@@ -52,4 +52,7 @@ public class Group {
 
     @OneToMany(mappedBy = "group")
     private Set<SpendingLimit> spendingLimits;
+
+    @OneToMany(mappedBy = "group")
+    private Set<UserBalance> userBalances;
 }

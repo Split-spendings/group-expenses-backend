@@ -86,5 +86,8 @@ public class AppUser {
 
     @OneToOne(mappedBy = "appUser")
     private AppUserSettings appUserSettings;
+
+    @OneToMany(mappedBy = "appUser")
+    private Set<UserBalance> isOwed;
 }
 
