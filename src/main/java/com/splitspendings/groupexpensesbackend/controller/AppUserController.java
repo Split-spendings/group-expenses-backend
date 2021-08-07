@@ -50,17 +50,17 @@ public class AppUserController {
         return appUserService.appUserActiveGroups();
     }
 
-    @PatchMapping("login-name")
+    @PatchMapping("/login-name")
     public AppUserFullInfoDto updateAppUserLoginName(@RequestBody UpdateLoginNameDto updateLoginNameDto) {
         return appUserService.updateAppUserLoginName(updateLoginNameDto);
     }
 
-    @PatchMapping("settings")
+    @PatchMapping("/settings")
     public AppUserSettingsWithIdDto updateAppUserSettings(@RequestBody UpdateAppUserSettingsDto updateAppUserSettingsDto) {
         return appUserService.updateAppUserSettings(updateAppUserSettingsDto);
     }
 
-    @GetMapping("invites")
+    @GetMapping("/invites")
     public AppUserReceivedGroupInvitesDto appUserReceivedGroupInvites() {
         return appUserService.appUserReceivedGroupInvites();
     }

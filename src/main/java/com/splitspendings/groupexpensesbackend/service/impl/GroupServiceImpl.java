@@ -1,26 +1,19 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
-import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
-import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
-import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
-import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.group.*;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteAcceptedDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupmembership.GroupMembershipDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.SpendingShortDto;
 import com.splitspendings.groupexpensesbackend.exception.InvalidGroupInviteException;
-import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
-import com.splitspendings.groupexpensesbackend.mapper.GroupInviteMapper;
-import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
-import com.splitspendings.groupexpensesbackend.mapper.GroupMembershipMapper;
-import com.splitspendings.groupexpensesbackend.model.AppUser;
-import com.splitspendings.groupexpensesbackend.model.Group;
-import com.splitspendings.groupexpensesbackend.model.GroupInvite;
-import com.splitspendings.groupexpensesbackend.model.GroupMembership;
+import com.splitspendings.groupexpensesbackend.mapper.*;
+import com.splitspendings.groupexpensesbackend.model.*;
 import com.splitspendings.groupexpensesbackend.repository.GroupInviteRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
+import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
@@ -52,11 +45,13 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final GroupMembershipRepository groupMembershipRepository;
     private final GroupInviteRepository groupInviteRepository;
+    private final SpendingRepository spendingRepository;
 
     private final GroupMapper groupMapper;
     private final AppUserMapper appUserMapper;
     private final GroupMembershipMapper groupMembershipMapper;
     private final GroupInviteMapper groupInviteMapper;
+    private final SpendingMapper spendingMapper;
 
     private final IdentityService identityService;
     private final AppUserService appUserService;
@@ -257,5 +252,20 @@ public class GroupServiceImpl implements GroupService {
         groupMembership.setActive(false);
         groupMembership.setLastTimeLeft(ZonedDateTime.now());
         groupMembershipRepository.save(groupMembership);
+    }
+
+    @Override
+    public GroupSpendingsDto groupSpendings(Long id) {
+        groupMembershipService.verifyCurrentUserActiveMembership(id);
+
+        Group group = groupModelById(id);
+
+        List<Spending> spendingList = spendingRepository.findAllByAddedByGroupMembershipGroup(group);
+
+        List<SpendingShortDto> spendingShortDtoList = spendingMapper.groupSpendingListToSpendingShortDtoList(spendingList);
+
+        GroupSpendingsDto groupSpendingsDto = groupMapper.groupToGroupSpendingsDto(group);
+        groupSpendingsDto.setSpendings(spendingShortDtoList);
+        return groupSpendingsDto;
     }
 }
