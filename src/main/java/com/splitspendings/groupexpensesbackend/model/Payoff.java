@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 public class Payoff {
+
     public static final int TITLE_MIN_LENGTH = 1;
     public static final int TITLE_MAX_LENGTH = 100;
 
@@ -20,35 +21,35 @@ public class Payoff {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "group_id", foreignKey = @ForeignKey(name = "fk_payoff_group"))
-    private Group group;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "added_by_app_user_id", foreignKey = @ForeignKey(name = "fk_payoff_app_user1"))
-    private AppUser addedBy;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "paid_from_app_user_id", foreignKey = @ForeignKey(name = "fk_payoff_app_user2"))
-    private AppUser paidFrom;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "paid_to_app_user_id", foreignKey = @ForeignKey(name = "fk_payoff_app_user3"))
-    private AppUser paidTo;
-
     @Column(name = "title", nullable = false, length = TITLE_MAX_LENGTH)
     private String title;
+
+    @Column(name = "amount", nullable = false)
+    private BigDecimal amount;
+
+    @Column(name = "time_created", nullable = false)
+    private ZonedDateTime timeCreated = ZonedDateTime.now();
+
+    @Column(name = "receipt_photo")
+    private byte[] receiptPhoto;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "currency_code", nullable = false, length = Currency.MAX_LENGTH)
     private Currency currency;
 
-    @Column(name = "total_amount", nullable = false)
-    private BigDecimal totalAmount;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "group_id", foreignKey = @ForeignKey(name = "fk_payoff_group"))
+    private Group group;
 
-    @Column(name = "time_created", nullable = false, updatable = false)
-    private ZonedDateTime timeCreated = ZonedDateTime.now();
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "added_by_app_user_id", foreignKey = @ForeignKey(name = "fk_payoff_added_by_app_user"))
+    private AppUser addedByAppUser;
 
-    @Column(name = "receipt_photo")
-    private byte[] receiptPhoto;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "paid_for_app_user_id", foreignKey = @ForeignKey(name = "fk_payoff_paid_for_app_user"))
+    private AppUser paidForAppUser;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "paid_to_app_user_id", foreignKey = @ForeignKey(name = "fk_payoff_paid_to_app_user"))
+    private AppUser paidToAppUser;
 }

@@ -12,26 +12,29 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class UserBalance {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "group_id", foreignKey = @ForeignKey(name = "fk_user_balance_group"))
-    private Group group;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "app_user_id", foreignKey = @ForeignKey(name = "fk_user_balance_app_user1"))
-    private AppUser appUser;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "owes_to_app_user_id", foreignKey = @ForeignKey(name = "fk_user_balance_app_user2"))
-    private AppUser owesTo;
+    @Column(name = "balance", nullable = false)
+    private BigDecimal balance;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "currency_code", nullable = false, length = Currency.MAX_LENGTH)
     private Currency currency;
 
-    @Column(name = "debt", nullable = false)
-    private BigDecimal debt;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "group_id", foreignKey = @ForeignKey(name = "fk_user_balance_group"))
+    private Group group;
+
+    // first appUser owes to second if balance is negative
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "first_app_user_id", foreignKey = @ForeignKey(name = "fk_user_balance_first_app_user"))
+    private AppUser firstAppUser;
+
+    // second appUser owes to first if balance is positive
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "second_app_user_id", foreignKey = @ForeignKey(name = "fk_user_balance_second_app_user"))
+    private AppUser secondAppUser;
 }

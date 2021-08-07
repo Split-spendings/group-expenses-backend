@@ -13,17 +13,10 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 public class SpendingLimit {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "group_id", foreignKey = @ForeignKey(name = "fk_spending_limit_group"))
-    private Group group;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "currency_code", nullable = false, length = Currency.MAX_LENGTH)
-    private Currency currency;
 
     @Column(name = "set_limit", nullable = false)
     private BigDecimal limit;
@@ -39,4 +32,12 @@ public class SpendingLimit {
 
     @Column(name = "valid_until")
     private ZonedDateTime validUntil;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "currency_code", nullable = false, length = Currency.MAX_LENGTH)
+    private Currency currency;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "group_id", foreignKey = @ForeignKey(name = "fk_spending_limit_group"))
+    private Group group;
 }
