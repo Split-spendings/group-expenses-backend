@@ -2,6 +2,7 @@ package com.splitspendings.groupexpensesbackend.dto.group;
 
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.enums.InviteOption;
+import com.splitspendings.groupexpensesbackend.util.TrimUtil;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -22,7 +23,7 @@ public class NewGroupDto {
 
     public void trim() {
         if(name != null) {
-            name = name.trim();
+            name = TrimUtil.trimAndRemoveExtraSpaces(name);
         }
     }
 }
