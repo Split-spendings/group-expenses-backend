@@ -262,7 +262,7 @@ public class GroupServiceImpl implements GroupService {
 
         List<Spending> spendingList = spendingRepository.findAllByAddedByGroupMembershipGroup(group);
 
-        List<SpendingShortDto> spendingShortDtoList = spendingMapper.groupSpendingListToSpendingShortDtoList(spendingList);
+        List<SpendingShortDto> spendingShortDtoList = spendingMapper.spendingListToSpendingShortDtoList(spendingList);
 
         GroupSpendingsDto groupSpendingsDto = groupMapper.groupToGroupSpendingsDto(group);
         groupSpendingsDto.setSpendings(spendingShortDtoList);
