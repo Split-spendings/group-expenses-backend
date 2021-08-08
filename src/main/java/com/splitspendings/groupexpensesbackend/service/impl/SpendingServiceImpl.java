@@ -1,10 +1,16 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
+import com.splitspendings.groupexpensesbackend.dto.item.NewItemDto;
+import com.splitspendings.groupexpensesbackend.dto.share.NewShareDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.NewSpendingDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingDto;
+import com.splitspendings.groupexpensesbackend.mapper.ItemMapper;
+import com.splitspendings.groupexpensesbackend.mapper.ShareMapper;
 import com.splitspendings.groupexpensesbackend.mapper.SpendingMapper;
-import com.splitspendings.groupexpensesbackend.model.GroupMembership;
-import com.splitspendings.groupexpensesbackend.model.Spending;
+import com.splitspendings.groupexpensesbackend.model.*;
+import com.splitspendings.groupexpensesbackend.model.enums.Currency;
+import com.splitspendings.groupexpensesbackend.repository.ItemRepository;
+import com.splitspendings.groupexpensesbackend.repository.ShareRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
@@ -20,9 +26,8 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.*;
 
 @Service
 @Transactional
@@ -33,8 +38,12 @@ public class SpendingServiceImpl implements SpendingService {
     private final Validator validator;
 
     private final SpendingRepository spendingRepository;
+    private final ItemRepository itemRepository;
+    private final ShareRepository shareRepository;
 
     private final SpendingMapper spendingMapper;
+    private final ItemMapper itemMapper;
+    private final ShareMapper shareMapper;
 
     private final GroupMembershipService groupMembershipService;
     private final IdentityService identityService;
@@ -66,10 +75,59 @@ public class SpendingServiceImpl implements SpendingService {
         }
 
         UUID currentAppUserId = identityService.currentUserID();
-        GroupMembership groupMembership = groupMembershipService.groupActiveMembershipModel(currentAppUserId, newSpendingDto.getGroupID());
+        GroupMembership addedByGroupMembership = groupMembershipService.groupActiveMembershipModel(currentAppUserId, newSpendingDto.getGroupID());
+        GroupMembership paidByGroupMembership = groupMembershipService.groupMembershipModelById(newSpendingDto.getPaidByGroupMembershipId());
 
-        log.debug("validation ok");
+        Group group = addedByGroupMembership.getGroup();
 
-        return null;
+        if(paidByGroupMembership.getGroup() != group) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "paidByGroupMembershipId does not belong to a member of a group");
+        }
+
+        Spending spending = spendingMapper.newSpendingDtoToSpending(newSpendingDto);
+        spending.setAddedByGroupMembership(addedByGroupMembership);
+
+        Currency currency = spending.getCurrency();
+
+        List<Item> items = new ArrayList<>();
+        List<Share> shares = new ArrayList<>();
+
+        BigDecimal totalAmount = new BigDecimal(0);
+
+        for (NewItemDto newItemDto : newSpendingDto.getNewItemDtoList()) {
+            Item item = itemMapper.newItemDtoToItem(newItemDto);
+            BigDecimal price = new BigDecimal(0);
+
+            for(NewShareDto newShareDto : newItemDto.getNewShareDtoList()) {
+                Share share = shareMapper.newShareDtoToShare(newShareDto);
+
+                GroupMembership paidForGroupMembership = groupMembershipService.groupMembershipModelById(newShareDto.getPaidForGroupMembershipId());
+                if(paidForGroupMembership.getGroup() != group) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "paidForGroupMembership does not belong to a member of a group");
+                }
+                share.setPaidByGroupMembership(paidByGroupMembership);
+                share.setPaidForGroupMembership(paidForGroupMembership);
+                share.setCurrency(currency);
+                share.setItem(item);
+
+                shares.add(share);
+
+                price = price.add(newShareDto.getAmount());
+            }
+            item.setPrice(price);
+            item.setSpending(spending);
+
+            items.add(item);
+
+            totalAmount = totalAmount.add(price);
+        }
+
+        spending.setTotalAmount(totalAmount);
+
+        Spending createdSpending = spendingRepository.save(spending);
+        itemRepository.saveAll(items);
+        shareRepository.saveAll(shares);
+
+        return spendingMapper.spendingToSpendingDto(createdSpending);
     }
 }

@@ -28,15 +28,18 @@ public class NewSpendingDto {
     @NotNull
     private Currency currency;
 
+    @NotNull
+    private Long paidByGroupMembershipId;
+
     @NotEmpty
-    private List<@Valid NewItemDto> items;
+    private List<@Valid NewItemDto> newItemDtoList;
 
     public void trim() {
         if(title != null) {
             title = TrimUtil.trimAndRemoveExtraSpaces(title);
         }
-        if(items != null) {
-            for(NewItemDto newItemDto: items) {
+        if(newItemDtoList != null) {
+            for(NewItemDto newItemDto: newItemDtoList) {
                 newItemDto.trim();
             }
         }

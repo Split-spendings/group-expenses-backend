@@ -30,6 +30,15 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     private final IdentityService identityService;
 
     @Override
+    public GroupMembership groupMembershipModelById(Long id) {
+        Optional<GroupMembership> groupMembership = groupMembershipRepository.findById(id);
+        if (groupMembership.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Group membership not found");
+        }
+        return groupMembership.get();
+    }
+
+    @Override
     public GroupMembership groupActiveMembershipModel(UUID appUserId, Long groupID) {
         Optional<GroupMembership> groupMembership = groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupID, appUserId);
         if (groupMembership.isEmpty()) {
