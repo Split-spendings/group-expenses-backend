@@ -41,6 +41,58 @@ public class DatabaseLoader implements CommandLineRunner {
     private final ShareRepository shareRepository;
     private final GroupMembershipSettingsRepository groupMembershipSettingsRepository;
 
+    private AppUser appUser1;
+    private AppUser appUser2;
+    private AppUser appUser3;
+    private AppUser adminAppUser1;
+
+    @SuppressWarnings("all")
+    private AppUserSettings appUserSettings1;
+    @SuppressWarnings("all")
+    private AppUserSettings appUserSettings2;
+    @SuppressWarnings("all")
+    private AppUserSettings appUserSettings3;
+    @SuppressWarnings("all")
+    private AppUserSettings adminAppUserSettings1;
+
+    private Group group1;
+    private Group group2;
+    private Group group3;
+
+    private GroupMembership groupMembership1;
+    private GroupMembership groupMembership2;
+    private GroupMembership groupMembership3;
+    private GroupMembership groupMembership4;
+    private GroupMembership groupMembership5;
+    private GroupMembership groupMembership6;
+
+    @SuppressWarnings("all")
+    private GroupMembershipSettings groupMembershipSettings1;
+    @SuppressWarnings("all")
+    private GroupMembershipSettings groupMembershipSettings2;
+    @SuppressWarnings("all")
+    private GroupMembershipSettings groupMembershipSettings3;
+    @SuppressWarnings("all")
+    private GroupMembershipSettings groupMembershipSettings4;
+    @SuppressWarnings("all")
+    private GroupMembershipSettings groupMembershipSettings5;
+    @SuppressWarnings("all")
+    private GroupMembershipSettings groupMembershipSettings6;
+
+    private Spending spending1;
+
+    @SuppressWarnings("all")
+    private SpendingComment spendingComment1;
+
+    private ItemCategory itemCategory1;
+    @SuppressWarnings("all")
+    private ItemCategory itemCategory2;
+
+    private Item item1;
+
+    @SuppressWarnings("all")
+    private Share share1;
+
     private Map<String, UUID> loadAppUserIds(String path) {
         Map<String, UUID> idMap = new HashMap<>();
         try(BufferedReader reader = new BufferedReader(new FileReader(path))) {
@@ -59,184 +111,72 @@ public class DatabaseLoader implements CommandLineRunner {
     @Transactional
     @Override
     public void run(String... args) throws Exception {
+        setUpAppUsers();
+        setUpAppUserSettings();
+        setUpGroups();
+        setUpGroupMembership();
+        setUpGroupMembershipSettings();
+        setUpGroupInvites();
+        setUpSpendings();
+        setUpSpendingComments();
+        setUpItemCategories();
+        setUpItems();
+        setUpShares();
+    }
 
-        var usersIdMap = loadAppUserIds(USERS_PATH);
-        if(usersIdMap.size() < 2) {
-            throw new Exception("not enough test user IDs to load data");
-        }
+    private void setUpShares() {
+        share1 = new Share();
+        share1.setAmount(new BigDecimal("20.02"));
+        share1.setItem(item1);
+        share1.setPaidByAppUser(appUser1);
+        share1.setPaidForAppUser(appUser2);
 
-        var adminsIdMap = loadAppUserIds(ADMINS_PATH);
-        if(adminsIdMap.size() < 1) {
-            throw new Exception("not enough test admin IDs to load data");
-        }
+        shareRepository.save(share1);
+    }
 
-        AppUser appUser1 = appUserFactory.generate();
-        AppUser appUser2 = appUserFactory.generate();
-        AppUser appUser3 = appUserFactory.generate();
-        AppUser adminAppUser1 = appUserFactory.generate();
+    private void setUpItems() {
+        item1 = new Item();
+        item1.setItemCategory(itemCategory1);
+        item1.setSpending(spending1);
+        item1.setTitle("Dummy item 1");
+        item1.setPrice(new BigDecimal("30.50"));
 
-        appUser1.setId(usersIdMap.get(ID + 1));
-        appUser2.setId(usersIdMap.get(ID + 2));
-        appUser3.setId(usersIdMap.get(ID + 3));
-        adminAppUser1.setId(adminsIdMap.get(ID + 1));
+        itemRepository.save(item1);
+    }
 
+    private void setUpItemCategories() {
+        itemCategory1 = new ItemCategory();
+        itemCategory1.setGroup(group1);
+        itemCategory1.setTitle("Dummy category 1");
+        itemCategory1.setCreatedByAppUser(appUser1);
 
-        AppUserSettings appUserSettings1 = new AppUserSettings();
-        appUserSettings1.setAppUser(appUser1);
-        appUserSettings1.setDefaultCurrency(Currency.PLN);
-        appUserSettings1.setLanguage(Language.PL);
-        appUserSettings1.setTheme(Theme.DARK);
-        appUserSettings1.setGroupInviteOption(GroupInviteOption.ANYONE);
-        appUserSettings1.setNotificationOption(NotificationOption.ALL);
+        itemCategory2 = new ItemCategory();
+        itemCategory2.setTitle("Default category 1");
 
-        AppUserSettings appUserSettings2 = new AppUserSettings();
-        appUserSettings2.setAppUser(appUser2);
-        appUserSettings2.setDefaultCurrency(Currency.USD);
-        appUserSettings2.setLanguage(Language.EN);
-        appUserSettings2.setTheme(Theme.LIGHT);
-        appUserSettings2.setGroupInviteOption(GroupInviteOption.NOBODY);
-        appUserSettings2.setNotificationOption(NotificationOption.NONE);
+        itemCategoryRepository.save(itemCategory1);
+        itemCategoryRepository.save(itemCategory2);
+    }
 
-        AppUserSettings appUserSettings3 = new AppUserSettings();
-        appUserSettings3.setAppUser(appUser3);
-        appUserSettings3.setDefaultCurrency(Currency.USD);
-        appUserSettings3.setLanguage(Language.EN);
-        appUserSettings3.setTheme(Theme.LIGHT);
-        appUserSettings3.setGroupInviteOption(GroupInviteOption.ANYONE);
-        appUserSettings3.setNotificationOption(NotificationOption.NONE);
+    private void setUpSpendingComments() {
+        spendingComment1 = new SpendingComment();
+        spendingComment1.setSpending(spending1);
+        spendingComment1.setMessage("Dummy comment 1");
+        spendingComment1.setAddedByAppUser(appUser1);
 
-        AppUserSettings adminAppUserSettings1 = new AppUserSettings();
-        adminAppUserSettings1.setAppUser(adminAppUser1);
-        adminAppUserSettings1.setDefaultCurrency(Currency.PLN);
-        adminAppUserSettings1.setLanguage(Language.PL);
-        adminAppUserSettings1.setTheme(Theme.DARK);
-        adminAppUserSettings1.setGroupInviteOption(GroupInviteOption.ANYONE);
-        adminAppUserSettings1.setNotificationOption(NotificationOption.SELECTED);
-        adminAppUserSettings1.setNotificationCategories(Set.of(NotificationCategory.NEW_COMMENT, NotificationCategory.NEW_SPENDING));
+        spendingCommentRepository.save(spendingComment1);
+    }
 
-        appUserSettingsRepository.save(appUserSettings1);
-        appUserSettingsRepository.save(appUserSettings2);
-        appUserSettingsRepository.save(appUserSettings3);
-        appUserSettingsRepository.save(adminAppUserSettings1);
+    private void setUpSpendings() {
+        spending1 = new Spending();
+        spending1.setAddedByGroupMembership(groupMembership1);
+        spending1.setCurrency(Currency.EUR);
+        spending1.setTotalAmount(new BigDecimal("123.50"));
+        spending1.setTitle("Dummy spending1");
 
+        spendingRepository.save(spending1);
+    }
 
-        Group group1 = groupFactory.generate();
-        group1.setOwner(appUser1);
-        group1.setPersonal(false);
-        group1.setInviteOption(InviteOption.ALL_ACTIVE_MEMBERS);
-
-        Group group2 = groupFactory.generate();
-        group2.setOwner(appUser2);
-        group2.setPersonal(true);
-        group2.setInviteOption(InviteOption.OWNER_ONLY);
-
-        Group group3 = groupFactory.generate();
-        group3.setOwner(appUser3);
-        group3.setPersonal(false);
-        group3.setInviteOption(InviteOption.OWNER_ONLY);
-
-        groupRepository.save(group1);
-        groupRepository.save(group2);
-        groupRepository.save(group3);
-
-
-        GroupMembership groupMembership1 = new GroupMembership();
-        groupMembership1.setGroup(group1);
-        groupMembership1.setAppUser(appUser1);
-        groupMembership1.setActive(true);
-        groupMembership1.setHasAdminRights(true);
-        groupMembership1.setFirstTimeJoined(groupMembership1.getTimeCreated());
-        groupMembership1.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
-
-        GroupMembership groupMembership2 = new GroupMembership();
-        groupMembership2.setGroup(group2);
-        groupMembership2.setAppUser(appUser2);
-        groupMembership2.setActive(false);
-        groupMembership2.setHasAdminRights(true);
-        groupMembership2.setFirstTimeJoined(groupMembership2.getTimeCreated());
-        groupMembership2.setLastTimeJoined(groupMembership2.getFirstTimeJoined());
-        groupMembership2.setLastTimeLeft(groupMembership2.getFirstTimeJoined().plusWeeks(1));
-
-        GroupMembership groupMembership3 = new GroupMembership();
-        groupMembership3.setGroup(group3);
-        groupMembership3.setAppUser(appUser3);
-        groupMembership3.setActive(true);
-        groupMembership3.setHasAdminRights(true);
-        groupMembership3.setFirstTimeJoined(groupMembership1.getTimeCreated());
-        groupMembership3.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
-
-        GroupMembership groupMembership4 = new GroupMembership();
-        groupMembership4.setGroup(group3);
-        groupMembership4.setAppUser(appUser1);
-        groupMembership4.setActive(false);
-        groupMembership4.setHasAdminRights(false);
-        groupMembership4.setFirstTimeJoined(groupMembership1.getTimeCreated());
-        groupMembership4.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
-
-        GroupMembership groupMembership5 = new GroupMembership();
-        groupMembership5.setGroup(group3);
-        groupMembership5.setAppUser(appUser2);
-        groupMembership5.setActive(true);
-        groupMembership5.setHasAdminRights(false);
-        groupMembership5.setFirstTimeJoined(groupMembership1.getTimeCreated());
-        groupMembership5.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
-
-        GroupMembership groupMembership6 = new GroupMembership();
-        groupMembership6.setGroup(group1);
-        groupMembership6.setAppUser(appUser3);
-        groupMembership6.setActive(true);
-        groupMembership6.setHasAdminRights(false);
-        groupMembership6.setFirstTimeJoined(groupMembership1.getTimeCreated());
-        groupMembership6.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
-
-        groupMembershipRepository.save(groupMembership1);
-        groupMembershipRepository.save(groupMembership2);
-        groupMembershipRepository.save(groupMembership3);
-        groupMembershipRepository.save(groupMembership4);
-        groupMembershipRepository.save(groupMembership5);
-        groupMembershipRepository.save(groupMembership6);
-
-
-        GroupMembershipSettings groupMembershipSettings1 = new GroupMembershipSettings();
-        groupMembershipSettings1.setGroupMembership(groupMembership1);
-        groupMembershipSettings1.setGroupTheme(GroupTheme.DEFAULT);
-        groupMembershipSettings1.setNotificationOption(NotificationOption.SELECTED);
-        groupMembershipSettings1.setNotificationCategories(Set.of(NotificationCategory.NEW_SPENDING));
-
-        GroupMembershipSettings groupMembershipSettings2 = new GroupMembershipSettings();
-        groupMembershipSettings2.setGroupMembership(groupMembership2);
-        groupMembershipSettings2.setGroupTheme(GroupTheme.DEFAULT);
-        groupMembershipSettings2.setNotificationOption(NotificationOption.SELECTED);
-        groupMembershipSettings2.setNotificationCategories(Set.of(NotificationCategory.NEW_SPENDING));
-
-        GroupMembershipSettings groupMembershipSettings3 = new GroupMembershipSettings();
-        groupMembershipSettings3.setGroupMembership(groupMembership3);
-        groupMembershipSettings3.setGroupTheme(GroupTheme.DEFAULT);
-        groupMembershipSettings3.setNotificationOption(NotificationOption.ALL);
-
-        GroupMembershipSettings groupMembershipSettings4 = new GroupMembershipSettings();
-        groupMembershipSettings4.setGroupMembership(groupMembership4);
-        groupMembershipSettings4.setGroupTheme(GroupTheme.DEFAULT);
-        groupMembershipSettings4.setNotificationOption(NotificationOption.ALL);
-
-        GroupMembershipSettings groupMembershipSettings5 = new GroupMembershipSettings();
-        groupMembershipSettings5.setGroupMembership(groupMembership5);
-        groupMembershipSettings5.setGroupTheme(GroupTheme.DEFAULT);
-        groupMembershipSettings5.setNotificationOption(NotificationOption.ALL);
-
-        GroupMembershipSettings groupMembershipSettings6 = new GroupMembershipSettings();
-        groupMembershipSettings6.setGroupMembership(groupMembership6);
-        groupMembershipSettings6.setGroupTheme(GroupTheme.DEFAULT);
-        groupMembershipSettings6.setNotificationOption(NotificationOption.ALL);
-
-        groupMembershipSettingsRepository.save(groupMembershipSettings1);
-        groupMembershipSettingsRepository.save(groupMembershipSettings2);
-        groupMembershipSettingsRepository.save(groupMembershipSettings3);
-        groupMembershipSettingsRepository.save(groupMembershipSettings4);
-        groupMembershipSettingsRepository.save(groupMembershipSettings5);
-        groupMembershipSettingsRepository.save(groupMembershipSettings6);
-
-
+    private void setUpGroupInvites() {
         GroupInvite groupInvite1 = new GroupInvite();
         groupInvite1.setMessage("hello");
         groupInvite1.setInvitedAppUser(appUser2);
@@ -263,53 +203,190 @@ public class DatabaseLoader implements CommandLineRunner {
         groupInviteRepository.save(groupInvite3);
         groupInviteRepository.save(groupInvite4);
         groupInviteRepository.save(groupInvite5);
+    }
 
+    @SuppressWarnings("all")
+    private void setUpGroupMembershipSettings() {
+        groupMembershipSettings1 = new GroupMembershipSettings();
+        groupMembershipSettings1.setGroupMembership(groupMembership1);
+        groupMembershipSettings1.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings1.setNotificationOption(NotificationOption.SELECTED);
+        groupMembershipSettings1.setNotificationCategories(Set.of(NotificationCategory.NEW_SPENDING));
 
-        Spending spending1 = new Spending();
-        spending1.setAddedByGroupMembership(groupMembership1);
-        spending1.setCurrency(Currency.EUR);
-        spending1.setTotalAmount(new BigDecimal("123.50"));
-        spending1.setTitle("Dummy spending1");
+        groupMembershipSettings2 = new GroupMembershipSettings();
+        groupMembershipSettings2.setGroupMembership(groupMembership2);
+        groupMembershipSettings2.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings2.setNotificationOption(NotificationOption.SELECTED);
+        groupMembershipSettings2.setNotificationCategories(Set.of(NotificationCategory.NEW_SPENDING));
 
-        spendingRepository.save(spending1);
+        groupMembershipSettings3 = new GroupMembershipSettings();
+        groupMembershipSettings3.setGroupMembership(groupMembership3);
+        groupMembershipSettings3.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings3.setNotificationOption(NotificationOption.ALL);
 
+        groupMembershipSettings4 = new GroupMembershipSettings();
+        groupMembershipSettings4.setGroupMembership(groupMembership4);
+        groupMembershipSettings4.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings4.setNotificationOption(NotificationOption.ALL);
 
-        SpendingComment spendingComment1 = new SpendingComment();
-        spendingComment1.setSpending(spending1);
-        spendingComment1.setMessage("Dummy comment 1");
-        spendingComment1.setAddedByAppUser(appUser1);
+        groupMembershipSettings5 = new GroupMembershipSettings();
+        groupMembershipSettings5.setGroupMembership(groupMembership5);
+        groupMembershipSettings5.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings5.setNotificationOption(NotificationOption.ALL);
 
-        spendingCommentRepository.save(spendingComment1);
+        groupMembershipSettings6 = new GroupMembershipSettings();
+        groupMembershipSettings6.setGroupMembership(groupMembership6);
+        groupMembershipSettings6.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings6.setNotificationOption(NotificationOption.ALL);
 
+        groupMembershipSettingsRepository.save(groupMembershipSettings1);
+        groupMembershipSettingsRepository.save(groupMembershipSettings2);
+        groupMembershipSettingsRepository.save(groupMembershipSettings3);
+        groupMembershipSettingsRepository.save(groupMembershipSettings4);
+        groupMembershipSettingsRepository.save(groupMembershipSettings5);
+        groupMembershipSettingsRepository.save(groupMembershipSettings6);
+    }
 
-        ItemCategory itemCategory1 = new ItemCategory();
-        itemCategory1.setGroup(group1);
-        itemCategory1.setTitle("Dummy category 1");
-        itemCategory1.setCreatedByAppUser(appUser1);
+    @SuppressWarnings("all")
+    private void setUpGroupMembership() {
+        groupMembership1 = new GroupMembership();
+        groupMembership1.setGroup(group1);
+        groupMembership1.setAppUser(appUser1);
+        groupMembership1.setActive(true);
+        groupMembership1.setHasAdminRights(true);
+        groupMembership1.setFirstTimeJoined(groupMembership1.getTimeCreated());
+        groupMembership1.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
 
-        ItemCategory itemCategory2 = new ItemCategory();
-        itemCategory2.setTitle("Default category 1");
+        groupMembership2 = new GroupMembership();
+        groupMembership2.setGroup(group2);
+        groupMembership2.setAppUser(appUser2);
+        groupMembership2.setActive(false);
+        groupMembership2.setHasAdminRights(true);
+        groupMembership2.setFirstTimeJoined(groupMembership2.getTimeCreated());
+        groupMembership2.setLastTimeJoined(groupMembership2.getFirstTimeJoined());
+        groupMembership2.setLastTimeLeft(groupMembership2.getFirstTimeJoined().plusWeeks(1));
 
-        itemCategoryRepository.save(itemCategory1);
-        itemCategoryRepository.save(itemCategory2);
+        groupMembership3 = new GroupMembership();
+        groupMembership3.setGroup(group3);
+        groupMembership3.setAppUser(appUser3);
+        groupMembership3.setActive(true);
+        groupMembership3.setHasAdminRights(true);
+        groupMembership3.setFirstTimeJoined(groupMembership1.getTimeCreated());
+        groupMembership3.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
 
+        groupMembership4 = new GroupMembership();
+        groupMembership4.setGroup(group3);
+        groupMembership4.setAppUser(appUser1);
+        groupMembership4.setActive(false);
+        groupMembership4.setHasAdminRights(false);
+        groupMembership4.setFirstTimeJoined(groupMembership1.getTimeCreated());
+        groupMembership4.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
 
-        Item item1 = new Item();
-        item1.setItemCategory(itemCategory1);
-        item1.setSpending(spending1);
-        item1.setTitle("Dummy item 1");
-        item1.setPrice(new BigDecimal("30.50"));
+        groupMembership5 = new GroupMembership();
+        groupMembership5.setGroup(group3);
+        groupMembership5.setAppUser(appUser2);
+        groupMembership5.setActive(true);
+        groupMembership5.setHasAdminRights(false);
+        groupMembership5.setFirstTimeJoined(groupMembership1.getTimeCreated());
+        groupMembership5.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
 
-        itemRepository.save(item1);
+        groupMembership6 = new GroupMembership();
+        groupMembership6.setGroup(group1);
+        groupMembership6.setAppUser(appUser3);
+        groupMembership6.setActive(true);
+        groupMembership6.setHasAdminRights(false);
+        groupMembership6.setFirstTimeJoined(groupMembership1.getTimeCreated());
+        groupMembership6.setLastTimeJoined(groupMembership1.getFirstTimeJoined());
 
+        groupMembershipRepository.save(groupMembership1);
+        groupMembershipRepository.save(groupMembership2);
+        groupMembershipRepository.save(groupMembership3);
+        groupMembershipRepository.save(groupMembership4);
+        groupMembershipRepository.save(groupMembership5);
+        groupMembershipRepository.save(groupMembership6);
+    }
 
-        Share share1 = new Share();
-        share1.setAmount(new BigDecimal("20.02"));
-        share1.setCurrency(Currency.EUR);
-        share1.setItem(item1);
-        share1.setPaidByGroupMembership(groupMembership1);
-        share1.setPaidForGroupMembership(groupMembership6);
+    private void setUpGroups() {
+        group1 = groupFactory.generate();
+        group1.setOwner(appUser1);
+        group1.setPersonal(false);
+        group1.setInviteOption(InviteOption.ALL_ACTIVE_MEMBERS);
 
-        shareRepository.save(share1);
+        group2 = groupFactory.generate();
+        group2.setOwner(appUser2);
+        group2.setPersonal(true);
+        group2.setInviteOption(InviteOption.OWNER_ONLY);
+
+        group3 = groupFactory.generate();
+        group3.setOwner(appUser3);
+        group3.setPersonal(false);
+        group3.setInviteOption(InviteOption.OWNER_ONLY);
+
+        groupRepository.save(group1);
+        groupRepository.save(group2);
+        groupRepository.save(group3);
+    }
+
+    private void setUpAppUserSettings() {
+        appUserSettings1 = new AppUserSettings();
+        appUserSettings1.setAppUser(appUser1);
+        appUserSettings1.setDefaultCurrency(Currency.PLN);
+        appUserSettings1.setLanguage(Language.PL);
+        appUserSettings1.setTheme(Theme.DARK);
+        appUserSettings1.setGroupInviteOption(GroupInviteOption.ANYONE);
+        appUserSettings1.setNotificationOption(NotificationOption.ALL);
+
+        appUserSettings2 = new AppUserSettings();
+        appUserSettings2.setAppUser(appUser2);
+        appUserSettings2.setDefaultCurrency(Currency.USD);
+        appUserSettings2.setLanguage(Language.EN);
+        appUserSettings2.setTheme(Theme.LIGHT);
+        appUserSettings2.setGroupInviteOption(GroupInviteOption.NOBODY);
+        appUserSettings2.setNotificationOption(NotificationOption.NONE);
+
+        appUserSettings3 = new AppUserSettings();
+        appUserSettings3.setAppUser(appUser3);
+        appUserSettings3.setDefaultCurrency(Currency.USD);
+        appUserSettings3.setLanguage(Language.EN);
+        appUserSettings3.setTheme(Theme.LIGHT);
+        appUserSettings3.setGroupInviteOption(GroupInviteOption.ANYONE);
+        appUserSettings3.setNotificationOption(NotificationOption.NONE);
+
+        adminAppUserSettings1 = new AppUserSettings();
+        adminAppUserSettings1.setAppUser(adminAppUser1);
+        adminAppUserSettings1.setDefaultCurrency(Currency.PLN);
+        adminAppUserSettings1.setLanguage(Language.PL);
+        adminAppUserSettings1.setTheme(Theme.DARK);
+        adminAppUserSettings1.setGroupInviteOption(GroupInviteOption.ANYONE);
+        adminAppUserSettings1.setNotificationOption(NotificationOption.SELECTED);
+        adminAppUserSettings1.setNotificationCategories(Set.of(NotificationCategory.NEW_COMMENT, NotificationCategory.NEW_SPENDING));
+
+        appUserSettingsRepository.save(appUserSettings1);
+        appUserSettingsRepository.save(appUserSettings2);
+        appUserSettingsRepository.save(appUserSettings3);
+        appUserSettingsRepository.save(adminAppUserSettings1);
+    }
+
+    @SuppressWarnings("all")
+    private void setUpAppUsers() throws Exception{
+        var usersIdMap = loadAppUserIds(USERS_PATH);
+        if(usersIdMap.size() < 2) {
+            throw new Exception("not enough test user IDs to load data");
+        }
+
+        var adminsIdMap = loadAppUserIds(ADMINS_PATH);
+        if(adminsIdMap.size() < 1) {
+            throw new Exception("not enough test admin IDs to load data");
+        }
+
+        appUser1 = appUserFactory.generate();
+        appUser2 = appUserFactory.generate();
+        appUser3 = appUserFactory.generate();
+        adminAppUser1 = appUserFactory.generate();
+
+        appUser1.setId(usersIdMap.get(ID + 1));
+        appUser2.setId(usersIdMap.get(ID + 2));
+        appUser3.setId(usersIdMap.get(ID + 3));
+        adminAppUser1.setId(adminsIdMap.get(ID + 1));
     }
 }

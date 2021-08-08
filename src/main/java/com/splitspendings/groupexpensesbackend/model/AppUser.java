@@ -80,5 +80,19 @@ public class AppUser {
 
     @OneToOne(mappedBy = "appUser")
     private AppUserSettings appUserSettings;
-}
 
+    @OneToMany(mappedBy = "firstAppUser")
+    private Set<UserBalance> userBalancesFirst;
+
+    @OneToMany(mappedBy = "secondAppUser")
+    private Set<UserBalance> userBalancesSecond;
+
+    @OneToMany(mappedBy = "addedByAppUser")
+    private Set<Payoff> addedPayoffs;
+
+    @OneToMany(mappedBy = "paidForAppUser")
+    private Set<Payoff> paidForPayoffs;
+
+    @OneToMany(mappedBy = "paidToAppUser")
+    private Set<Payoff> paidToPayoffs;
+}
