@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -31,20 +30,12 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
 
     @Override
     public GroupMembership groupMembershipModelById(Long id) {
-        Optional<GroupMembership> groupMembership = groupMembershipRepository.findById(id);
-        if (groupMembership.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Group membership not found");
-        }
-        return groupMembership.get();
+        return groupMembershipRepository.findById(id).orElseThrow(() -> new  ResponseStatusException(HttpStatus.NOT_FOUND, "Group membership not found"));
     }
 
     @Override
     public GroupMembership groupActiveMembershipModel(UUID appUserId, Long groupID) {
-        Optional<GroupMembership> groupMembership = groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupID, appUserId);
-        if (groupMembership.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not an active member of a group");
-        }
-        return groupMembership.get();
+        return groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupID, appUserId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not an active member of a group"));
     }
 
     @Override
