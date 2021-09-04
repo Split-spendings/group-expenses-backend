@@ -128,8 +128,9 @@ public class DatabaseLoader implements CommandLineRunner {
         share1 = new Share();
         share1.setAmount(new BigDecimal("20.02"));
         share1.setItem(item1);
-        share1.setPaidByAppUser(appUser1);
-        share1.setPaidForAppUser(appUser2);
+        share1.setCurrency(Currency.EUR);
+        share1.setPaidByGroupMembership(groupMembership1);
+        share1.setPaidForGroupMembership(groupMembership6);
 
         shareRepository.save(share1);
     }

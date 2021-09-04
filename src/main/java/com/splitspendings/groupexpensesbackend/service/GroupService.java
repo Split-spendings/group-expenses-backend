@@ -1,9 +1,6 @@
 package com.splitspendings.groupexpensesbackend.service;
 
-import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
-import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
-import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
-import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.group.*;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteAcceptedDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
@@ -36,4 +33,6 @@ public interface GroupService {
     void declineGroupInvite(Long id);
 
     void leaveGroup(Long id);
+
+    GroupSpendingsDto groupSpendings(Long id);
 }

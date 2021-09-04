@@ -1,9 +1,6 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
-import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
-import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
-import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
-import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.group.*;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteAcceptedDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
@@ -35,38 +32,43 @@ public class GroupController {
         return groupService.createGroup(newGroupDto);
     }
 
-    @PatchMapping("{id}")
+    @PatchMapping("/{id}")
     public GroupInfoDto updateGroupInfo(@PathVariable Long id, @RequestBody UpdateGroupInfoDto updateGroupInfoDto) {
         return groupService.updateGroupInfo(id, updateGroupInfoDto);
     }
 
-    @GetMapping("{id}/members")
+    @GetMapping("/{id}/members")
     public GroupActiveMembersDto groupActiveMembers(@PathVariable Long id) {
         return groupService.groupActiveMembersById(id);
     }
 
-    @GetMapping("{id}/members/{appUserId}")
+    @GetMapping("/{id}/members/{appUserId}")
     public GroupMembershipDto groupMembership(@PathVariable Long id, @PathVariable UUID appUserId) {
         return groupService.groupMembership(id, appUserId);
     }
 
-    @PostMapping("invite")
+    @PostMapping("/invite")
     public GroupInviteDto createGroupInvite(@RequestBody NewGroupInviteDto newGroupInviteDto) {
         return groupService.createGroupInvite(newGroupInviteDto);
     }
 
-    @PatchMapping("invite/{inviteId}")
+    @PatchMapping("/invite/{inviteId}")
     public GroupInviteAcceptedDto acceptGroupInvite(@PathVariable Long inviteId) {
         return groupService.acceptGroupInvite(inviteId);
     }
 
-    @DeleteMapping("invite/{id}")
+    @DeleteMapping("/invite/{id}")
     public void declineGroupInvite(@PathVariable Long id) {
         groupService.declineGroupInvite(id);
     }
 
-    @PatchMapping("{id}/leave")
+    @PatchMapping("/{id}/leave")
     public void leaveGroup(@PathVariable Long id) {
         groupService.leaveGroup(id);
+    }
+
+    @GetMapping("/{id}/spendings")
+    public GroupSpendingsDto groupSpendings(@PathVariable Long id) {
+        return groupService.groupSpendings(id);
     }
 }

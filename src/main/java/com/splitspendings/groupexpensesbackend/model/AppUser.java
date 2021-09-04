@@ -78,12 +78,6 @@ public class AppUser {
     @OneToMany(mappedBy = "createdByAppUser")
     private Set<ItemCategory> createdItemCategories;
 
-    @OneToMany(mappedBy = "paidByAppUser")
-    private Set<Share> paidShares;
-
-    @OneToMany(mappedBy = "paidForAppUser")
-    private Set<Share> debtShares;
-
     @OneToOne(mappedBy = "appUser")
     private AppUserSettings appUserSettings;
 

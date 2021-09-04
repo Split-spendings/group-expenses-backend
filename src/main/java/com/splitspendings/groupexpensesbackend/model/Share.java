@@ -1,5 +1,6 @@
 package com.splitspendings.groupexpensesbackend.model;
 
+import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,13 +24,17 @@ public class Share {
     @Column(name = "time_created", nullable = false)
     private ZonedDateTime timeCreated = ZonedDateTime.now();
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "paid_by_app_user_id", foreignKey = @ForeignKey(name = "fk_share_paid_by_user"))
-    private AppUser paidByAppUser;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "currency_code", nullable = false, length = Currency.MAX_LENGTH)
+    private Currency currency;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "paid_for_app_user_id", foreignKey = @ForeignKey(name = "fk_share_paid_for_user"))
-    private AppUser paidForAppUser;
+    @JoinColumn(name = "paid_by_group_membership_id", foreignKey = @ForeignKey(name = "fk_share_paid_by_group_membership"))
+    private GroupMembership paidByGroupMembership;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "paid_for_group_membership_id", foreignKey = @ForeignKey(name = "fk_share_paid_for_group_membership"))
+    private GroupMembership paidForGroupMembership;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "item_id", foreignKey = @ForeignKey(name = "fk_share_item"))

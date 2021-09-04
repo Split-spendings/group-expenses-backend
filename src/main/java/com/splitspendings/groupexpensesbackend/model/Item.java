@@ -34,7 +34,7 @@ public class Item {
     @JoinColumn(name = "spending_id", foreignKey = @ForeignKey(name = "fk_item_spending"))
     private Spending spending;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_category_id", foreignKey = @ForeignKey(name = "fk_item_category"))
     private ItemCategory itemCategory;
 

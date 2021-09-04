@@ -54,4 +54,10 @@ public class GroupMembership {
 
     @OneToOne(mappedBy = "groupMembership", optional = false)
     private GroupMembershipSettings groupMembershipSettings;
+
+    @OneToMany(mappedBy = "paidByGroupMembership")
+    private Set<Share> paidShares;
+
+    @OneToMany(mappedBy = "paidForGroupMembership")
+    private Set<Share> debtShares;
 }
