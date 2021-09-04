@@ -12,7 +12,6 @@ import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import com.splitspendings.groupexpensesbackend.repository.ItemRepository;
 import com.splitspendings.groupexpensesbackend.repository.ShareRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
-import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.service.SpendingService;
@@ -47,15 +46,10 @@ public class SpendingServiceImpl implements SpendingService {
 
     private final GroupMembershipService groupMembershipService;
     private final IdentityService identityService;
-    private final AppUserService appUserService;
 
     @Override
     public Spending spendingModelById(Long id) {
-        Optional<Spending> spending = spendingRepository.findById(id);
-        if (spending.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Spending not found");
-        }
-        return spending.get();
+        return spendingRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Spending not found"));
     }
 
     @Override

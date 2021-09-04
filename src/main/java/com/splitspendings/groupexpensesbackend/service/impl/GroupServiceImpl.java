@@ -59,11 +59,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group groupModelById(Long id) {
-        Optional<Group> group = groupRepository.findById(id);
-        if (group.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found");
-        }
-        return group.get();
+        return groupRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
     }
 
     @Override

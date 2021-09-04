@@ -61,29 +61,17 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public AppUser appUserModelById(UUID id) {
-        Optional<AppUser> appUser = appUserRepository.findById(id);
-        if (appUser.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
-        return appUser.get();
+        return appUserRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     @Override
     public AppUserSettings appUserSettingsModelById(UUID id) {
-        Optional<AppUserSettings> appUserSettings = appUserSettingsRepository.findById(id);
-        if (appUserSettings.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
-        return appUserSettings.get();
+        return appUserSettingsRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     @Override
     public AppUser appUserModelByLoginName(String loginName) {
-        Optional<AppUser> appUser = appUserRepository.findByLoginName(loginName);
-        if (appUser.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
-        return appUser.get();
+        return appUserRepository.findByLoginName(loginName).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     @Override
