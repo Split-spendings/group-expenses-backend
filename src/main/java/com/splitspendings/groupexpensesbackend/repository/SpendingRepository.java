@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface SpendingRepository extends JpaRepository<Spending, Long> {
 
@@ -14,6 +16,6 @@ public interface SpendingRepository extends JpaRepository<Spending, Long> {
     @Query( "SELECT s " +
             "FROM Spending s " +
             "LEFT JOIN fetch s.comments " +
-            "WHERE s.id = ?1")
-    Spending findByIdFetchComments(Long spendingId);
+            "WHERE s.id = ?1 AND s.addedByGroupMembership.appUser.id = ?2")
+    Optional<Spending> findByIdFetchComments(Long spendingId, UUID userId);
 }

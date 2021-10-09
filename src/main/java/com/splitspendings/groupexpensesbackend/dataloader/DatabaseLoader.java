@@ -84,6 +84,8 @@ public class DatabaseLoader implements CommandLineRunner {
 
     private Spending spending1;
 
+    private Spending spending2;
+
     @SuppressWarnings("all")
     private SpendingComment spendingComment1;
     @SuppressWarnings("all")
@@ -187,7 +189,14 @@ public class DatabaseLoader implements CommandLineRunner {
         spending1.setTotalAmount(new BigDecimal("123.50"));
         spending1.setTitle("Dummy spending1");
 
+        spending2 = new Spending();
+        spending2.setAddedByGroupMembership(groupMembership2);
+        spending2.setCurrency(Currency.PLN);
+        spending2.setTotalAmount(new BigDecimal("234.56"));
+        spending2.setTitle("Dummy spending2");
+
         spendingRepository.save(spending1);
+        spendingRepository.save(spending2);
     }
 
     private void setUpGroupInvites() {

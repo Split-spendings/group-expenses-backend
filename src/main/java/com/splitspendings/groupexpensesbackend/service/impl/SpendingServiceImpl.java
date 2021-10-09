@@ -131,6 +131,9 @@ public class SpendingServiceImpl implements SpendingService {
 
     @Override
     public SpendingCommentsDto findAllBySpendingId(Long spendingId) {
-        return spendingMapper.spendingToSpendingCommentsDto(spendingRepository.findByIdFetchComments(spendingId));
+        Spending spending = spendingRepository.findByIdFetchComments(spendingId, identityService.currentUserID())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("No spending with id = {%d} found", spendingId)));
+        return spendingMapper.spendingToSpendingCommentsDto(spending);
     }
 }
