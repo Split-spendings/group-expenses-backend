@@ -69,7 +69,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     public void verifyCurrentUserActiveMembership(GroupMembership groupMembership) {
         UUID appUserId = identityService.currentUserID();
         if(!isAppUserActiveMember(appUserId, groupMembership)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not an active member of a group");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current user is not an active member of a group");
         }
     }
 }
