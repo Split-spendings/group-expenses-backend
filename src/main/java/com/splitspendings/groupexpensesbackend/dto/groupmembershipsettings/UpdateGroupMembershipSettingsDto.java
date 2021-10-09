@@ -4,10 +4,14 @@ import com.splitspendings.groupexpensesbackend.model.enums.GroupTheme;
 import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
 import lombok.Data;
 
-@Data
-public class GroupMembershipSettingsInfoDto {
+import javax.validation.constraints.NotNull;
 
-    private Long id;
+@Data
+public class UpdateGroupMembershipSettingsDto {
+
+    @NotNull
     private GroupTheme groupTheme;
+
+    @NotNull
     private NotificationOption notificationOption;
 }

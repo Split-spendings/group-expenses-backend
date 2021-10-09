@@ -1,7 +1,6 @@
 package com.splitspendings.groupexpensesbackend.service;
 
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
-import com.splitspendings.groupexpensesbackend.model.GroupMembershipSettings;
 
 import java.util.UUID;
 
@@ -9,15 +8,17 @@ public interface GroupMembershipService {
 
     GroupMembership groupMembershipModelById(Long id);
 
-    GroupMembership groupActiveMembershipModel(UUID appUserId, Long groupID);
+    GroupMembership groupActiveMembershipModelByGroupId(UUID appUserId, Long groupID);
 
     boolean isAppUserActiveMemberOfGroup(UUID appUserId, Long groupID);
 
-    void verifyActiveMembership(UUID appUserId, Long groupId);
+    void verifyActiveMembershipByGroupId(UUID appUserId, Long groupId);
 
-    void verifyCurrentUserActiveMembership(Long groupId);
+    void verifyCurrentUserActiveMembershipByGroupId(Long groupId);
 
-    GroupMembershipSettings createDefaultGroupMembershipSettings();
+    boolean isAppUserActiveMember(UUID appUserId, GroupMembership groupMembership);
 
-    GroupMembershipSettings createAndSaveDefaultGroupMembershipSettingsForGroupMembership(GroupMembership groupMembership);
+    void verifyActiveMembership(UUID appUserId, GroupMembership groupMembership);
+
+    void verifyCurrentUserActiveMembership(GroupMembership groupMembership);
 }

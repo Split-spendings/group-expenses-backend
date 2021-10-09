@@ -26,7 +26,10 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -55,7 +58,7 @@ public class SpendingServiceImpl implements SpendingService {
     @Override
     public SpendingDto spendingById(Long id) {
         Spending spending = spendingModelById(id);
-        groupMembershipService.verifyCurrentUserActiveMembership(spending.getAddedByGroupMembership().getGroup().getId());
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(spending.getAddedByGroupMembership().getGroup().getId());
         return spendingMapper.spendingToSpendingDto(spending);
     }
 
@@ -69,7 +72,7 @@ public class SpendingServiceImpl implements SpendingService {
         }
 
         UUID currentAppUserId = identityService.currentUserID();
-        GroupMembership addedByGroupMembership = groupMembershipService.groupActiveMembershipModel(currentAppUserId, newSpendingDto.getGroupID());
+        GroupMembership addedByGroupMembership = groupMembershipService.groupActiveMembershipModelByGroupId(currentAppUserId, newSpendingDto.getGroupID());
         GroupMembership paidByGroupMembership = groupMembershipService.groupMembershipModelById(newSpendingDto.getPaidByGroupMembershipId());
 
         Group group = addedByGroupMembership.getGroup();
