@@ -14,10 +14,7 @@ import com.splitspendings.groupexpensesbackend.repository.GroupInviteRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
-import com.splitspendings.groupexpensesbackend.service.AppUserService;
-import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
-import com.splitspendings.groupexpensesbackend.service.GroupService;
-import com.splitspendings.groupexpensesbackend.service.IdentityService;
+import com.splitspendings.groupexpensesbackend.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -56,6 +53,7 @@ public class GroupServiceImpl implements GroupService {
     private final IdentityService identityService;
     private final AppUserService appUserService;
     private final GroupMembershipService groupMembershipService;
+    private final GroupMembershipSettingsService groupMembershipSettingsService;
 
     @Override
     public Group groupModelById(Long id) {
@@ -94,7 +92,7 @@ public class GroupServiceImpl implements GroupService {
 
         GroupMembership createdGroupMembership = groupMembershipRepository.save(groupMembership);
 
-        groupMembershipService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(createdGroupMembership);
+        groupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(createdGroupMembership);
 
         return groupMapper.groupToGroupInfoDto(createdGroup);
     }
@@ -108,7 +106,7 @@ public class GroupServiceImpl implements GroupService {
             throw new ConstraintViolationException(violations);
         }
 
-        groupMembershipService.verifyCurrentUserActiveMembership(id);
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
 
         Group existingGroup = groupModelById(id);
 
@@ -120,7 +118,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupActiveMembersDto groupActiveMembersById(Long id) {
-        groupMembershipService.verifyCurrentUserActiveMembership(id);
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
 
         Group group = groupModelById(id);
 
@@ -135,8 +133,8 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupMembershipDto groupMembership(Long id, UUID appUserId) {
-        groupMembershipService.verifyCurrentUserActiveMembership(id);
-        GroupMembership groupMembership = groupMembershipService.groupActiveMembershipModel(appUserId, id);
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
+        GroupMembership groupMembership = groupMembershipService.groupActiveMembershipModelByGroupId(appUserId, id);
         return groupMembershipMapper.groupMembershipToGroupMembershipDto(groupMembership);
     }
 
@@ -155,7 +153,7 @@ public class GroupServiceImpl implements GroupService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot invite self in a group");
         }
 
-        GroupMembership invitedByGroupMembership = groupMembershipService.groupActiveMembershipModel(currentAppUserId, groupId);
+        GroupMembership invitedByGroupMembership = groupMembershipService.groupActiveMembershipModelByGroupId(currentAppUserId, groupId);
 
         if (groupMembershipService.isAppUserActiveMemberOfGroup(invitedAppUserId, groupId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invited user is already an active group member");
@@ -221,7 +219,7 @@ public class GroupServiceImpl implements GroupService {
             groupMembership.setFirstTimeJoined(ZonedDateTime.now());
             groupMembership.setLastTimeJoined(ZonedDateTime.now());
             groupMembershipRepository.save(groupMembership);
-            groupMembershipService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(groupMembership);
+            groupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(groupMembership);
         } else {
             throw new InvalidGroupInviteException(HttpStatus.BAD_REQUEST, "Invited user is already an active member of a group");
         }
@@ -252,7 +250,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupSpendingsDto groupSpendings(Long id) {
-        groupMembershipService.verifyCurrentUserActiveMembership(id);
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
 
         Group group = groupModelById(id);
 

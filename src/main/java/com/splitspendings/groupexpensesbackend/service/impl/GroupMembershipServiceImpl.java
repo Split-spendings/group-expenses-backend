@@ -1,11 +1,7 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
-import com.splitspendings.groupexpensesbackend.model.GroupMembershipSettings;
-import com.splitspendings.groupexpensesbackend.model.enums.GroupTheme;
-import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
-import com.splitspendings.groupexpensesbackend.repository.GroupMembershipSettingsRepository;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +20,6 @@ import java.util.UUID;
 public class GroupMembershipServiceImpl implements GroupMembershipService {
 
     private final GroupMembershipRepository groupMembershipRepository;
-    private final GroupMembershipSettingsRepository groupMembershipSettingsRepository;
 
     private final IdentityService identityService;
 
@@ -34,7 +29,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     }
 
     @Override
-    public GroupMembership groupActiveMembershipModel(UUID appUserId, Long groupID) {
+    public GroupMembership groupActiveMembershipModelByGroupId(UUID appUserId, Long groupID) {
         return groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupID, appUserId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not an active member of a group"));
     }
 
@@ -44,14 +39,14 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     }
 
     @Override
-    public void verifyActiveMembership(UUID appUserId, Long groupId) {
+    public void verifyActiveMembershipByGroupId(UUID appUserId, Long groupId) {
         if(!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not an active member of a group");
         }
     }
 
     @Override
-    public void verifyCurrentUserActiveMembership(Long groupId) {
+    public void verifyCurrentUserActiveMembershipByGroupId(Long groupId) {
         UUID appUserId = identityService.currentUserID();
         if(!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current user is not an active member of a group");
@@ -59,17 +54,22 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     }
 
     @Override
-    public GroupMembershipSettings createDefaultGroupMembershipSettings() {
-        GroupMembershipSettings groupMembershipSettings = new GroupMembershipSettings();
-        groupMembershipSettings.setGroupTheme(GroupTheme.DEFAULT);
-        groupMembershipSettings.setNotificationOption(NotificationOption.ALL);
-        return groupMembershipSettings;
+    public boolean isAppUserActiveMember(UUID appUserId, GroupMembership groupMembership) {
+        return groupMembership.getActive() && groupMembership.getAppUser().getId().equals(appUserId);
     }
 
     @Override
-    public GroupMembershipSettings createAndSaveDefaultGroupMembershipSettingsForGroupMembership(GroupMembership groupMembership) {
-        GroupMembershipSettings defaultGroupMembershipSettings = createDefaultGroupMembershipSettings();
-        defaultGroupMembershipSettings.setGroupMembership(groupMembership);
-        return groupMembershipSettingsRepository.save(defaultGroupMembershipSettings);
+    public void verifyActiveMembership(UUID appUserId, GroupMembership groupMembership) {
+        if(!isAppUserActiveMember(appUserId, groupMembership)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not an active member of a group");
+        }
+    }
+
+    @Override
+    public void verifyCurrentUserActiveMembership(GroupMembership groupMembership) {
+        UUID appUserId = identityService.currentUserID();
+        if(!isAppUserActiveMember(appUserId, groupMembership)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not an active member of a group");
+        }
     }
 }

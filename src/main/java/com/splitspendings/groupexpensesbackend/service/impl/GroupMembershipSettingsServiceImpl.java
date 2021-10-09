@@ -1,10 +1,14 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
-import com.splitspendings.groupexpensesbackend.dto.groupmembershipsettings.GroupMembershipSettingsInfoDto;
-import com.splitspendings.groupexpensesbackend.dto.groupmembershipsettings.UpdateGroupMembershipSettingsInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.groupmembershipsettings.GroupMembershipSettingsDto;
+import com.splitspendings.groupexpensesbackend.dto.groupmembershipsettings.UpdateGroupMembershipSettingsDto;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMembershipSettingsMapper;
+import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import com.splitspendings.groupexpensesbackend.model.GroupMembershipSettings;
+import com.splitspendings.groupexpensesbackend.model.enums.GroupTheme;
+import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipSettingsRepository;
+import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +26,28 @@ import javax.validation.Validator;
 @Slf4j
 public class GroupMembershipSettingsServiceImpl implements GroupMembershipSettingsService {
 
+    private final Validator validator;
+
     private final GroupMembershipSettingsRepository groupMembershipSettingsRepository;
 
     private final GroupMembershipSettingsMapper groupMembershipSettingsMapper;
 
-    private final Validator validator;
+    private final GroupMembershipService groupMembershipService;
+
+    @Override
+    public GroupMembershipSettings createDefaultGroupMembershipSettings() {
+        GroupMembershipSettings groupMembershipSettings = new GroupMembershipSettings();
+        groupMembershipSettings.setGroupTheme(GroupTheme.DEFAULT);
+        groupMembershipSettings.setNotificationOption(NotificationOption.ALL);
+        return groupMembershipSettings;
+    }
+
+    @Override
+    public GroupMembershipSettings createAndSaveDefaultGroupMembershipSettingsForGroupMembership(GroupMembership groupMembership) {
+        GroupMembershipSettings defaultGroupMembershipSettings = createDefaultGroupMembershipSettings();
+        defaultGroupMembershipSettings.setGroupMembership(groupMembership);
+        return groupMembershipSettingsRepository.save(defaultGroupMembershipSettings);
+    }
 
     @Override
     public GroupMembershipSettings groupMembershipSettingsModelById(Long id) {
@@ -34,19 +55,21 @@ public class GroupMembershipSettingsServiceImpl implements GroupMembershipSettin
     }
 
     @Override
-    public GroupMembershipSettingsInfoDto groupMembershipSettingsInfoById(Long id) {
-        return groupMembershipSettingsMapper.groupMembershipSettingsToGroupMembershipSettingsInfoDto(groupMembershipSettingsModelById(id));
+    public GroupMembershipSettingsDto groupMembershipSettingsById(Long id) {
+        return groupMembershipSettingsMapper.groupMembershipSettingsToGroupMembershipSettingsDto(groupMembershipSettingsModelById(id));
     }
 
     @Override
-    public GroupMembershipSettingsInfoDto updateGroupMembershipSettingsInfo(Long id, UpdateGroupMembershipSettingsInfoDto updateGroupMembershipSettingsInfoDto) {
-        ValidatorUtil.validate(validator, updateGroupMembershipSettingsInfoDto);
-        GroupMembershipSettings existingGroup = groupMembershipSettingsModelById(id);
-        if(!existingGroup.getGroupMembership().getActive()){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current user is not an active member of a group");
-        }
-        GroupMembershipSettings toUpdate = groupMembershipSettingsMapper.copyUpdateGroupMembershipSettingsInfoDtoToGroup(updateGroupMembershipSettingsInfoDto, existingGroup);
-        GroupMembershipSettings updatedGroup = groupMembershipSettingsRepository.save(toUpdate);
-        return groupMembershipSettingsMapper.groupMembershipSettingsToGroupMembershipSettingsInfoDto(updatedGroup);
+    public GroupMembershipSettingsDto updateGroupMembershipSettings(Long id, UpdateGroupMembershipSettingsDto updateGroupMembershipSettingsDto) {
+        ValidatorUtil.validate(validator, updateGroupMembershipSettingsDto);
+
+        GroupMembership groupMembership = groupMembershipService.groupMembershipModelById(id);
+        groupMembershipService.verifyCurrentUserActiveMembership(groupMembership);
+
+        GroupMembershipSettings existingGroupMembershipSettings = groupMembership.getGroupMembershipSettings();
+
+        GroupMembershipSettings newGroupMembershipSettings = groupMembershipSettingsMapper.copyUpdateGroupMembershipSettingsDtoToGroupMembershipSettings(updateGroupMembershipSettingsDto, existingGroupMembershipSettings);
+        GroupMembershipSettings updatedGroupMembershipSettings = groupMembershipSettingsRepository.save(newGroupMembershipSettings);
+        return groupMembershipSettingsMapper.groupMembershipSettingsToGroupMembershipSettingsDto(updatedGroupMembershipSettings);
     }
 }
