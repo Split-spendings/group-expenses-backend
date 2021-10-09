@@ -83,13 +83,14 @@ public class DatabaseLoader implements CommandLineRunner {
     private GroupMembershipSettings groupMembershipSettings6;
 
     private Spending spending1;
-
     private Spending spending2;
 
     @SuppressWarnings("all")
     private SpendingComment spendingComment1;
     @SuppressWarnings("all")
     private SpendingComment spendingComment2;
+    @SuppressWarnings("all")
+    private SpendingComment spendingComment3;
 
     private ItemCategory itemCategory1;
     @SuppressWarnings("all")
@@ -175,11 +176,18 @@ public class DatabaseLoader implements CommandLineRunner {
         spendingComment2 = new SpendingComment();
         spendingComment2.setSpending(spending1);
         spendingComment2.setMessage("Dummy comment 2");
-        spendingComment2.setAddedByAppUser(appUser2);
+        spendingComment2.setAddedByAppUser(appUser1);
         spendingComment2.setTimeAdded(ZonedDateTime.of(LocalDateTime.of(2021, 9, 24, 11,30,34), ZoneId.of("-02:00")));
+
+        spendingComment3 = new SpendingComment();
+        spendingComment3.setSpending(spending2);
+        spendingComment3.setMessage("Dummy comment 3");
+        spendingComment3.setAddedByAppUser(appUser2);
+        spendingComment3.setTimeAdded(ZonedDateTime.of(LocalDateTime.of(2020, 9, 24, 11,30,34), ZoneId.of("-02:00")));
 
         spendingCommentRepository.save(spendingComment1);
         spendingCommentRepository.save(spendingComment2);
+        spendingCommentRepository.save(spendingComment3);
     }
 
     private void setUpSpendings() {

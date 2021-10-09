@@ -16,6 +16,8 @@ public interface SpendingRepository extends JpaRepository<Spending, Long> {
     @Query( "SELECT s " +
             "FROM Spending s " +
             "LEFT JOIN fetch s.comments " +
-            "WHERE s.id = ?1 AND s.addedByGroupMembership.appUser.id = ?2")
+            "WHERE s.id = ?1 " +
+            "AND s.addedByGroupMembership.appUser.id = ?2 " +
+            "AND s.addedByGroupMembership.active = true")
     Optional<Spending> findByIdFetchComments(Long spendingId, UUID userId);
 }
