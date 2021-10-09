@@ -1,15 +1,13 @@
 package com.splitspendings.groupexpensesbackend.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "spending_comment")
-@Getter
-@Setter
+@Data
 public class SpendingComment {
 
     public static final int MESSAGE_MIN_LENGTH = 1;

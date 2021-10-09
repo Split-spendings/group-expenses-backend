@@ -1,8 +1,8 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
 import com.splitspendings.groupexpensesbackend.dto.spending.NewSpendingDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.SpendingCommentsDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingDto;
-import com.splitspendings.groupexpensesbackend.dto.spendingcomment.SpendingCommentDto;
 import com.splitspendings.groupexpensesbackend.service.SpendingService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +29,7 @@ public class SpendingController {
     }
 
     @GetMapping("/{spendingId}/comments")
-    public Iterable<SpendingCommentDto> getSpendingComments(@PathVariable Long spendingId){
-        throw new UnsupportedOperationException();
-        //todo
+    public SpendingCommentsDto getSpendingComments(@PathVariable Long spendingId){
+        return spendingService.findAllBySpendingId(spendingId);
     }
 }

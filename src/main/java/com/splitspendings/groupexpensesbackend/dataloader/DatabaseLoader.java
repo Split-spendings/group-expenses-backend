@@ -14,6 +14,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -83,6 +86,8 @@ public class DatabaseLoader implements CommandLineRunner {
 
     @SuppressWarnings("all")
     private SpendingComment spendingComment1;
+    @SuppressWarnings("all")
+    private SpendingComment spendingComment2;
 
     private ItemCategory itemCategory1;
     @SuppressWarnings("all")
@@ -163,8 +168,16 @@ public class DatabaseLoader implements CommandLineRunner {
         spendingComment1.setSpending(spending1);
         spendingComment1.setMessage("Dummy comment 1");
         spendingComment1.setAddedByAppUser(appUser1);
+        spendingComment1.setTimeAdded(ZonedDateTime.of(LocalDateTime.of(2020, 8, 27, 12,34,56), ZoneId.of("+02:00")));
+
+        spendingComment2 = new SpendingComment();
+        spendingComment2.setSpending(spending1);
+        spendingComment2.setMessage("Dummy comment 2");
+        spendingComment2.setAddedByAppUser(appUser2);
+        spendingComment2.setTimeAdded(ZonedDateTime.of(LocalDateTime.of(2021, 9, 24, 11,30,34), ZoneId.of("-02:00")));
 
         spendingCommentRepository.save(spendingComment1);
+        spendingCommentRepository.save(spendingComment2);
     }
 
     private void setUpSpendings() {

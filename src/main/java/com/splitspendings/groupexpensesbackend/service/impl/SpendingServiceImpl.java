@@ -3,6 +3,7 @@ package com.splitspendings.groupexpensesbackend.service.impl;
 import com.splitspendings.groupexpensesbackend.dto.item.NewItemDto;
 import com.splitspendings.groupexpensesbackend.dto.share.NewShareDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.NewSpendingDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.SpendingCommentsDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingDto;
 import com.splitspendings.groupexpensesbackend.mapper.ItemMapper;
 import com.splitspendings.groupexpensesbackend.mapper.ShareMapper;
@@ -126,5 +127,10 @@ public class SpendingServiceImpl implements SpendingService {
         shareRepository.saveAll(shares);
 
         return spendingMapper.spendingToSpendingDto(createdSpending);
+    }
+
+    @Override
+    public SpendingCommentsDto findAllBySpendingId(Long spendingId) {
+        return spendingMapper.spendingToSpendingCommentsDto(spendingRepository.findByIdFetchComments(spendingId));
     }
 }
