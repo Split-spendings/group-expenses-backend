@@ -25,8 +25,7 @@ public class SpendingCommentController {
 
     @PostMapping
     public SpendingCommentDto createSpendingComment(@RequestBody NewSpendingCommentDto newSpendingCommentDto) {
-        throw new UnsupportedOperationException();
-        //todo
+        return spendingCommentService.createSpendingComment(newSpendingCommentDto);
     }
 
     @PatchMapping("/{id}")
