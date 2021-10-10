@@ -21,4 +21,10 @@ public interface GroupMembershipService {
     void verifyActiveMembership(UUID appUserId, GroupMembership groupMembership);
 
     void verifyCurrentUserActiveMembership(GroupMembership groupMembership);
+
+    boolean isAppUserActiveMember(UUID appUserId, Long id);
+
+    void verifyActiveMembership(UUID appUserId, Long id);
+
+    void verifyCurrentUserActiveMembership(Long id);
 }
