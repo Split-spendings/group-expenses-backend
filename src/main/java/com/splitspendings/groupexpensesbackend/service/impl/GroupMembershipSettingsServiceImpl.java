@@ -56,18 +56,16 @@ public class GroupMembershipSettingsServiceImpl implements GroupMembershipSettin
 
     @Override
     public GroupMembershipSettingsDto groupMembershipSettingsById(Long id) {
+        groupMembershipService.verifyCurrentUserActiveMembership(id);
         return groupMembershipSettingsMapper.groupMembershipSettingsToGroupMembershipSettingsDto(groupMembershipSettingsModelById(id));
     }
 
     @Override
     public GroupMembershipSettingsDto updateGroupMembershipSettings(Long id, UpdateGroupMembershipSettingsDto updateGroupMembershipSettingsDto) {
         ValidatorUtil.validate(validator, updateGroupMembershipSettingsDto);
+        groupMembershipService.verifyCurrentUserActiveMembership(id);
 
-        GroupMembership groupMembership = groupMembershipService.groupMembershipModelById(id);
-        groupMembershipService.verifyCurrentUserActiveMembership(groupMembership);
-
-        GroupMembershipSettings existingGroupMembershipSettings = groupMembership.getGroupMembershipSettings();
-
+        GroupMembershipSettings existingGroupMembershipSettings = groupMembershipSettingsModelById(id);
         GroupMembershipSettings newGroupMembershipSettings = groupMembershipSettingsMapper.copyUpdateGroupMembershipSettingsDtoToGroupMembershipSettings(updateGroupMembershipSettingsDto, existingGroupMembershipSettings);
         GroupMembershipSettings updatedGroupMembershipSettings = groupMembershipSettingsRepository.save(newGroupMembershipSettings);
         return groupMembershipSettingsMapper.groupMembershipSettingsToGroupMembershipSettingsDto(updatedGroupMembershipSettings);

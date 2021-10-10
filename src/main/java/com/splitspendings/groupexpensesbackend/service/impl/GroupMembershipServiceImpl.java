@@ -72,4 +72,25 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current user is not an active member of a group");
         }
     }
+
+    @Override
+    public boolean isAppUserActiveMember(UUID appUserId, Long id) {
+        GroupMembership groupMembership = groupMembershipModelById(id);
+        return isAppUserActiveMember(appUserId, groupMembership);
+    }
+
+    @Override
+    public void verifyActiveMembership(UUID appUserId, Long id) {
+        if(!isAppUserActiveMember(appUserId, id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not an active member of a group");
+        }
+    }
+
+    @Override
+    public void verifyCurrentUserActiveMembership(Long id) {
+        UUID appUserId = identityService.currentUserID();
+        if(!isAppUserActiveMember(appUserId, id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current user is not an active member of a group");
+        }
+    }
 }
