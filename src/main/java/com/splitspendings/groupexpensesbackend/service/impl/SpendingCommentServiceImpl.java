@@ -1,5 +1,6 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
+import com.splitspendings.groupexpensesbackend.dto.spendingcomment.NewSpendingCommentDto;
 import com.splitspendings.groupexpensesbackend.dto.spendingcomment.SpendingCommentDto;
 import com.splitspendings.groupexpensesbackend.mapper.SpendingCommentMapper;
 import com.splitspendings.groupexpensesbackend.model.SpendingComment;
@@ -32,5 +33,10 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("Spending comment with id = {%d} not found", commentId)));
         return spendingCommentMapper.spendingCommentToSpendingCommentDto(spendingComment);
+    }
+
+    @Override
+    public SpendingCommentDto createSpendingComment(NewSpendingCommentDto newSpendingCommentDto) {
+        return null;
     }
 }
