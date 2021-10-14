@@ -45,7 +45,6 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
     }
 
     @Override
-    @Transactional
     public SpendingCommentDto createSpendingComment(NewSpendingCommentDto newSpendingCommentDto) {
         ValidatorUtil.validate(validator, newSpendingCommentDto);
 

@@ -53,13 +53,15 @@ public class SpendingServiceImpl implements SpendingService {
 
     @Override
     public Spending spendingModelById(Long id) {
-        return spendingRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Spending not found"));
+        return spendingRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("No spending with id = {%d} found", id)));
     }
 
     @Override
     public SpendingDto spendingById(Long id) {
         Spending spending = spendingModelById(id);
-        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(spending.getAddedByGroupMembership().getGroup().getId());
+        verifyCurrentUserActiveMembership(spending);
         return spendingMapper.spendingToSpendingDto(spending);
     }
 
@@ -131,9 +133,12 @@ public class SpendingServiceImpl implements SpendingService {
 
     @Override
     public SpendingCommentsDto findAllBySpendingId(Long spendingId) {
-        Spending spending = spendingRepository.findById(spendingId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("No spending with id = {%d} found", spendingId)));
+        Spending spending = spendingModelById(spendingId);
+        verifyCurrentUserActiveMembership(spending);
+        return spendingMapper.spendingToSpendingCommentsDto(spending);
+    }
+
+    private void verifyCurrentUserActiveMembership(Spending spending){
         Long groupId = spending.getAddedByGroupMembership().getGroup().getId();
         groupMembershipService.verifyCurrentUserActiveMembership(groupId);
         return spendingMapper.spendingToSpendingCommentsDto(spending);

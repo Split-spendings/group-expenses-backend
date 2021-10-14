@@ -28,8 +28,8 @@ public class SpendingController {
         return spendingService.createSpending(newSpendingDto);
     }
 
-    @GetMapping("/{spendingId}/comments")
-    public SpendingCommentsDto getSpendingComments(@PathVariable Long spendingId){
-        return spendingService.findAllBySpendingId(spendingId);
+    @GetMapping("/{id}/comments")
+    public SpendingCommentsDto getSpendingComments(@PathVariable Long id){
+        return spendingService.findAllBySpendingId(id);
     }
 }
