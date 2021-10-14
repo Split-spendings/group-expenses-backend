@@ -2,24 +2,21 @@ package com.splitspendings.groupexpensesbackend.dto.spendingcomment;
 
 import com.splitspendings.groupexpensesbackend.util.TrimUtil;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
 @Data
+@NoArgsConstructor
 public class NewSpendingCommentDto {
 
-    public NewSpendingCommentDto(Long spendingID, String message) {
-        this.spendingID = spendingID;
-        setMessage(message);
-    }
-
     @NotNull
-    private final Long spendingID;
+    private Long spendingID;
 
     @NotNull
     private String message;
 
-    private void setMessage(String message){
+    public void setMessage(String message){
         this.message = TrimUtil.trimAndRemoveExtraSpaces(message);
     }
 }
