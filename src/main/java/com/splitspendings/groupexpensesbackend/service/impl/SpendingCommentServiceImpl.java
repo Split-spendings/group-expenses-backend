@@ -2,6 +2,7 @@ package com.splitspendings.groupexpensesbackend.service.impl;
 
 import com.splitspendings.groupexpensesbackend.dto.spendingcomment.NewSpendingCommentDto;
 import com.splitspendings.groupexpensesbackend.dto.spendingcomment.SpendingCommentDto;
+import com.splitspendings.groupexpensesbackend.dto.spendingcomment.UpdateSpendingCommentDto;
 import com.splitspendings.groupexpensesbackend.mapper.SpendingCommentMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Spending;
@@ -58,5 +59,11 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
         SpendingComment spendingComment = new SpendingComment(message, spending, appUser);
         spendingCommentRepository.save(spendingComment);
         return spendingCommentMapper.spendingCommentToSpendingCommentDto(spendingComment);
+    }
+
+    @Override
+    public SpendingCommentDto updateSpendingCommentInfo(Long id, UpdateSpendingCommentDto updateSpendingCommentDto) {
+        throw new UnsupportedOperationException();
+        //todo
     }
 }

@@ -30,7 +30,6 @@ public class SpendingCommentController {
 
     @PatchMapping("/{id}")
     public SpendingCommentDto updateSpendingCommentInfo(@PathVariable Long id, @RequestBody UpdateSpendingCommentDto updateSpendingCommentDto) {
-        throw new UnsupportedOperationException();
-        //todo
+        return spendingCommentService.updateSpendingCommentInfo(id, updateSpendingCommentDto);
     }
 }
