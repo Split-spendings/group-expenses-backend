@@ -141,6 +141,5 @@ public class SpendingServiceImpl implements SpendingService {
     private void verifyCurrentUserActiveMembership(Spending spending){
         Long groupId = spending.getAddedByGroupMembership().getGroup().getId();
         groupMembershipService.verifyCurrentUserActiveMembership(groupId);
-        return spendingMapper.spendingToSpendingCommentsDto(spending);
     }
 }
