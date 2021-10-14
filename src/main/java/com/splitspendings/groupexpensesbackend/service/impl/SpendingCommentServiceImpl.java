@@ -8,10 +8,7 @@ import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Spending;
 import com.splitspendings.groupexpensesbackend.model.SpendingComment;
 import com.splitspendings.groupexpensesbackend.repository.SpendingCommentRepository;
-import com.splitspendings.groupexpensesbackend.service.AppUserService;
-import com.splitspendings.groupexpensesbackend.service.IdentityService;
-import com.splitspendings.groupexpensesbackend.service.SpendingCommentService;
-import com.splitspendings.groupexpensesbackend.service.SpendingService;
+import com.splitspendings.groupexpensesbackend.service.*;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +29,7 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
 
     private final SpendingService spendingService;
     private final AppUserService appUserService;
-    private final IdentityService identityService;
+    private final GroupMembershipService groupMembershipService;
 
     private final SpendingCommentMapper spendingCommentMapper;
 
@@ -41,9 +38,13 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
     @Override
     public SpendingCommentDto spendingCommentById(Long commentId) {
         SpendingComment spendingComment = spendingCommentRepository
-                .findById(commentId, identityService.currentUserID())
+                .findById(commentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("Spending comment with id = {%d} not found", commentId)));
+
+        Long groupId = spendingComment.getSpending().getAddedByGroupMembership().getId();
+        groupMembershipService.verifyCurrentUserActiveMembership(groupId);
+
         return spendingCommentMapper.spendingCommentToSpendingCommentDto(spendingComment);
     }
 
