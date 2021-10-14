@@ -30,6 +30,7 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
     private final SpendingService spendingService;
     private final AppUserService appUserService;
     private final GroupMembershipService groupMembershipService;
+    private final IdentityService identityService;
 
     private final SpendingCommentMapper spendingCommentMapper;
 
@@ -54,11 +55,16 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
         ValidatorUtil.validate(validator, newSpendingCommentDto);
 
         Spending spending = spendingService.spendingModelById(newSpendingCommentDto.getSpendingID());
-        AppUser appUser = appUserService.appUserModelById(newSpendingCommentDto.getAddedByAppUserId());
+
+        Long groupId = spending.getAddedByGroupMembership().getGroup().getId();
+        groupMembershipService.verifyCurrentUserActiveMembership(groupId);
+
         String message = newSpendingCommentDto.getMessage();
-        //todo add check whether user is active member of a group
+        AppUser appUser = appUserService.appUserModelById(identityService.currentUserID());
+
         SpendingComment spendingComment = new SpendingComment(message, spending, appUser);
         spendingCommentRepository.save(spendingComment);
+
         return spendingCommentMapper.spendingCommentToSpendingCommentDto(spendingComment);
     }
 
