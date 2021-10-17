@@ -24,27 +24,89 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
 
     private final IdentityService identityService;
 
+    /**
+     * @param id
+     *         id of a {@link GroupMembership} to be found
+     *
+     * @return {@link GroupMembership}
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if there is no {@link GroupMembership} with given id in the
+     *         database
+     */
     @Override
     public GroupMembership groupMembershipModelById(Long id) {
-        return groupMembershipRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group membership not found"));
+        return groupMembershipRepository.findById(id).
+                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("GroupMembership with id = {%d} not found", id)));
     }
 
+    /**
+     * Finds {@link GroupMembership} based on appUserId and groupId
+     *
+     * @param appUserId
+     *         id of {@link AppUser} to be checked
+     * @param groupId
+     *         id of {@link Group} to be checked
+     *
+     * @return {@link GroupMembership} with {GroupMembership#active} set to true
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if there is no {@link GroupMembership} with given {@param
+     *         appUserId} and {@param groupId} and {GroupMembership#active} set to true
+     */
     @Override
     public GroupMembership groupActiveMembershipModelByGroupId(UUID appUserId, Long groupId) {
-        return groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupId, appUserId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not an active member of a group"));
+        return groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupId, appUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("User with id = {%s} is not an active member of a Group with id = {%d}",
+                                appUserId.toString(),
+                                groupId)));
     }
 
+    /**
+     * @param appUserId
+     *         id of {@link AppUser} to be checked
+     * @param groupId
+     *         id of {@link Group} to be checked
+     *
+     * @return true if there is a {@link GroupMembership} with given {@param appUserId} and {@param groupId} and
+     * {GroupMembership#active} set to true, false otherwise
+     */
     @Override
     public boolean isAppUserActiveMemberOfGroup(UUID appUserId, Long groupId) {
         return groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupId, appUserId).isPresent();
     }
 
+    /**
+     * @param appUserId
+     *         id of {@link AppUser} to be checked
+     * @param groupId
+     *         id of {@link Group} to be checked
+     *
+     * @return true if {@link AppUser} has admin rights on {@link Group}, false otherwise
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if there is no {@link GroupMembership} with given {@link
+     *         AppUser} and {@link Group} in the database
+     */
     @Override
     public boolean isAdminOfGroup(UUID appUserId, Long groupId) {
         GroupMembership groupMembership = groupActiveMembershipModelByGroupId(appUserId, groupId);
         return groupMembership.getHasAdminRights();
     }
 
+    /**
+     * Checks whether given {@link AppUser} is an active member of {@link Group}
+     *
+     * @param appUserId
+     *         id of {@link AppUser} to be checked
+     * @param groupId
+     *         id of {@link Group} to be checked
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} if there is none
+     */
     @Override
     public void verifyUserActiveMembershipByGroupId(UUID appUserId, Long groupId) {
         if (!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
@@ -56,12 +118,33 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
         }
     }
 
+    /**
+     * Checks whether current {@link AppUser} is an active member of {@link Group}
+     *
+     * @param groupId
+     *         id of {@link Group} to be checked
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} if there is none
+     */
     @Override
     public void verifyCurrentUserActiveMembershipByGroupId(Long groupId) {
         UUID appUserId = identityService.currentUserID();
         verifyUserActiveMembershipByGroupId(appUserId, groupId);
     }
 
+    /**
+     * Checks whether current {@link AppUser} is an active member of {@link GroupMembership}
+     *
+     * @param id
+     *         id of {@link GroupMembership} to be checked
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if there is no {@link GroupMembership} with given id
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} if current {@link AppUser} is not active member of {@link
+     *         GroupMembership}
+     */
     @Override
     public void verifyCurrentUserActiveMembershipById(Long id) {
         UUID appUserId = identityService.currentUserID();
