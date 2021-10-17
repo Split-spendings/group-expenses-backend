@@ -8,7 +8,11 @@ import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Spending;
 import com.splitspendings.groupexpensesbackend.model.SpendingComment;
 import com.splitspendings.groupexpensesbackend.repository.SpendingCommentRepository;
-import com.splitspendings.groupexpensesbackend.service.*;
+import com.splitspendings.groupexpensesbackend.service.AppUserService;
+import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
+import com.splitspendings.groupexpensesbackend.service.IdentityService;
+import com.splitspendings.groupexpensesbackend.service.SpendingCommentService;
+import com.splitspendings.groupexpensesbackend.service.SpendingService;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -130,6 +134,7 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
     }
 
     private boolean isAdminOfGroup(UUID appUserId, SpendingComment spendingComment) {
-        return groupMembershipService.isAdminOfGroup(appUserId, spendingComment.getSpending().getAddedByGroupMembership().getGroup().getId());
+        Long groupID = spendingComment.getSpending().getAddedByGroupMembership().getGroup().getId();
+        return groupMembershipService.isAdminOfGroup(appUserId, groupID);
     }
 }
