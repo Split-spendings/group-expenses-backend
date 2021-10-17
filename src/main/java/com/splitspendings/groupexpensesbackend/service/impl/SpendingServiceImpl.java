@@ -53,13 +53,37 @@ public class SpendingServiceImpl implements SpendingService {
     private final GroupMembershipService groupMembershipService;
     private final IdentityService identityService;
 
+    /**
+     * @param id
+     *         id of a {@link Spending} to be found
+     *
+     * @return {@link Spending} with given id
+     *
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link Spending} with given id
+     */
     @Override
     public Spending spendingModelById(Long id) {
         return spendingRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("No spending with id = {%d} found", id)));
+                .orElseThrow(() -> {
+                    String logMessage = String.format("No spending with id = {%d} found", id);
+                    log.info(logMessage);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
+                });
     }
 
+    /**
+     * @param id
+     *         id of a {@link Spending} to be found
+     *
+     * @return {@link SpendingDto} with given id
+     *
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link Spending} with given id
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#FORBIDDEN} when current {@link AppUser} has no rights to access {@link
+     *         Spending} with given id
+     */
     @Override
     public SpendingDto spendingById(Long id) {
         Spending spending = spendingModelById(id);
@@ -67,6 +91,31 @@ public class SpendingServiceImpl implements SpendingService {
         return spendingMapper.spendingToSpendingDto(spending);
     }
 
+    /**
+     * @param newSpendingDto
+     *         data to create new {@link Spending}
+     *
+     * @return {@link SpendingDto} with given id
+     *
+     * @throws ConstraintViolationException
+     *         when {@link NewSpendingDto} is invalid
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link Spending} with given id
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no active {@link GroupMembership} with given
+     *         {@link AppUser} and {@link Group}
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no active {@link GroupMembership} with given id
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#FORBIDDEN} when current {@link AppUser} has no rights to access {@link
+     *         Spending} with given id
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#BAD_REQUEST} when paid by {@link AppUser} is not an active member of {@link
+     *         Group} with given id
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#BAD_REQUEST} when paid for {@link AppUser} is not an active member of
+     *         {@link Group} with given id
+     */
     @Override
     public SpendingDto createSpending(NewSpendingDto newSpendingDto) {
         ValidatorUtil.validate(validator, newSpendingDto);
@@ -128,6 +177,18 @@ public class SpendingServiceImpl implements SpendingService {
         return spendingMapper.spendingToSpendingDto(createdSpending);
     }
 
+    /**
+     * @param spendingId
+     *         id of a {@link Spending} to find all {@link SpendingComment}
+     *
+     * @return all {@link SpendingComment} of a given {@link Spending}
+     *
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link Spending} with given id
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} if current {@link AppUser} is not an active member of
+     *         {@link Group}
+     */
     @Override
     public SpendingCommentsDto getSpendingComments(Long spendingId) {
         Spending spending = spendingModelById(spendingId);
@@ -135,6 +196,9 @@ public class SpendingServiceImpl implements SpendingService {
         return spendingMapper.spendingToSpendingCommentsDto(spending);
     }
 
+    /**
+     * Delegates job of checking whether current {@link AppUser} is an active member of a {@link Group}
+     */
     private void verifyCurrentUserActiveMembershipBySpending(Spending spending) {
         Long groupId = spending.getAddedByGroupMembership().getGroup().getId();
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(groupId);

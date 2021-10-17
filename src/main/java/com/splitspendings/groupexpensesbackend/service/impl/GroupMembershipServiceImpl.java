@@ -105,7 +105,8 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
      *         id of {@link Group} to be checked
      *
      * @throws ResponseStatusException
-     *         with status code {@link HttpStatus#FORBIDDEN} if there is none
+     *         with status code {@link HttpStatus#FORBIDDEN} if {@link AppUser} is not an active member of {@link
+     *         Group}
      */
     @Override
     public void verifyUserActiveMembershipByGroupId(UUID appUserId, Long groupId) {
@@ -125,7 +126,8 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
      *         id of {@link Group} to be checked
      *
      * @throws ResponseStatusException
-     *         with status code {@link HttpStatus#FORBIDDEN} if there is none
+     *         with status code {@link HttpStatus#FORBIDDEN} if current {@link AppUser} is not an active member of
+     *         {@link Group}
      */
     @Override
     public void verifyCurrentUserActiveMembershipByGroupId(Long groupId) {
