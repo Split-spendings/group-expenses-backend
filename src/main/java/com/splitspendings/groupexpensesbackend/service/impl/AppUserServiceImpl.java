@@ -1,6 +1,13 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
-import com.splitspendings.groupexpensesbackend.dto.appuser.*;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserFullInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserFullInfoWithSettingsDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserGroupsDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserIdentityDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserReceivedGroupInvitesDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.NewAppUserDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.UpdateLoginNameDto;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsWithIdDto;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.UpdateAppUserSettingsDto;
@@ -19,6 +26,7 @@ import com.splitspendings.groupexpensesbackend.repository.AppUserSettingsReposit
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
+import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,8 +34,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.util.List;
 import java.util.Optional;
@@ -107,12 +113,7 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public AppUserFullInfoWithSettingsDto createAppUser(NewAppUserDto newAppUserDto) {
-        newAppUserDto.trim();
-
-        Set<ConstraintViolation<NewAppUserDto>> violations = validator.validate(newAppUserDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        ValidatorUtil.validate(validator, newAppUserDto);
 
         AppUserIdentityDto appUserIdentityDto = identityService.currentUser();
 
@@ -155,18 +156,13 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public AppUserFullInfoDto updateAppUserLoginName(UpdateLoginNameDto updateLoginNameDto) {
-        updateLoginNameDto.trim();
-
-        Set<ConstraintViolation<UpdateLoginNameDto>> violations = validator.validate(updateLoginNameDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        ValidatorUtil.validate(validator, updateLoginNameDto);
 
         UUID id = identityService.currentUserID();
 
         Optional<AppUser> appUserOptionalByLoginName = appUserRepository.findByLoginName(updateLoginNameDto.getLoginName());
         if (appUserOptionalByLoginName.isPresent()) {
-            if(appUserOptionalByLoginName.get().getId().equals(id)) {
+            if (appUserOptionalByLoginName.get().getId().equals(id)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current user already has the provided login name");
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Login name is used by another user");
@@ -183,10 +179,7 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public AppUserSettingsWithIdDto updateAppUserSettings(UpdateAppUserSettingsDto updateAppUserSettingsDto) {
-        Set<ConstraintViolation<UpdateAppUserSettingsDto>> violations = validator.validate(updateAppUserSettingsDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        ValidatorUtil.validate(validator, updateAppUserSettingsDto);
 
         UUID id = identityService.currentUserID();
 

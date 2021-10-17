@@ -1,6 +1,10 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
-import com.splitspendings.groupexpensesbackend.dto.group.*;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
+import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
+import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteAcceptedDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
@@ -9,7 +13,14 @@ import com.splitspendings.groupexpensesbackend.service.GroupService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 

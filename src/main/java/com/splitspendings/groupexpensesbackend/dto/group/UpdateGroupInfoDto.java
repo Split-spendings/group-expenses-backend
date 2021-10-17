@@ -14,9 +14,7 @@ public class UpdateGroupInfoDto {
     @Size(min = Group.NAME_MIN_LENGTH, max = Group.NAME_MAX_LENGTH)
     private String name;
 
-    public void trim() {
-        if(name != null) {
-            name = TrimUtil.trimAndRemoveExtraSpaces(name);
-        }
+    public void setName(String name) {
+        this.name = TrimUtil.trimAndRemoveExtraSpaces(name);
     }
 }

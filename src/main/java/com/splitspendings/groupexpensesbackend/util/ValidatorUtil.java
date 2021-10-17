@@ -10,7 +10,7 @@ public class ValidatorUtil {
     private ValidatorUtil() {
     }
 
-    public static<T> void validate(Validator validator, T t) {
+    public static <T> void validate(Validator validator, T t) {
         Set<ConstraintViolation<T>> violations = validator.validate(t);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);

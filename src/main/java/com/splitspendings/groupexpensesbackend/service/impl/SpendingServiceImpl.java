@@ -3,11 +3,16 @@ package com.splitspendings.groupexpensesbackend.service.impl;
 import com.splitspendings.groupexpensesbackend.dto.item.NewItemDto;
 import com.splitspendings.groupexpensesbackend.dto.share.NewShareDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.NewSpendingDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.SpendingCommentsDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingDto;
 import com.splitspendings.groupexpensesbackend.mapper.ItemMapper;
 import com.splitspendings.groupexpensesbackend.mapper.ShareMapper;
 import com.splitspendings.groupexpensesbackend.mapper.SpendingMapper;
-import com.splitspendings.groupexpensesbackend.model.*;
+import com.splitspendings.groupexpensesbackend.model.Group;
+import com.splitspendings.groupexpensesbackend.model.GroupMembership;
+import com.splitspendings.groupexpensesbackend.model.Item;
+import com.splitspendings.groupexpensesbackend.model.Share;
+import com.splitspendings.groupexpensesbackend.model.Spending;
 import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import com.splitspendings.groupexpensesbackend.repository.ItemRepository;
 import com.splitspendings.groupexpensesbackend.repository.ShareRepository;
@@ -15,6 +20,7 @@ import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.service.SpendingService;
+import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,13 +28,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -52,24 +55,21 @@ public class SpendingServiceImpl implements SpendingService {
 
     @Override
     public Spending spendingModelById(Long id) {
-        return spendingRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Spending not found"));
+        return spendingRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("No spending with id = {%d} found", id)));
     }
 
     @Override
     public SpendingDto spendingById(Long id) {
         Spending spending = spendingModelById(id);
-        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(spending.getAddedByGroupMembership().getGroup().getId());
+        verifyCurrentUserActiveMembershipBySpending(spending);
         return spendingMapper.spendingToSpendingDto(spending);
     }
 
     @Override
     public SpendingDto createSpending(NewSpendingDto newSpendingDto) {
-        newSpendingDto.trim();
-
-        Set<ConstraintViolation<NewSpendingDto>> violations = validator.validate(newSpendingDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        ValidatorUtil.validate(validator, newSpendingDto);
 
         UUID currentAppUserId = identityService.currentUserID();
         GroupMembership addedByGroupMembership = groupMembershipService.groupActiveMembershipModelByGroupId(currentAppUserId, newSpendingDto.getGroupID());
@@ -77,7 +77,7 @@ public class SpendingServiceImpl implements SpendingService {
 
         Group group = addedByGroupMembership.getGroup();
 
-        if(paidByGroupMembership.getGroup() != group) {
+        if (paidByGroupMembership.getGroup() != group) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "paidByGroupMembershipId does not belong to a member of a group");
         }
 
@@ -95,11 +95,11 @@ public class SpendingServiceImpl implements SpendingService {
             Item item = itemMapper.newItemDtoToItem(newItemDto);
             BigDecimal price = new BigDecimal(0);
 
-            for(NewShareDto newShareDto : newItemDto.getNewShareDtoList()) {
+            for (NewShareDto newShareDto : newItemDto.getNewShareDtoList()) {
                 Share share = shareMapper.newShareDtoToShare(newShareDto);
 
                 GroupMembership paidForGroupMembership = groupMembershipService.groupMembershipModelById(newShareDto.getPaidForGroupMembershipId());
-                if(paidForGroupMembership.getGroup() != group) {
+                if (paidForGroupMembership.getGroup() != group) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "paidForGroupMembership does not belong to a member of a group");
                 }
                 share.setPaidByGroupMembership(paidByGroupMembership);
@@ -126,5 +126,17 @@ public class SpendingServiceImpl implements SpendingService {
         shareRepository.saveAll(shares);
 
         return spendingMapper.spendingToSpendingDto(createdSpending);
+    }
+
+    @Override
+    public SpendingCommentsDto getSpendingComments(Long spendingId) {
+        Spending spending = spendingModelById(spendingId);
+        verifyCurrentUserActiveMembershipBySpending(spending);
+        return spendingMapper.spendingToSpendingCommentsDto(spending);
+    }
+
+    private void verifyCurrentUserActiveMembershipBySpending(Spending spending) {
+        Long groupId = spending.getAddedByGroupMembership().getGroup().getId();
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(groupId);
     }
 }

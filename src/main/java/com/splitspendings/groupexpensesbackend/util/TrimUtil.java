@@ -6,6 +6,6 @@ public class TrimUtil {
     }
 
     public static String trimAndRemoveExtraSpaces(String string) {
-        return string.trim().replaceAll("\\s{2,}", " ");
+        return string == null ? null : string.trim().replaceAll("\\s{2,}", " ");
     }
 }

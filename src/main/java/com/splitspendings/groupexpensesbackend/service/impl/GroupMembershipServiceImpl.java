@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -25,72 +26,61 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
 
     @Override
     public GroupMembership groupMembershipModelById(Long id) {
-        return groupMembershipRepository.findById(id).orElseThrow(() -> new  ResponseStatusException(HttpStatus.NOT_FOUND, "Group membership not found"));
+        return groupMembershipRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group membership not found"));
     }
 
     @Override
-    public GroupMembership groupActiveMembershipModelByGroupId(UUID appUserId, Long groupID) {
-        return groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupID, appUserId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not an active member of a group"));
+    public GroupMembership groupActiveMembershipModelByGroupId(UUID appUserId, Long groupId) {
+        return groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupId, appUserId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not an active member of a group"));
     }
 
     @Override
-    public boolean isAppUserActiveMemberOfGroup(UUID appUserId, Long groupID) {
-        return groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupID, appUserId).isPresent();
+    public boolean isAppUserActiveMemberOfGroup(UUID appUserId, Long groupId) {
+        return groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupId, appUserId).isPresent();
     }
 
     @Override
-    public void verifyActiveMembershipByGroupId(UUID appUserId, Long groupId) {
-        if(!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not an active member of a group");
+    public boolean isAdminOfGroup(UUID appUserId, Long groupId) {
+        GroupMembership groupMembership = groupActiveMembershipModelByGroupId(appUserId, groupId);
+        return groupMembership.getHasAdminRights();
+    }
+
+    @Override
+    public void verifyUserActiveMembershipByGroupId(UUID appUserId, Long groupId) {
+        if (!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
+            String logMessage = String.format("User with id = {%s} is not an active member of a Group with id = {%d}",
+                    appUserId.toString(),
+                    groupId);
+            log.info(logMessage);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, logMessage);
         }
     }
 
     @Override
     public void verifyCurrentUserActiveMembershipByGroupId(Long groupId) {
         UUID appUserId = identityService.currentUserID();
-        if(!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current user is not an active member of a group");
-        }
+        verifyUserActiveMembershipByGroupId(appUserId, groupId);
     }
 
     @Override
-    public boolean isAppUserActiveMember(UUID appUserId, GroupMembership groupMembership) {
-        return groupMembership.getActive() && groupMembership.getAppUser().getId().equals(appUserId);
-    }
-
-    @Override
-    public void verifyActiveMembership(UUID appUserId, GroupMembership groupMembership) {
-        if(!isAppUserActiveMember(appUserId, groupMembership)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not an active member of a group");
-        }
-    }
-
-    @Override
-    public void verifyCurrentUserActiveMembership(GroupMembership groupMembership) {
+    public void verifyCurrentUserActiveMembershipById(Long id) {
         UUID appUserId = identityService.currentUserID();
-        if(!isAppUserActiveMember(appUserId, groupMembership)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current user is not an active member of a group");
-        }
-    }
-
-    @Override
-    public boolean isAppUserActiveMember(UUID appUserId, Long id) {
         GroupMembership groupMembership = groupMembershipModelById(id);
-        return isAppUserActiveMember(appUserId, groupMembership);
-    }
 
-    @Override
-    public void verifyActiveMembership(UUID appUserId, Long id) {
-        if(!isAppUserActiveMember(appUserId, id)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not an active member of a group");
+        if (!Objects.equals(groupMembership.getAppUser().getId(), appUserId)) {
+            String logMessage = String.format("User with id = {%s} does not belong to GroupMembership with id = {%d}",
+                    appUserId.toString(),
+                    groupMembership.getId());
+            log.info(logMessage);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, logMessage);
         }
-    }
 
-    @Override
-    public void verifyCurrentUserActiveMembership(Long id) {
-        UUID appUserId = identityService.currentUserID();
-        if(!isAppUserActiveMember(appUserId, id)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current user is not an active member of a group");
+        if (!groupMembership.getActive()) {
+            String logMessage = String.format("User with id = {%s} is not active member of GroupMembership with id = {%d}",
+                    appUserId.toString(),
+                    groupMembership.getId());
+            log.info(logMessage);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, logMessage);
         }
     }
 }

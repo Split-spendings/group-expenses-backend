@@ -1,20 +1,37 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
-import com.splitspendings.groupexpensesbackend.dto.group.*;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
+import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
+import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteAcceptedDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupmembership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingShortDto;
 import com.splitspendings.groupexpensesbackend.exception.InvalidGroupInviteException;
-import com.splitspendings.groupexpensesbackend.mapper.*;
-import com.splitspendings.groupexpensesbackend.model.*;
+import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
+import com.splitspendings.groupexpensesbackend.mapper.GroupInviteMapper;
+import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
+import com.splitspendings.groupexpensesbackend.mapper.GroupMembershipMapper;
+import com.splitspendings.groupexpensesbackend.mapper.SpendingMapper;
+import com.splitspendings.groupexpensesbackend.model.AppUser;
+import com.splitspendings.groupexpensesbackend.model.Group;
+import com.splitspendings.groupexpensesbackend.model.GroupInvite;
+import com.splitspendings.groupexpensesbackend.model.GroupMembership;
+import com.splitspendings.groupexpensesbackend.model.Spending;
 import com.splitspendings.groupexpensesbackend.repository.GroupInviteRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
-import com.splitspendings.groupexpensesbackend.service.*;
+import com.splitspendings.groupexpensesbackend.service.AppUserService;
+import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
+import com.splitspendings.groupexpensesbackend.service.GroupMembershipSettingsService;
+import com.splitspendings.groupexpensesbackend.service.GroupService;
+import com.splitspendings.groupexpensesbackend.service.IdentityService;
+import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,13 +39,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -67,12 +81,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupInfoDto createGroup(NewGroupDto newGroupDto) {
-        newGroupDto.trim();
-
-        Set<ConstraintViolation<NewGroupDto>> violations = validator.validate(newGroupDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        ValidatorUtil.validate(validator, newGroupDto);
 
         UUID currentAppUserId = identityService.currentUserID();
         AppUser currentAppUser = appUserService.appUserModelById(currentAppUserId);
@@ -99,12 +108,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupInfoDto updateGroupInfo(Long id, UpdateGroupInfoDto updateGroupInfoDto) {
-        updateGroupInfoDto.trim();
-
-        Set<ConstraintViolation<UpdateGroupInfoDto>> violations = validator.validate(updateGroupInfoDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        ValidatorUtil.validate(validator, updateGroupInfoDto);
 
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
 
@@ -140,16 +144,13 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupInviteDto createGroupInvite(NewGroupInviteDto newGroupInviteDto) {
-        Set<ConstraintViolation<NewGroupInviteDto>> violations = validator.validate(newGroupInviteDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        ValidatorUtil.validate(validator, newGroupInviteDto);
 
         Long groupId = newGroupInviteDto.getGroupId();
         UUID invitedAppUserId = newGroupInviteDto.getInvitedAppUserId();
         UUID currentAppUserId = identityService.currentUserID();
 
-        if(invitedAppUserId.equals(currentAppUserId)) {
+        if (invitedAppUserId.equals(currentAppUserId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot invite self in a group");
         }
 
@@ -193,7 +194,7 @@ public class GroupServiceImpl implements GroupService {
 
         GroupMembership invitedByGroupMembership = groupInvite.getInvitedByGroupMembership();
 
-        if(!invitedByGroupMembership.getActive()) {
+        if (!invitedByGroupMembership.getActive()) {
             groupInviteRepository.delete(groupInvite);
             throw new InvalidGroupInviteException(HttpStatus.BAD_REQUEST, "User who made an invite is no longer an active group member");
         }
@@ -205,12 +206,12 @@ public class GroupServiceImpl implements GroupService {
         Optional<GroupMembership> groupMembershipOptional = groupMembershipRepository.findByGroupAndAppUser(group, invitedAppUser);
         GroupMembership groupMembership;
 
-        if(groupMembershipOptional.isPresent() && !groupMembershipOptional.get().getActive()) {
+        if (groupMembershipOptional.isPresent() && !groupMembershipOptional.get().getActive()) {
             groupMembership = groupMembershipOptional.get();
             groupMembership.setActive(true);
             groupMembership.setLastTimeJoined(ZonedDateTime.now());
             groupMembershipRepository.save(groupMembership);
-        } else if(groupMembershipOptional.isEmpty()){
+        } else if (groupMembershipOptional.isEmpty()) {
             groupMembership = new GroupMembership();
             groupMembership.setAppUser(invitedAppUser);
             groupMembership.setGroup(group);
@@ -239,7 +240,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void leaveGroup(Long id) {
         Optional<GroupMembership> groupMembershipOptional = groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(id, identityService.currentUserID());
-        if(groupMembershipOptional.isEmpty()) {
+        if (groupMembershipOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a member of a group");
         }
         GroupMembership groupMembership = groupMembershipOptional.get();

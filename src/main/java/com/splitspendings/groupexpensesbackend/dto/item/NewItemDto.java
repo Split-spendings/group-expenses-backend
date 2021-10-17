@@ -21,9 +21,7 @@ public class NewItemDto {
     @NotEmpty
     private List<@Valid NewShareDto> newShareDtoList;
 
-    public void trim() {
-        if(title != null) {
-            title = TrimUtil.trimAndRemoveExtraSpaces(title);
-        }
+    public void setTitle(String title) {
+        this.title = TrimUtil.trimAndRemoveExtraSpaces(title);
     }
 }

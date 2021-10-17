@@ -20,9 +20,7 @@ public class NewAppUserDto {
     @Valid
     private NewAppUserSettingsDto newAppUserSettingsDto;
 
-    public void trim() {
-        if (loginName != null) {
-            loginName = TrimUtil.trimAndRemoveExtraSpaces(loginName);
-        }
+    public void setLoginName(String loginName) {
+        this.loginName = TrimUtil.trimAndRemoveExtraSpaces(loginName);
     }
 }
