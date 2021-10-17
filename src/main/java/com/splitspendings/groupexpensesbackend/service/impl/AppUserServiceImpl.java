@@ -1,6 +1,13 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
-import com.splitspendings.groupexpensesbackend.dto.appuser.*;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserFullInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserFullInfoWithSettingsDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserGroupsDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserIdentityDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserReceivedGroupInvitesDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.NewAppUserDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.UpdateLoginNameDto;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsWithIdDto;
 import com.splitspendings.groupexpensesbackend.dto.appusersettings.UpdateAppUserSettingsDto;
@@ -166,7 +173,7 @@ public class AppUserServiceImpl implements AppUserService {
 
         Optional<AppUser> appUserOptionalByLoginName = appUserRepository.findByLoginName(updateLoginNameDto.getLoginName());
         if (appUserOptionalByLoginName.isPresent()) {
-            if(appUserOptionalByLoginName.get().getId().equals(id)) {
+            if (appUserOptionalByLoginName.get().getId().equals(id)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current user already has the provided login name");
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Login name is used by another user");

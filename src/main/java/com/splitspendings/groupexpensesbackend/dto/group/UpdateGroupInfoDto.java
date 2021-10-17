@@ -15,7 +15,7 @@ public class UpdateGroupInfoDto {
     private String name;
 
     public void trim() {
-        if(name != null) {
+        if (name != null) {
             name = TrimUtil.trimAndRemoveExtraSpaces(name);
         }
     }

@@ -1,6 +1,11 @@
 package com.splitspendings.groupexpensesbackend.dto.appusersettings;
 
-import com.splitspendings.groupexpensesbackend.model.enums.*;
+import com.splitspendings.groupexpensesbackend.model.enums.Currency;
+import com.splitspendings.groupexpensesbackend.model.enums.GroupInviteOption;
+import com.splitspendings.groupexpensesbackend.model.enums.Language;
+import com.splitspendings.groupexpensesbackend.model.enums.NotificationCategory;
+import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
+import com.splitspendings.groupexpensesbackend.model.enums.Theme;
 import lombok.Data;
 
 import java.util.Set;

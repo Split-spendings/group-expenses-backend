@@ -14,7 +14,7 @@ public class UpdateSpendingCommentDto {
     @Size(min = SpendingComment.MESSAGE_MIN_LENGTH, max = SpendingComment.MESSAGE_MAX_LENGTH)
     private String message;
 
-    public void setMessage(String message){
+    public void setMessage(String message) {
         this.message = TrimUtil.trimAndRemoveExtraSpaces(message);
     }
 }

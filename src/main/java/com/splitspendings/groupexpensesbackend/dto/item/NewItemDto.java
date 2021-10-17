@@ -22,7 +22,7 @@ public class NewItemDto {
     private List<@Valid NewShareDto> newShareDtoList;
 
     public void trim() {
-        if(title != null) {
+        if (title != null) {
             title = TrimUtil.trimAndRemoveExtraSpaces(title);
         }
     }

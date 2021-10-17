@@ -1,10 +1,27 @@
 package com.splitspendings.groupexpensesbackend.model;
 
-import com.splitspendings.groupexpensesbackend.model.enums.*;
+import com.splitspendings.groupexpensesbackend.model.enums.Currency;
+import com.splitspendings.groupexpensesbackend.model.enums.GroupInviteOption;
+import com.splitspendings.groupexpensesbackend.model.enums.Language;
+import com.splitspendings.groupexpensesbackend.model.enums.NotificationCategory;
+import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
+import com.splitspendings.groupexpensesbackend.model.enums.Theme;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import java.util.Set;
 import java.util.UUID;
 

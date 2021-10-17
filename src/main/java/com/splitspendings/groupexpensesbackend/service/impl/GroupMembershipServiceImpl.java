@@ -26,7 +26,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
 
     @Override
     public GroupMembership groupMembershipModelById(Long id) {
-        return groupMembershipRepository.findById(id).orElseThrow(() -> new  ResponseStatusException(HttpStatus.NOT_FOUND, "Group membership not found"));
+        return groupMembershipRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group membership not found"));
     }
 
     @Override
@@ -40,14 +40,14 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     }
 
     @Override
-    public boolean isAdminOfGroup(UUID appUserId, Long groupId){
+    public boolean isAdminOfGroup(UUID appUserId, Long groupId) {
         GroupMembership groupMembership = groupActiveMembershipModelByGroupId(appUserId, groupId);
         return groupMembership.getHasAdminRights();
     }
 
     @Override
     public void verifyUserActiveMembershipByGroupId(UUID appUserId, Long groupId) {
-        if(!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
+        if (!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
             String logMessage = String.format("User with id = {%s} is not an active member of a Group with id = {%d}",
                     appUserId.toString(),
                     groupId);
@@ -67,7 +67,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
         UUID appUserId = identityService.currentUserID();
         GroupMembership groupMembership = groupMembershipModelById(id);
 
-        if(!Objects.equals(groupMembership.getAppUser().getId(), appUserId)){
+        if (!Objects.equals(groupMembership.getAppUser().getId(), appUserId)) {
             String logMessage = String.format("User with id = {%s} does not belong to GroupMembership with id = {%d}",
                     appUserId.toString(),
                     groupMembership.getId());
@@ -75,7 +75,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, logMessage);
         }
 
-        if(!groupMembership.getActive()) {
+        if (!groupMembership.getActive()) {
             String logMessage = String.format("User with id = {%s} is not active member of GroupMembership with id = {%d}",
                     appUserId.toString(),
                     groupMembership.getId());

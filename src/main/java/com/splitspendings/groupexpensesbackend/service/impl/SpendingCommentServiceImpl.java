@@ -44,10 +44,14 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
     private final IdentityService identityService;
 
     /**
-     * @param id id of a spending to be returned
+     * @param id
+     *         id of a spending to be returned
+     *
      * @return valid {@link SpendingComment}
-     * @throws ResponseStatusException with status {@link HttpStatus#NOT_FOUND}
-     *                                 when there is no {@link SpendingComment} with given id
+     *
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND}
+     *         when there is no {@link SpendingComment} with given id
      */
     @Override
     public SpendingComment spendingCommentModelById(Long id) {
@@ -57,12 +61,17 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
     }
 
     /**
-     * @param id id of a spending to be returned
+     * @param id
+     *         id of a spending to be returned
+     *
      * @return valid {@link SpendingCommentDto}
-     * @throws ResponseStatusException with status {@link HttpStatus#NOT_FOUND}
-     *                                 when there is no {@link SpendingComment} with given id
-     * @throws ResponseStatusException with status {@link HttpStatus#FORBIDDEN}
-     *                                 when current user has no rights to access {@link SpendingComment} with given id
+     *
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND}
+     *         when there is no {@link SpendingComment} with given id
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#FORBIDDEN}
+     *         when current user has no rights to access {@link SpendingComment} with given id
      */
     @Override
     public SpendingCommentDto spendingCommentById(Long id) {
@@ -72,12 +81,17 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
     }
 
     /**
-     * @param newSpendingCommentDto data to be saved in the database
-     * @throws ConstraintViolationException when provided DTO doesn't meet requirements
-     * @throws ResponseStatusException      with status {@link HttpStatus#NOT_FOUND}
-     *                                      when there is no {@link Spending} with given id
-     * @throws ResponseStatusException      with status {@link HttpStatus#FORBIDDEN}
-     *                                      when current user has no rights to access {@link Spending} with given id
+     * @param newSpendingCommentDto
+     *         data to be saved in the database
+     *
+     * @throws ConstraintViolationException
+     *         when provided DTO doesn't meet requirements
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND}
+     *         when there is no {@link Spending} with given id
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#FORBIDDEN}
+     *         when current user has no rights to access {@link Spending} with given id
      */
     @Override
     public SpendingCommentDto createSpendingComment(NewSpendingCommentDto newSpendingCommentDto) {

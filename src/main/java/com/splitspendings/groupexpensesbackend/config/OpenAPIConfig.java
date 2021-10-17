@@ -33,8 +33,8 @@ public class OpenAPIConfig {
                         .addSecuritySchemes("identity", new SecurityScheme()
                                 .type(SecurityScheme.Type.OAUTH2)
                                 .flows(new OAuthFlows().implicit(new OAuthFlow()
-                                        .authorizationUrl( keycloakProps.getAuthServerUrl()
-                                                +"/realms/"+keycloakProps.getRealm() +
+                                        .authorizationUrl(keycloakProps.getAuthServerUrl()
+                                                + "/realms/" + keycloakProps.getRealm() +
                                                 "/protocol/openid-connect/auth")))));
     }
 }

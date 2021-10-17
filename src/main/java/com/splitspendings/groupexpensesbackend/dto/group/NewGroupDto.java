@@ -22,7 +22,7 @@ public class NewGroupDto {
     private InviteOption inviteOption;
 
     public void trim() {
-        if(name != null) {
+        if (name != null) {
             name = TrimUtil.trimAndRemoveExtraSpaces(name);
         }
     }

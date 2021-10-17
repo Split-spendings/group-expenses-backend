@@ -2,9 +2,35 @@ package com.splitspendings.groupexpensesbackend.dataloader;
 
 import com.splitspendings.groupexpensesbackend.dataloader.factory.AppUserFactory;
 import com.splitspendings.groupexpensesbackend.dataloader.factory.GroupFactory;
-import com.splitspendings.groupexpensesbackend.model.*;
-import com.splitspendings.groupexpensesbackend.model.enums.*;
-import com.splitspendings.groupexpensesbackend.repository.*;
+import com.splitspendings.groupexpensesbackend.model.AppUser;
+import com.splitspendings.groupexpensesbackend.model.AppUserSettings;
+import com.splitspendings.groupexpensesbackend.model.Group;
+import com.splitspendings.groupexpensesbackend.model.GroupInvite;
+import com.splitspendings.groupexpensesbackend.model.GroupMembership;
+import com.splitspendings.groupexpensesbackend.model.GroupMembershipSettings;
+import com.splitspendings.groupexpensesbackend.model.Item;
+import com.splitspendings.groupexpensesbackend.model.ItemCategory;
+import com.splitspendings.groupexpensesbackend.model.Share;
+import com.splitspendings.groupexpensesbackend.model.Spending;
+import com.splitspendings.groupexpensesbackend.model.SpendingComment;
+import com.splitspendings.groupexpensesbackend.model.enums.Currency;
+import com.splitspendings.groupexpensesbackend.model.enums.GroupInviteOption;
+import com.splitspendings.groupexpensesbackend.model.enums.GroupTheme;
+import com.splitspendings.groupexpensesbackend.model.enums.InviteOption;
+import com.splitspendings.groupexpensesbackend.model.enums.Language;
+import com.splitspendings.groupexpensesbackend.model.enums.NotificationCategory;
+import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
+import com.splitspendings.groupexpensesbackend.model.enums.Theme;
+import com.splitspendings.groupexpensesbackend.repository.AppUserSettingsRepository;
+import com.splitspendings.groupexpensesbackend.repository.GroupInviteRepository;
+import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
+import com.splitspendings.groupexpensesbackend.repository.GroupMembershipSettingsRepository;
+import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
+import com.splitspendings.groupexpensesbackend.repository.ItemCategoryRepository;
+import com.splitspendings.groupexpensesbackend.repository.ItemRepository;
+import com.splitspendings.groupexpensesbackend.repository.ShareRepository;
+import com.splitspendings.groupexpensesbackend.repository.SpendingCommentRepository;
+import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -103,7 +129,7 @@ public class DatabaseLoader implements CommandLineRunner {
 
     private Map<String, UUID> loadAppUserIds(String path) {
         Map<String, UUID> idMap = new HashMap<>();
-        try(BufferedReader reader = new BufferedReader(new FileReader(path))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
             String line = reader.readLine();
             int nextIdIndex = 1;
             while (line != null) {
@@ -171,19 +197,19 @@ public class DatabaseLoader implements CommandLineRunner {
         spendingComment1.setSpending(spending1);
         spendingComment1.setMessage("Dummy comment 1");
         spendingComment1.setAddedByAppUser(appUser1);
-        spendingComment1.setTimeAdded(ZonedDateTime.of(LocalDateTime.of(2020, 8, 27, 12,34,56), ZoneId.of("+02:00")));
+        spendingComment1.setTimeAdded(ZonedDateTime.of(LocalDateTime.of(2020, 8, 27, 12, 34, 56), ZoneId.of("+02:00")));
 
         spendingComment2 = new SpendingComment();
         spendingComment2.setSpending(spending1);
         spendingComment2.setMessage("Dummy comment 2");
         spendingComment2.setAddedByAppUser(appUser1);
-        spendingComment2.setTimeAdded(ZonedDateTime.of(LocalDateTime.of(2021, 9, 24, 11,30,34), ZoneId.of("-02:00")));
+        spendingComment2.setTimeAdded(ZonedDateTime.of(LocalDateTime.of(2021, 9, 24, 11, 30, 34), ZoneId.of("-02:00")));
 
         spendingComment3 = new SpendingComment();
         spendingComment3.setSpending(spending2);
         spendingComment3.setMessage("Dummy comment 3");
         spendingComment3.setAddedByAppUser(appUser2);
-        spendingComment3.setTimeAdded(ZonedDateTime.of(LocalDateTime.of(2020, 9, 24, 11,30,34), ZoneId.of("-02:00")));
+        spendingComment3.setTimeAdded(ZonedDateTime.of(LocalDateTime.of(2020, 9, 24, 11, 30, 34), ZoneId.of("-02:00")));
 
         spendingCommentRepository.save(spendingComment1);
         spendingCommentRepository.save(spendingComment2);
@@ -399,14 +425,14 @@ public class DatabaseLoader implements CommandLineRunner {
     }
 
     @SuppressWarnings("all")
-    private void setUpAppUsers() throws Exception{
+    private void setUpAppUsers() throws Exception {
         var usersIdMap = loadAppUserIds(USERS_PATH);
-        if(usersIdMap.size() < 2) {
+        if (usersIdMap.size() < 2) {
             throw new Exception("not enough test user IDs to load data");
         }
 
         var adminsIdMap = loadAppUserIds(ADMINS_PATH);
-        if(adminsIdMap.size() < 1) {
+        if (adminsIdMap.size() < 1) {
             throw new Exception("not enough test admin IDs to load data");
         }
 
