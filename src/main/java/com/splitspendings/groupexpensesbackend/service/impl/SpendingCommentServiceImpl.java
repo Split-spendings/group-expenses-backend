@@ -36,10 +36,16 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
 
     private final Validator validator;
 
+    public SpendingComment spendingCommentModelById(Long id){
+        return spendingCommentRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("Spending comment with id = {%d} not found", id)));
+    }
+
     @Override
     public SpendingCommentDto spendingCommentById(Long commentId) {
         SpendingComment spendingComment = spendingCommentModelById(commentId);
-        verifyCurrentUserActiveMembership(spendingComment);
+        verifyCurrentUserActiveMembershipByGroupId(spendingComment);
 
         return spendingCommentMapper.spendingCommentToSpendingCommentDto(spendingComment);
     }
@@ -56,33 +62,31 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
         String message = newSpendingCommentDto.getMessage();
         AppUser appUser = appUserService.appUserModelById(identityService.currentUserID());
 
-        SpendingComment spendingComment = new SpendingComment(message, spending, appUser);
+        SpendingComment spendingComment = new SpendingComment();
+        spendingComment.setSpending(spending);
+        spendingComment.setMessage(message);
+        spendingComment.setAddedByAppUser(appUser);
+
         spendingCommentRepository.save(spendingComment);
 
         return spendingCommentMapper.spendingCommentToSpendingCommentDto(spendingComment);
     }
 
     @Override
-    public SpendingCommentDto updateSpendingCommentInfo(Long id, UpdateSpendingCommentDto updateSpendingCommentDto) {
+    public SpendingCommentDto updateSpendingComment(Long id, UpdateSpendingCommentDto updateSpendingCommentDto) {
         ValidatorUtil.validate(validator, updateSpendingCommentDto);
 
         SpendingComment spendingComment = spendingCommentModelById(id);
-        verifyCurrentUserActiveMembership(spendingComment);
+        verifyCurrentUserActiveMembershipByGroupId(spendingComment);
 
         spendingCommentMapper.copyUpdateSpendingCommentDtoToSpendingComment(updateSpendingCommentDto, spendingComment);
         spendingCommentRepository.save(spendingComment);
-
+        //todo add functionality that admin can change any comment, the rest only personal comments
         return spendingCommentMapper.spendingCommentToSpendingCommentDto(spendingComment);
     }
 
-    private SpendingComment spendingCommentModelById(Long id){
-        return spendingCommentRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("Spending comment with id = {%d} not found", id)));
-    }
-
-    private void verifyCurrentUserActiveMembership(SpendingComment spendingComment){
-        Long groupId = spendingComment.getSpending().getAddedByGroupMembership().getId();
-        groupMembershipService.verifyCurrentUserActiveMembership(groupId);
+    private void verifyCurrentUserActiveMembershipByGroupId(SpendingComment spendingComment){
+        Long groupId = spendingComment.getSpending().getAddedByGroupMembership().getGroup().getId();
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(groupId);
     }
 }

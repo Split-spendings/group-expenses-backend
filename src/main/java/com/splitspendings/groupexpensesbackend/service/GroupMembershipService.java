@@ -8,23 +8,11 @@ public interface GroupMembershipService {
 
     GroupMembership groupMembershipModelById(Long id);
 
-    GroupMembership groupActiveMembershipModelByGroupId(UUID appUserId, Long groupID);
+    GroupMembership groupActiveMembershipModelByGroupId(UUID appUserId, Long groupId);
 
-    boolean isAppUserActiveMemberOfGroup(UUID appUserId, Long groupID);
-
-    void verifyActiveMembershipByGroupId(UUID appUserId, Long groupId);
+    boolean isAppUserActiveMemberOfGroup(UUID appUserId, Long groupId);
 
     void verifyCurrentUserActiveMembershipByGroupId(Long groupId);
-
-    boolean isAppUserActiveMember(UUID appUserId, GroupMembership groupMembership);
-
-    void verifyActiveMembership(UUID appUserId, GroupMembership groupMembership);
-
-    void verifyCurrentUserActiveMembership(GroupMembership groupMembership);
-
-    boolean isAppUserActiveMember(UUID appUserId, Long id);
-
-    void verifyActiveMembership(UUID appUserId, Long id);
 
     void verifyCurrentUserActiveMembership(Long id);
 }

@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/api/spending-comments")
+@RequestMapping(value = "/api/spendings/comments")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "identity")
 @Slf4j
@@ -29,7 +29,7 @@ public class SpendingCommentController {
     }
 
     @PatchMapping("/{id}")
-    public SpendingCommentDto updateSpendingCommentInfo(@PathVariable Long id, @RequestBody UpdateSpendingCommentDto updateSpendingCommentDto) {
-        return spendingCommentService.updateSpendingCommentInfo(id, updateSpendingCommentDto);
+    public SpendingCommentDto updateSpendingComment(@PathVariable Long id, @RequestBody UpdateSpendingCommentDto updateSpendingCommentDto) {
+        return spendingCommentService.updateSpendingComment(id, updateSpendingCommentDto);
     }
 }

@@ -132,7 +132,7 @@ public class SpendingServiceImpl implements SpendingService {
     }
 
     @Override
-    public SpendingCommentsDto findAllBySpendingId(Long spendingId) {
+    public SpendingCommentsDto getSpendingComments(Long spendingId) {
         Spending spending = spendingModelById(spendingId);
         verifyCurrentUserActiveMembership(spending);
         return spendingMapper.spendingToSpendingCommentsDto(spending);

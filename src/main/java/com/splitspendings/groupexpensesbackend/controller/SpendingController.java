@@ -30,6 +30,6 @@ public class SpendingController {
 
     @GetMapping("/{id}/comments")
     public SpendingCommentsDto getSpendingComments(@PathVariable Long id){
-        return spendingService.findAllBySpendingId(id);
+        return spendingService.getSpendingComments(id);
     }
 }
