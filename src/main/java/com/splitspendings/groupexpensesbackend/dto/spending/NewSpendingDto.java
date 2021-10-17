@@ -34,14 +34,7 @@ public class NewSpendingDto {
     @NotEmpty
     private List<@Valid NewItemDto> newItemDtoList;
 
-    public void trim() {
-        if (title != null) {
-            title = TrimUtil.trimAndRemoveExtraSpaces(title);
-        }
-        if (newItemDtoList != null) {
-            for (NewItemDto newItemDto : newItemDtoList) {
-                newItemDto.trim();
-            }
-        }
+    public void setTitle(String title) {
+        this.title = TrimUtil.trimAndRemoveExtraSpaces(title);
     }
 }

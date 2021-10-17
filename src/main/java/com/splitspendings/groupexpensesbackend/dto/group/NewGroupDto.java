@@ -21,9 +21,7 @@ public class NewGroupDto {
     @NotNull
     private InviteOption inviteOption;
 
-    public void trim() {
-        if (name != null) {
-            name = TrimUtil.trimAndRemoveExtraSpaces(name);
-        }
+    public void setName(String name) {
+        this.name = TrimUtil.trimAndRemoveExtraSpaces(name);
     }
 }

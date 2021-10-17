@@ -14,9 +14,7 @@ public class UpdateLoginNameDto {
     @Size(min = AppUser.NAMES_MIN_LENGTH, max = AppUser.NAMES_MAX_LENGTH)
     private String loginName;
 
-    public void trim() {
-        if (loginName != null) {
-            loginName = TrimUtil.trimAndRemoveExtraSpaces(loginName);
-        }
+    public void setLoginName(String loginName) {
+        this.loginName = TrimUtil.trimAndRemoveExtraSpaces(loginName);
     }
 }

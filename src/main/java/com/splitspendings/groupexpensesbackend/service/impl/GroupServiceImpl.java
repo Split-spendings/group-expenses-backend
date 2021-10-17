@@ -31,6 +31,7 @@ import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
+import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -38,13 +39,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -83,12 +81,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupInfoDto createGroup(NewGroupDto newGroupDto) {
-        newGroupDto.trim();
-
-        Set<ConstraintViolation<NewGroupDto>> violations = validator.validate(newGroupDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        ValidatorUtil.validate(validator, newGroupDto);
 
         UUID currentAppUserId = identityService.currentUserID();
         AppUser currentAppUser = appUserService.appUserModelById(currentAppUserId);
@@ -115,12 +108,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupInfoDto updateGroupInfo(Long id, UpdateGroupInfoDto updateGroupInfoDto) {
-        updateGroupInfoDto.trim();
-
-        Set<ConstraintViolation<UpdateGroupInfoDto>> violations = validator.validate(updateGroupInfoDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        ValidatorUtil.validate(validator, updateGroupInfoDto);
 
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
 
@@ -156,10 +144,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupInviteDto createGroupInvite(NewGroupInviteDto newGroupInviteDto) {
-        Set<ConstraintViolation<NewGroupInviteDto>> violations = validator.validate(newGroupInviteDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        ValidatorUtil.validate(validator, newGroupInviteDto);
 
         Long groupId = newGroupInviteDto.getGroupId();
         UUID invitedAppUserId = newGroupInviteDto.getInvitedAppUserId();

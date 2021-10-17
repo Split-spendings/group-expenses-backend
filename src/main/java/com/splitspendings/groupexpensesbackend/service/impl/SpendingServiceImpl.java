@@ -20,6 +20,7 @@ import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.service.SpendingService;
+import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,13 +28,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -71,12 +69,7 @@ public class SpendingServiceImpl implements SpendingService {
 
     @Override
     public SpendingDto createSpending(NewSpendingDto newSpendingDto) {
-        newSpendingDto.trim();
-
-        Set<ConstraintViolation<NewSpendingDto>> violations = validator.validate(newSpendingDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        ValidatorUtil.validate(validator, newSpendingDto);
 
         UUID currentAppUserId = identityService.currentUserID();
         GroupMembership addedByGroupMembership = groupMembershipService.groupActiveMembershipModelByGroupId(currentAppUserId, newSpendingDto.getGroupID());
