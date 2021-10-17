@@ -18,5 +18,5 @@ public interface GroupMembershipService {
 
     void verifyCurrentUserActiveMembershipByGroupId(Long groupId);
 
-    void verifyCurrentUserActiveMembership(Long id);
+    void verifyCurrentUserActiveMembershipById(Long id);
 }

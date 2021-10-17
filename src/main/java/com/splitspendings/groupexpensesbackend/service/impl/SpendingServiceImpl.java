@@ -61,7 +61,7 @@ public class SpendingServiceImpl implements SpendingService {
     @Override
     public SpendingDto spendingById(Long id) {
         Spending spending = spendingModelById(id);
-        verifyUserActiveMembershipByGroupId(spending);
+        verifyCurrentUserActiveMembershipBySpending(spending);
         return spendingMapper.spendingToSpendingDto(spending);
     }
 
@@ -80,7 +80,7 @@ public class SpendingServiceImpl implements SpendingService {
 
         Group group = addedByGroupMembership.getGroup();
 
-        if(paidByGroupMembership.getGroup() != group) {
+        if (paidByGroupMembership.getGroup() != group) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "paidByGroupMembershipId does not belong to a member of a group");
         }
 
@@ -98,11 +98,11 @@ public class SpendingServiceImpl implements SpendingService {
             Item item = itemMapper.newItemDtoToItem(newItemDto);
             BigDecimal price = new BigDecimal(0);
 
-            for(NewShareDto newShareDto : newItemDto.getNewShareDtoList()) {
+            for (NewShareDto newShareDto : newItemDto.getNewShareDtoList()) {
                 Share share = shareMapper.newShareDtoToShare(newShareDto);
 
                 GroupMembership paidForGroupMembership = groupMembershipService.groupMembershipModelById(newShareDto.getPaidForGroupMembershipId());
-                if(paidForGroupMembership.getGroup() != group) {
+                if (paidForGroupMembership.getGroup() != group) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "paidForGroupMembership does not belong to a member of a group");
                 }
                 share.setPaidByGroupMembership(paidByGroupMembership);
@@ -134,11 +134,11 @@ public class SpendingServiceImpl implements SpendingService {
     @Override
     public SpendingCommentsDto getSpendingComments(Long spendingId) {
         Spending spending = spendingModelById(spendingId);
-        verifyUserActiveMembershipByGroupId(spending);
+        verifyCurrentUserActiveMembershipBySpending(spending);
         return spendingMapper.spendingToSpendingCommentsDto(spending);
     }
 
-    private void verifyUserActiveMembershipByGroupId(Spending spending){
+    private void verifyCurrentUserActiveMembershipBySpending(Spending spending) {
         Long groupId = spending.getAddedByGroupMembership().getGroup().getId();
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(groupId);
     }

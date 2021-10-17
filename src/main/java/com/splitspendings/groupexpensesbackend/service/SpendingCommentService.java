@@ -6,8 +6,12 @@ import com.splitspendings.groupexpensesbackend.dto.spendingcomment.UpdateSpendin
 import com.splitspendings.groupexpensesbackend.model.SpendingComment;
 
 public interface SpendingCommentService {
+
     SpendingComment spendingCommentModelById(Long id);
+
     SpendingCommentDto spendingCommentById(Long commentId);
+
     SpendingCommentDto createSpendingComment(NewSpendingCommentDto newSpendingCommentDto);
+
     SpendingCommentDto updateSpendingComment(Long id, UpdateSpendingCommentDto updateSpendingCommentDto);
 }
