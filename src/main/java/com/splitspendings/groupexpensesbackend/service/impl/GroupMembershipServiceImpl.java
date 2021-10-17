@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -39,23 +40,45 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     }
 
     @Override
+    public boolean isAdminOfGroup(UUID appUserId, Long groupId){
+        GroupMembership groupMembership = groupActiveMembershipModelByGroupId(appUserId, groupId);
+        return groupMembership.getHasAdminRights();
+
+    }
+
+    @Override
+    public void verifyUserActiveMembershipByGroupId(UUID appUserId, Long groupId) {
+        if(!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
+            log.info(String.format("User with id = {%s} is not an active member of a Group with id = {%d}",
+                    appUserId.toString(),
+                    groupId));
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @Override
     public void verifyCurrentUserActiveMembershipByGroupId(Long groupId) {
         UUID appUserId = identityService.currentUserID();
-        if(!isAppUserActiveMemberOfGroup(appUserId, groupId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current user is not an active member of a group");
-        }
+        verifyUserActiveMembershipByGroupId(appUserId, groupId);
     }
 
     @Override
     public void verifyCurrentUserActiveMembership(Long id) {
         UUID appUserId = identityService.currentUserID();
         GroupMembership groupMembership = groupMembershipModelById(id);
-        if(!isAppUserActiveMember(appUserId, groupMembership)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current user is not an active member of a group");
-        }
-    }
 
-    private boolean isAppUserActiveMember(UUID appUserId, GroupMembership groupMembership) {
-        return groupMembership.getActive() && groupMembership.getAppUser().getId().equals(appUserId);
+        if(!Objects.equals(groupMembership.getAppUser().getId(), appUserId)){
+            log.info(String.format("User with id = {%s} does not belong to GroupMembership with id = {%d}",
+                    appUserId.toString(),
+                    groupMembership.getId()));
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        if(!groupMembership.getActive()) {
+            log.info(String.format("User with id = {%s} is not active member of GroupMembership with id = {%d}",
+                    appUserId.toString(),
+                    groupMembership.getId()));
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
     }
 }

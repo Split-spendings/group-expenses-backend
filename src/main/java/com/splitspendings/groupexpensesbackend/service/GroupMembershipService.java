@@ -12,6 +12,10 @@ public interface GroupMembershipService {
 
     boolean isAppUserActiveMemberOfGroup(UUID appUserId, Long groupId);
 
+    boolean isAdminOfGroup(UUID appUserId, Long groupId);
+
+    void verifyUserActiveMembershipByGroupId(UUID appUserId, Long groupId);
+
     void verifyCurrentUserActiveMembershipByGroupId(Long groupId);
 
     void verifyCurrentUserActiveMembership(Long id);

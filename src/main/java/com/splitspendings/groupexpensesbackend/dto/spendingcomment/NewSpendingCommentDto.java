@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 public class NewSpendingCommentDto {
 
     @NotNull
-    private Long spendingID;
+    private Long spendingId;
 
     @NotNull
     @Size(min = SpendingComment.MESSAGE_MIN_LENGTH, max = SpendingComment.MESSAGE_MAX_LENGTH)

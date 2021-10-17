@@ -61,7 +61,7 @@ public class SpendingServiceImpl implements SpendingService {
     @Override
     public SpendingDto spendingById(Long id) {
         Spending spending = spendingModelById(id);
-        verifyCurrentUserActiveMembership(spending);
+        verifyUserActiveMembershipByGroupId(spending);
         return spendingMapper.spendingToSpendingDto(spending);
     }
 
@@ -134,12 +134,12 @@ public class SpendingServiceImpl implements SpendingService {
     @Override
     public SpendingCommentsDto getSpendingComments(Long spendingId) {
         Spending spending = spendingModelById(spendingId);
-        verifyCurrentUserActiveMembership(spending);
+        verifyUserActiveMembershipByGroupId(spending);
         return spendingMapper.spendingToSpendingCommentsDto(spending);
     }
 
-    private void verifyCurrentUserActiveMembership(Spending spending){
+    private void verifyUserActiveMembershipByGroupId(Spending spending){
         Long groupId = spending.getAddedByGroupMembership().getGroup().getId();
-        groupMembershipService.verifyCurrentUserActiveMembership(groupId);
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(groupId);
     }
 }
