@@ -1,5 +1,7 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
+import com.splitspendings.groupexpensesbackend.model.AppUser;
+import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
@@ -37,8 +39,11 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     @Override
     public GroupMembership groupMembershipModelById(Long id) {
         return groupMembershipRepository.findById(id).
-                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("GroupMembership with id = {%d} not found", id)));
+                orElseThrow(() -> {
+                    String logMessage = String.format("GroupMembership with id = {%d} not found", id);
+                    log.info(logMessage);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
+                });
     }
 
     /**
@@ -58,10 +63,13 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     @Override
     public GroupMembership groupActiveMembershipModelByGroupId(UUID appUserId, Long groupId) {
         return groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupId, appUserId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("User with id = {%s} is not an active member of a Group with id = {%d}",
-                                appUserId.toString(),
-                                groupId)));
+                .orElseThrow(() -> {
+                    String logMessage = String.format("User with id = {%s} is not an active member of a Group with id = {%d}",
+                            appUserId.toString(),
+                            groupId);
+                    log.info(logMessage);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
+                });
     }
 
     /**

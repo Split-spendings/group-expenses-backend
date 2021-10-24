@@ -82,10 +82,12 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group groupModelById(Long id) {
         return groupRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("Group with id = {%d} not found", id)));
+                .orElseThrow(() -> {
+                    String logMessage = String.format("Group with id = {%d} not found", id);
+                    log.info(logMessage);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
+                });
     }
-
 
     /**
      * @param id
@@ -278,9 +280,11 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupInvite groupInviteModelById(Long inviteId) {
         return groupInviteRepository.findById(inviteId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("Group invite with id = {%d} not found",
-                                inviteId)));
+                .orElseThrow(() -> {
+                    String logMessage = String.format("Group invite with id = {%d} not found", inviteId);
+                    log.info(logMessage);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
+                });
     }
 
     /**

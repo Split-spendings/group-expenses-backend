@@ -77,8 +77,11 @@ public class GroupMembershipSettingsServiceImpl implements GroupMembershipSettin
     @Override
     public GroupMembershipSettings groupMembershipSettingsModelById(Long id) {
         return groupMembershipSettingsRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("GroupMembershipSettings with id = {%d} not found", id)));
+                .orElseThrow(() -> {
+                    String logMessage = String.format("GroupMembershipSettings with id = {%d} not found", id);
+                    log.info(logMessage);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
+                });
     }
 
     /**
