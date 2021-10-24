@@ -3,7 +3,7 @@ package com.splitspendings.groupexpensesbackend.controller;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteAcceptedDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
-import com.splitspendings.groupexpensesbackend.service.GroupService;
+import com.splitspendings.groupexpensesbackend.service.GroupInviteService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class GroupInviteController {
 
-    private final GroupService groupService;
+    private final GroupInviteService groupInviteService;
 
     @GetMapping({"/{id}"})
     public GroupInviteDto getGroupInviteById(@PathVariable Long id) {
@@ -34,16 +34,17 @@ public class GroupInviteController {
 
     @PostMapping
     public GroupInviteDto createGroupInvite(@RequestBody NewGroupInviteDto newGroupInviteDto) {
-        return groupService.createGroupInvite(newGroupInviteDto);
+        //TODO add message field to NewGroupInviteDto
+        return groupInviteService.createGroupInvite(newGroupInviteDto);
     }
 
     @PatchMapping("/{id}")
     public GroupInviteAcceptedDto acceptGroupInvite(@PathVariable Long id) {
-        return groupService.acceptGroupInvite(id);
+        return groupInviteService.acceptGroupInvite(id);
     }
 
     @DeleteMapping("/{id}")
     public void declineGroupInvite(@PathVariable Long id) {
-        groupService.declineGroupInvite(id);
+        groupInviteService.declineGroupInvite(id);
     }
 }
