@@ -14,6 +14,7 @@ import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.service.SpendingCommentService;
 import com.splitspendings.groupexpensesbackend.service.SpendingService;
+import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,7 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
     @Override
     public SpendingComment spendingCommentModelById(Long id) {
         return spendingCommentRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.NOT_FOUND,
                         String.format("Spending comment with id = {%d} not found", id)));
     }
 
@@ -163,10 +164,10 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
         boolean hasAdminRights = groupMembership.getHasAdminRights();
 
         if (!(isAuthorOfComment || hasAdminRights)) {
-            String logMessage = String.format("User with id = {%s} is not an author of comment with id = {%d} and does not have admin rights",
-                    appUserId, spendingComment.getId());
-            log.info(logMessage);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, logMessage);
+            throw LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.FORBIDDEN,
+                    String.format("User with id = {%s} is not an author of comment with id = {%d} and does not have admin rights",
+                            appUserId,
+                            spendingComment.getId()));
         }
     }
 }

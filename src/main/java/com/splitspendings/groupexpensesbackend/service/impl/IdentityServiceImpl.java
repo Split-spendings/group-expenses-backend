@@ -2,6 +2,7 @@ package com.splitspendings.groupexpensesbackend.service.impl;
 
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserIdentityDto;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
+import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
@@ -9,7 +10,6 @@ import org.keycloak.representations.AccessToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -63,7 +63,8 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void verifyAuthorization(UUID checkedUserId) {
         if (unauthorized(checkedUserId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorised for access to the user data");
+            throw LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.FORBIDDEN,
+                    "Not authorised for access to the user data");
         }
     }
 
@@ -75,7 +76,8 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void verifyAuthorization(UUID currentUserId, UUID checkedUserId) {
         if (unauthorized(currentUserId, checkedUserId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorised for access to the user data");
+            throw LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.FORBIDDEN,
+                    "Not authorised for access to the user data");
         }
     }
 }

@@ -8,11 +8,13 @@ import com.splitspendings.groupexpensesbackend.dto.spending.SpendingDto;
 import com.splitspendings.groupexpensesbackend.mapper.ItemMapper;
 import com.splitspendings.groupexpensesbackend.mapper.ShareMapper;
 import com.splitspendings.groupexpensesbackend.mapper.SpendingMapper;
+import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import com.splitspendings.groupexpensesbackend.model.Item;
 import com.splitspendings.groupexpensesbackend.model.Share;
 import com.splitspendings.groupexpensesbackend.model.Spending;
+import com.splitspendings.groupexpensesbackend.model.SpendingComment;
 import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import com.splitspendings.groupexpensesbackend.repository.ItemRepository;
 import com.splitspendings.groupexpensesbackend.repository.ShareRepository;
@@ -20,6 +22,7 @@ import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.service.SpendingService;
+import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -65,11 +69,8 @@ public class SpendingServiceImpl implements SpendingService {
     @Override
     public Spending spendingModelById(Long id) {
         return spendingRepository.findById(id)
-                .orElseThrow(() -> {
-                    String logMessage = String.format("No spending with id = {%d} found", id);
-                    log.info(logMessage);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
-                });
+                .orElseThrow(() -> LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.NOT_FOUND,
+                        String.format("No spending with id = {%d} found", id)));
     }
 
     /**
@@ -127,7 +128,8 @@ public class SpendingServiceImpl implements SpendingService {
         Group group = addedByGroupMembership.getGroup();
 
         if (paidByGroupMembership.getGroup() != group) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "paidByGroupMembershipId does not belong to a member of a group");
+            throw LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.BAD_REQUEST,
+                    "paidByGroupMembershipId does not belong to a member of a group");
         }
 
         Spending spending = spendingMapper.newSpendingDtoToSpending(newSpendingDto);
@@ -149,7 +151,8 @@ public class SpendingServiceImpl implements SpendingService {
 
                 GroupMembership paidForGroupMembership = groupMembershipService.groupMembershipModelById(newShareDto.getPaidForGroupMembershipId());
                 if (paidForGroupMembership.getGroup() != group) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "paidForGroupMembership does not belong to a member of a group");
+                    throw LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.BAD_REQUEST,
+                            "paidForGroupMembership does not belong to a member of a group");
                 }
                 share.setPaidByGroupMembership(paidByGroupMembership);
                 share.setPaidForGroupMembership(paidForGroupMembership);
