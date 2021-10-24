@@ -7,11 +7,11 @@ import com.splitspendings.groupexpensesbackend.model.GroupInvite;
 
 public interface GroupInviteService {
 
-    GroupInvite groupInviteModelById(Long inviteId);
+    GroupInvite groupInviteModelById(Long id);
 
     GroupInviteDto createGroupInvite(NewGroupInviteDto newGroupInviteDto);
 
-    GroupInviteAcceptedDto acceptGroupInvite(Long inviteId);
+    GroupInviteAcceptedDto acceptGroupInvite(Long id);
 
     void declineGroupInvite(Long id);
 }

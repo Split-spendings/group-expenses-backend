@@ -51,7 +51,7 @@ public class GroupInviteServiceImpl implements GroupInviteService {
     private final GroupMembershipSettingsService groupMembershipSettingsService;
 
     /**
-     * @param inviteId
+     * @param id
      *         id of {@link GroupInvite} to be found in the database
      *
      * @return {@link GroupInvite} with given id
@@ -60,11 +60,11 @@ public class GroupInviteServiceImpl implements GroupInviteService {
      *         with status code {@link HttpStatus#NOT_FOUND} if not found
      */
     @Override
-    public GroupInvite groupInviteModelById(Long inviteId) {
-        return groupInviteRepository.findById(inviteId)
+    public GroupInvite groupInviteModelById(Long id) {
+        return groupInviteRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("Group invite with id = {%d} not found",
-                                inviteId)));
+                                id)));
     }
 
     /**
@@ -120,7 +120,7 @@ public class GroupInviteServiceImpl implements GroupInviteService {
     }
 
     /**
-     * @param inviteId
+     * @param id
      *         id of {@link GroupInvite} to be accepted
      *
      * @return {@link GroupInviteAcceptedDto} created from given {@link GroupInvite}
@@ -138,8 +138,8 @@ public class GroupInviteServiceImpl implements GroupInviteService {
      */
     @Override
     @Transactional(noRollbackFor = InvalidGroupInviteException.class)
-    public GroupInviteAcceptedDto acceptGroupInvite(Long inviteId) {
-        GroupInvite groupInvite = groupInviteModelById(inviteId);
+    public GroupInviteAcceptedDto acceptGroupInvite(Long id) {
+        GroupInvite groupInvite = groupInviteModelById(id);
 
         AppUser invitedAppUser = groupInvite.getInvitedAppUser();
         identityService.verifyAuthorization(invitedAppUser.getId());
@@ -151,7 +151,7 @@ public class GroupInviteServiceImpl implements GroupInviteService {
             String logMessage =
                     String.format("AppUser with id = {%s} who made an invite with id = {%d} is no longer an active member of a group with id = {%d}",
                             invitedByGroupMembership.getAppUser().getId(),
-                            inviteId,
+                            id,
                             invitedByGroupMembership.getGroup().getId());
             log.info(logMessage);
             throw new InvalidGroupInviteException(HttpStatus.BAD_REQUEST, logMessage);
