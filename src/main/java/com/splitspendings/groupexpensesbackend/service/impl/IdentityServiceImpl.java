@@ -17,6 +17,7 @@ import java.util.UUID;
 @Slf4j
 public class IdentityServiceImpl implements IdentityService {
 
+    @SuppressWarnings("unchecked")
     @Override
     public AppUserIdentityDto currentUser() {
         try {
@@ -39,6 +40,7 @@ public class IdentityServiceImpl implements IdentityService {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public UUID currentUserID() {
         try {
