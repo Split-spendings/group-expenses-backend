@@ -142,9 +142,11 @@ public class GroupInviteServiceImpl implements GroupInviteService {
         GroupInvite newGroupInvite = new GroupInvite();
         newGroupInvite.setInvitedAppUser(invitedAppUser);
         newGroupInvite.setInvitedByGroupMembership(invitedByGroupMembership);
+        newGroupInvite.setMessage(newGroupInviteDto.getMessage());
 
-        GroupInvite createdGroupInvite = groupInviteRepository.save(newGroupInvite);
-        return groupInviteMapper.groupInviteToGroupInviteDto(createdGroupInvite);
+        groupInviteRepository.save(newGroupInvite);
+
+        return groupInviteMapper.groupInviteToGroupInviteDto(newGroupInvite);
     }
 
     /**

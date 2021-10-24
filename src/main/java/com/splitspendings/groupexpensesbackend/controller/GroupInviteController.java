@@ -32,7 +32,6 @@ public class GroupInviteController {
 
     @PostMapping
     public GroupInviteDto createGroupInvite(@RequestBody NewGroupInviteDto newGroupInviteDto) {
-        //TODO add message field to NewGroupInviteDto
         return groupInviteService.createGroupInvite(newGroupInviteDto);
     }
 
