@@ -94,14 +94,11 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
      *
      * @return true if {@link AppUser} has admin rights on {@link Group}, false otherwise
      *
-     * @throws ResponseStatusException
-     *         with status code {@link HttpStatus#NOT_FOUND} if there is no {@link GroupMembership} with given {@link
-     *         AppUser} and {@link Group} in the database
      */
     @Override
     public boolean isAdminOfGroup(UUID appUserId, Long groupId) {
-        GroupMembership groupMembership = groupActiveMembershipModelByGroupId(appUserId, groupId);
-        return groupMembership.getHasAdminRights();
+        return groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(groupId, appUserId)
+                .map(GroupMembership::getHasAdminRights).orElse(false);
     }
 
     /**

@@ -5,6 +5,7 @@ import com.splitspendings.groupexpensesbackend.dto.spendingcomment.SpendingComme
 import com.splitspendings.groupexpensesbackend.dto.spendingcomment.UpdateSpendingCommentDto;
 import com.splitspendings.groupexpensesbackend.mapper.SpendingCommentMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
+import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import com.splitspendings.groupexpensesbackend.model.Spending;
 import com.splitspendings.groupexpensesbackend.model.SpendingComment;
 import com.splitspendings.groupexpensesbackend.repository.SpendingCommentRepository;
@@ -124,8 +125,8 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
      * @throws ResponseStatusException
      *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link SpendingComment} with given id
      * @throws ResponseStatusException
-     *         with status {@link HttpStatus#FORBIDDEN} when current user has no rights to update {@link SpendingComment} with
-     *         given id
+     *         with status {@link HttpStatus#FORBIDDEN} when current user has no rights to update {@link
+     *         SpendingComment} with given id
      */
     @Override
     public SpendingCommentDto updateSpendingComment(Long id, UpdateSpendingCommentDto updateSpendingCommentDto) {
@@ -133,24 +134,16 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
 
         SpendingComment spendingComment = spendingCommentModelById(id);
         UUID currentAppUserId = identityService.currentUserID();
+        Long groupId = spendingComment.getSpending().getAddedByGroupMembership().getGroup().getId();
 
-        if (!isCommentAddedByUserWithId(spendingComment, currentAppUserId)
-                && !isAdminOfGroup(currentAppUserId, spendingComment)) {
-            String logMessage = String.format(
-                    "User with id = {%s} is not an author of comment with id = {%d} and does not have admin rights",
-                    currentAppUserId.toString(),
-                    spendingComment.getId());
-            log.info(logMessage);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, logMessage);
-        }
+        groupMembershipService.verifyUserActiveMembershipByGroupId(currentAppUserId, groupId);
+        verifyHasRightsToUpdateComment(currentAppUserId, spendingComment, groupId);
 
         spendingCommentMapper.copyUpdateSpendingCommentDtoToSpendingComment(updateSpendingCommentDto, spendingComment);
+        spendingComment.setLastModifiedByAppUser(appUserService.appUserModelById(currentAppUserId));
+
         spendingCommentRepository.save(spendingComment);
         return spendingCommentMapper.spendingCommentToSpendingCommentDto(spendingComment);
-    }
-
-    private boolean isCommentAddedByUserWithId(SpendingComment spendingComment, UUID currentAppUserId) {
-        return Objects.equals(spendingComment.getAddedByAppUser().getId(), currentAppUserId);
     }
 
     private void verifyCurrentUserActiveMembershipBySpendingComment(SpendingComment spendingComment) {
@@ -163,8 +156,17 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
         groupMembershipService.verifyUserActiveMembershipByGroupId(appUserId, groupId);
     }
 
-    private boolean isAdminOfGroup(UUID appUserId, SpendingComment spendingComment) {
-        Long groupID = spendingComment.getSpending().getAddedByGroupMembership().getGroup().getId();
-        return groupMembershipService.isAdminOfGroup(appUserId, groupID);
+    private void verifyHasRightsToUpdateComment(UUID appUserId, SpendingComment spendingComment, Long groupId) {
+        GroupMembership groupMembership = groupMembershipService.groupActiveMembershipModelByGroupId(appUserId, groupId);
+
+        boolean isAuthorOfComment = Objects.equals(spendingComment.getAddedByAppUser().getId(), appUserId);
+        boolean hasAdminRights = groupMembership.getHasAdminRights();
+
+        if (!(isAuthorOfComment || hasAdminRights)) {
+            String logMessage = String.format("User with id = {%s} is not an author of comment with id = {%d} and does not have admin rights",
+                    appUserId, spendingComment.getId());
+            log.info(logMessage);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, logMessage);
+        }
     }
 }

@@ -14,4 +14,5 @@ public class SpendingCommentDto {
     private final ZonedDateTime timeAdded;
     private final SpendingShortDto spending;
     private final AppUserDto addedByAppUser;
+    private final AppUserDto lastModifiedByAppUser;
 }
