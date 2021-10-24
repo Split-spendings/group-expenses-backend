@@ -7,7 +7,6 @@ import com.splitspendings.groupexpensesbackend.service.GroupInviteService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,8 +27,7 @@ public class GroupInviteController {
 
     @GetMapping({"/{id}"})
     public GroupInviteDto getGroupInviteById(@PathVariable Long id) {
-        //todo
-        throw new NotImplementedException();
+        return groupInviteService.groupInviteById(id);
     }
 
     @PostMapping

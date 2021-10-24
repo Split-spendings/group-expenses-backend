@@ -28,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -62,9 +63,36 @@ public class GroupInviteServiceImpl implements GroupInviteService {
     @Override
     public GroupInvite groupInviteModelById(Long id) {
         return groupInviteRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("Group invite with id = {%d} not found",
-                                id)));
+                .orElseThrow(() -> {
+                    String logMessage = String.format("Group invite with id = {%d} not found", id);
+                    log.info(logMessage);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
+                });
+    }
+
+    /**
+     * @param id
+     *         id of {@link GroupInvite} to be found in the database
+     *
+     * @return {@link GroupInvite} with given id
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if not found
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} if {@link AppUser} has no right to access {@link
+     *         GroupInvite}
+     */
+    @Override
+    public GroupInviteDto groupInviteById(Long id) {
+        GroupInvite groupInvite = groupInviteModelById(id);
+        if (hasAccessToGroupInvite(groupInvite)) {
+            return groupInviteMapper.groupInviteToGroupInviteDto(groupInvite);
+        }
+        String logMessage = String.format("User with id = {%s} has no right to access GroupInvite with id = {%d}",
+                identityService.currentUserID(),
+                id);
+        log.info(logMessage);
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, logMessage);
     }
 
     /**
@@ -208,5 +236,20 @@ public class GroupInviteServiceImpl implements GroupInviteService {
         GroupInvite groupInvite = groupInviteModelById(id);
         identityService.verifyAuthorization(groupInvite.getInvitedAppUser().getId());
         groupInviteRepository.delete(groupInvite);
+    }
+
+    private boolean hasAccessToGroupInvite(GroupInvite groupInvite) {
+        UUID currentAppUserId = identityService.currentUserID();
+        if (Objects.equals(currentAppUserId, groupInvite.getInvitedAppUser().getId())) {
+            return true;
+        }
+
+        GroupMembership groupMembership = groupInvite.getInvitedByGroupMembership();
+        if (Objects.equals(currentAppUserId, groupMembership.getAppUser().getId())
+                && groupMembership.getActive()) {
+            return true;
+        }
+
+        return groupMembershipService.isAdminOfGroup(currentAppUserId, groupMembership.getGroup().getId());
     }
 }

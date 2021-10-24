@@ -9,6 +9,8 @@ public interface GroupInviteService {
 
     GroupInvite groupInviteModelById(Long id);
 
+    GroupInviteDto groupInviteById(Long id);
+
     GroupInviteDto createGroupInvite(NewGroupInviteDto newGroupInviteDto);
 
     GroupInviteAcceptedDto acceptGroupInvite(Long id);
