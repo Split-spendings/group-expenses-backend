@@ -240,7 +240,7 @@ public class DatabaseLoader implements CommandLineRunner {
         groupInvite1.setInvitedByGroupMembership(groupMembership1);
 
         GroupInvite groupInvite2 = new GroupInvite();
-        groupInvite2.setInvitedAppUser(appUser1);
+        groupInvite2.setInvitedAppUser(appUser3);
         groupInvite2.setInvitedByGroupMembership(groupMembership2);
 
         GroupInvite groupInvite3 = new GroupInvite();
