@@ -5,15 +5,11 @@ import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
-import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteAcceptedDto;
-import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
-import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.groupmembership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,21 +52,6 @@ public class GroupController {
     @GetMapping("/{id}/members/{appUserId}")
     public GroupMembershipDto groupMembership(@PathVariable Long id, @PathVariable UUID appUserId) {
         return groupService.groupMembership(id, appUserId);
-    }
-
-    @PostMapping("/invite")
-    public GroupInviteDto createGroupInvite(@RequestBody NewGroupInviteDto newGroupInviteDto) {
-        return groupService.createGroupInvite(newGroupInviteDto);
-    }
-
-    @PatchMapping("/invite/{inviteId}")
-    public GroupInviteAcceptedDto acceptGroupInvite(@PathVariable Long inviteId) {
-        return groupService.acceptGroupInvite(inviteId);
-    }
-
-    @DeleteMapping("/invite/{id}")
-    public void declineGroupInvite(@PathVariable Long id) {
-        groupService.declineGroupInvite(id);
     }
 
     @PatchMapping("/{id}/leave")
