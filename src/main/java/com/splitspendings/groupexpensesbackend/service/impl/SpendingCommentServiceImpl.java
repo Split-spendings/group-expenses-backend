@@ -50,8 +50,10 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
      * @return valid {@link SpendingComment}
      *
      * @throws ResponseStatusException
-     *         with status {@link HttpStatus#NOT_FOUND}
-     *         when there is no {@link SpendingComment} with given id
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link SpendingComment} with given id
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#FORBIDDEN} when current user has no rights to access Spending with given
+     *         id
      */
     @Override
     public SpendingComment spendingCommentModelById(Long id) {
@@ -67,11 +69,10 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
      * @return valid {@link SpendingCommentDto}
      *
      * @throws ResponseStatusException
-     *         with status {@link HttpStatus#NOT_FOUND}
-     *         when there is no {@link SpendingComment} with given id
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link SpendingComment} with given id
      * @throws ResponseStatusException
-     *         with status {@link HttpStatus#FORBIDDEN}
-     *         when current user has no rights to access {@link SpendingComment} with given id
+     *         with status {@link HttpStatus#FORBIDDEN} when current user has no rights to access {@link
+     *         SpendingComment} with given id
      */
     @Override
     public SpendingCommentDto spendingCommentById(Long id) {
@@ -87,11 +88,10 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
      * @throws ConstraintViolationException
      *         when provided DTO doesn't meet requirements
      * @throws ResponseStatusException
-     *         with status {@link HttpStatus#NOT_FOUND}
-     *         when there is no {@link Spending} with given id
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link Spending} with given id
      * @throws ResponseStatusException
-     *         with status {@link HttpStatus#FORBIDDEN}
-     *         when current user has no rights to access {@link Spending} with given id
+     *         with status {@link HttpStatus#FORBIDDEN} when current user has no rights to access {@link Spending} with
+     *         given id
      */
     @Override
     public SpendingCommentDto createSpendingComment(NewSpendingCommentDto newSpendingCommentDto) {
@@ -111,6 +111,22 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
         return spendingCommentMapper.spendingCommentToSpendingCommentDto(spendingComment);
     }
 
+    /**
+     * @param id
+     *         id of a {@link SpendingComment} do be updated
+     * @param updateSpendingCommentDto
+     *         data to update {@link SpendingComment} with
+     *
+     * @return {@link SpendingCommentDto} with updated data
+     *
+     * @throws ConstraintViolationException
+     *         when {@link UpdateSpendingCommentDto} doesn't meet requirements
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link SpendingComment} with given id
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#FORBIDDEN} when current user has no rights to update {@link SpendingComment} with
+     *         given id
+     */
     @Override
     public SpendingCommentDto updateSpendingComment(Long id, UpdateSpendingCommentDto updateSpendingCommentDto) {
         ValidatorUtil.validate(validator, updateSpendingCommentDto);

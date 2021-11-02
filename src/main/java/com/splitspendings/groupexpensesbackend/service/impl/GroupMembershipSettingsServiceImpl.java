@@ -3,6 +3,7 @@ package com.splitspendings.groupexpensesbackend.service.impl;
 import com.splitspendings.groupexpensesbackend.dto.groupmembershipsettings.GroupMembershipSettingsDto;
 import com.splitspendings.groupexpensesbackend.dto.groupmembershipsettings.UpdateGroupMembershipSettingsDto;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMembershipSettingsMapper;
+import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import com.splitspendings.groupexpensesbackend.model.GroupMembershipSettings;
 import com.splitspendings.groupexpensesbackend.model.enums.GroupTheme;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
 @Service
@@ -34,6 +36,11 @@ public class GroupMembershipSettingsServiceImpl implements GroupMembershipSettin
 
     private final GroupMembershipService groupMembershipService;
 
+    /**
+     * Creates {@link GroupMembershipSettings} with default values
+     *
+     * @return created {@link GroupMembershipSettings}
+     */
     @Override
     public GroupMembershipSettings createDefaultGroupMembershipSettings() {
         GroupMembershipSettings groupMembershipSettings = new GroupMembershipSettings();
@@ -42,6 +49,14 @@ public class GroupMembershipSettingsServiceImpl implements GroupMembershipSettin
         return groupMembershipSettings;
     }
 
+    /**
+     * Creates and saves default {@link GroupMembershipSettings}
+     *
+     * @param groupMembership
+     *         {@link GroupMembership} to be used for saving default {@link GroupMembershipSettings}
+     *
+     * @return newly created {@link GroupMembershipSettings}
+     */
     @Override
     public GroupMembershipSettings createAndSaveDefaultGroupMembershipSettingsForGroupMembership(GroupMembership groupMembership) {
         GroupMembershipSettings defaultGroupMembershipSettings = createDefaultGroupMembershipSettings();
@@ -49,17 +64,62 @@ public class GroupMembershipSettingsServiceImpl implements GroupMembershipSettin
         return groupMembershipSettingsRepository.save(defaultGroupMembershipSettings);
     }
 
+    /**
+     * @param id
+     *         id of {@link GroupMembershipSettings} to be found in the database
+     *
+     * @return {@link GroupMembershipSettings} with given id
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} when there is no {@link GroupMembershipSettings} with given
+     *         id
+     */
     @Override
     public GroupMembershipSettings groupMembershipSettingsModelById(Long id) {
-        return groupMembershipSettingsRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "GroupMembershipSettings not found"));
+        return groupMembershipSettingsRepository.findById(id)
+                .orElseThrow(() -> {
+                    String logMessage = String.format("GroupMembershipSettings with id = {%d} not found", id);
+                    log.info(logMessage);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
+                });
     }
 
+    /**
+     * @param id
+     *         id of {@link GroupMembershipSettings} to be found in the database
+     *
+     * @return {@link GroupMembershipSettingsDto} with given id
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} when there is no {@link GroupMembershipSettings} with given
+     *         id
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} when current {@link AppUser} has no rights to access {@link
+     *         GroupMembershipSettings} with given id
+     */
     @Override
     public GroupMembershipSettingsDto groupMembershipSettingsById(Long id) {
         groupMembershipService.verifyCurrentUserActiveMembershipById(id);
         return groupMembershipSettingsMapper.groupMembershipSettingsToGroupMembershipSettingsDto(groupMembershipSettingsModelById(id));
     }
 
+    /**
+     * @param id
+     *         id of {@link GroupMembershipSettings} to be updated
+     * @param updateGroupMembershipSettingsDto
+     *         data to be updated
+     *
+     * @return {@link GroupMembershipSettingsDto} with updated data
+     *
+     * @throws ConstraintViolationException
+     *         if given {@link UpdateGroupMembershipSettingsDto} is not valid
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} when current {@link AppUser} has no rights to access {@link
+     *         GroupMembership} with given id
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} when there is no {@link GroupMembershipSettings} with given
+     *         id
+     */
     @Override
     public GroupMembershipSettingsDto updateGroupMembershipSettings(Long id, UpdateGroupMembershipSettingsDto updateGroupMembershipSettingsDto) {
         ValidatorUtil.validate(validator, updateGroupMembershipSettingsDto);

@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -69,16 +70,50 @@ public class GroupServiceImpl implements GroupService {
     private final GroupMembershipService groupMembershipService;
     private final GroupMembershipSettingsService groupMembershipSettingsService;
 
+    /**
+     * @param id
+     *         id of {@link Group} to be found in the database
+     *
+     * @return {@link Group} with given id
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if not found
+     */
     @Override
     public Group groupModelById(Long id) {
-        return groupRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
+        return groupRepository.findById(id)
+                .orElseThrow(() -> {
+                    String logMessage = String.format("Group with id = {%d} not found", id);
+                    log.info(logMessage);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
+                });
     }
 
+    /**
+     * @param id
+     *         id of {@link Group} to be found in the database
+     *
+     * @return {@link GroupInfoDto} with given id
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if not found
+     */
     @Override
     public GroupInfoDto groupInfoById(Long id) {
         return groupMapper.groupToGroupInfoDto(groupModelById(id));
     }
 
+    /**
+     * @param newGroupDto
+     *         data to save new {@link Group}
+     *
+     * @return created {@link GroupInfoDto}
+     *
+     * @throws ConstraintViolationException
+     *         if {@link NewGroupDto} is not valid
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if not found
+     */
     @Override
     public GroupInfoDto createGroup(NewGroupDto newGroupDto) {
         ValidatorUtil.validate(validator, newGroupDto);
@@ -106,6 +141,21 @@ public class GroupServiceImpl implements GroupService {
         return groupMapper.groupToGroupInfoDto(createdGroup);
     }
 
+    /**
+     * @param id
+     *         id of {@link Group} to be updated
+     * @param updateGroupInfoDto
+     *         data to update {@link Group} with
+     *
+     * @return {@link GroupInfoDto} with updated data
+     *
+     * @throws ConstraintViolationException
+     *         if {@link UpdateGroupInfoDto} is not valid
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if not found
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if current user has no rights to update {@link Group}
+     */
     @Override
     public GroupInfoDto updateGroupInfo(Long id, UpdateGroupInfoDto updateGroupInfoDto) {
         ValidatorUtil.validate(validator, updateGroupInfoDto);
@@ -120,6 +170,17 @@ public class GroupServiceImpl implements GroupService {
         return groupMapper.groupToGroupInfoDto(updatedGroup);
     }
 
+    /**
+     * @param id
+     *         id of {@link Group}
+     *
+     * @return all active members of {@link Group}
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if not found
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} if current user has no rights to access {@link Group}
+     */
     @Override
     public GroupActiveMembersDto groupActiveMembersById(Long id) {
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
@@ -135,6 +196,19 @@ public class GroupServiceImpl implements GroupService {
         return groupMembersDto;
     }
 
+    /**
+     * @param id
+     *         id of {@link Group} to be found
+     * @param appUserId
+     *         id of {@link AppUser} to be found
+     *
+     * @return {@link GroupMembershipDto} with given {@link Group} and {@link AppUser}
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if not found
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} if current user has no rights to access {@link Group}
+     */
     @Override
     public GroupMembershipDto groupMembership(Long id, UUID appUserId) {
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
@@ -142,6 +216,25 @@ public class GroupServiceImpl implements GroupService {
         return groupMembershipMapper.groupMembershipToGroupMembershipDto(groupMembership);
     }
 
+    /**
+     * @param newGroupInviteDto
+     *         data to be used to create new {@link NewGroupInviteDto}
+     *
+     * @return created {@link GroupInviteDto}
+     *
+     * @throws ConstraintViolationException
+     *         if {@link NewGroupInviteDto} is not valid
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#BAD_REQUEST} if user tries to invite itself
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} if current user has no rights to access {@link Group}
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if invited {@link AppUser} is already an active group
+     *         member
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#BAD_REQUEST} if invited {@link AppUser} is already invited by current
+     *         {@link AppUser}
+     */
     @Override
     public GroupInviteDto createGroupInvite(NewGroupInviteDto newGroupInviteDto) {
         ValidatorUtil.validate(validator, newGroupInviteDto);
@@ -175,15 +268,42 @@ public class GroupServiceImpl implements GroupService {
         return groupInviteMapper.groupInviteToGroupInviteDto(createdGroupInvite);
     }
 
+    /**
+     * @param inviteId
+     *         id of {@link GroupInvite} to be found in the database
+     *
+     * @return {@link GroupInvite} with given id
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if not found
+     */
     @Override
     public GroupInvite groupInviteModelById(Long inviteId) {
-        Optional<GroupInvite> groupInvite = groupInviteRepository.findById(inviteId);
-        if (groupInvite.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Group invite not found");
-        }
-        return groupInvite.get();
+        return groupInviteRepository.findById(inviteId)
+                .orElseThrow(() -> {
+                    String logMessage = String.format("Group invite with id = {%d} not found", inviteId);
+                    log.info(logMessage);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
+                });
     }
 
+    /**
+     * @param inviteId
+     *         id of {@link GroupInvite} to be accepted
+     *
+     * @return {@link GroupInviteAcceptedDto} created from given {@link GroupInvite}
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if no {@link GroupInvite} with given id is found
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} if {@link AppUser} is unathorized to accept invitation
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#BAD_REQUEST} if {@link AppUser} who created invitation is no longer an
+     *         active member of a {@link Group}
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#BAD_REQUEST} if invited {@link AppUser} is an active member of a
+     *         {@link Group}
+     */
     @Override
     @Transactional(noRollbackFor = InvalidGroupInviteException.class)
     public GroupInviteAcceptedDto acceptGroupInvite(Long inviteId) {
@@ -196,7 +316,13 @@ public class GroupServiceImpl implements GroupService {
 
         if (!invitedByGroupMembership.getActive()) {
             groupInviteRepository.delete(groupInvite);
-            throw new InvalidGroupInviteException(HttpStatus.BAD_REQUEST, "User who made an invite is no longer an active group member");
+            String logMessage =
+                    String.format("AppUser with id = {%s} who made an invite with id = {%d} is no longer an active member of a group with id = {%d}",
+                            invitedByGroupMembership.getAppUser().getId(),
+                            inviteId,
+                            invitedByGroupMembership.getGroup().getId());
+            log.info(logMessage);
+            throw new InvalidGroupInviteException(HttpStatus.BAD_REQUEST, logMessage);
         }
 
         Group group = invitedByGroupMembership.getGroup();
@@ -222,7 +348,10 @@ public class GroupServiceImpl implements GroupService {
             groupMembershipRepository.save(groupMembership);
             groupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(groupMembership);
         } else {
-            throw new InvalidGroupInviteException(HttpStatus.BAD_REQUEST, "Invited user is already an active member of a group");
+            String logMessage = String.format("Invited user with id = {%s} is already an active member of a group with id = {%d}",
+                    invitedByGroupMembership.getAppUser().getId(), group.getId());
+            log.info(logMessage);
+            throw new InvalidGroupInviteException(HttpStatus.BAD_REQUEST, logMessage);
         }
 
         GroupInviteAcceptedDto groupInviteAcceptedDto = new GroupInviteAcceptedDto();
@@ -230,6 +359,18 @@ public class GroupServiceImpl implements GroupService {
         return groupInviteAcceptedDto;
     }
 
+    /**
+     * Deletes {@link GroupInvite} with given id
+     *
+     * @param id
+     *         id of a {@link GroupInvite} to be deleted
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} if {@link GroupInvite} with given id is not found
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#BAD_REQUEST} if {@link AppUser} who created invitation is no longer an
+     *         active member of a {@link Group}
+     */
     @Override
     public void declineGroupInvite(Long id) {
         GroupInvite groupInvite = groupInviteModelById(id);
@@ -237,18 +378,38 @@ public class GroupServiceImpl implements GroupService {
         groupInviteRepository.delete(groupInvite);
     }
 
+    /**
+     * @param id
+     *         id of a {@link Group} to leave
+     *
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} if there is no {@link Group} with given id
+     */
     @Override
     public void leaveGroup(Long id) {
-        Optional<GroupMembership> groupMembershipOptional = groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(id, identityService.currentUserID());
-        if (groupMembershipOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a member of a group");
-        }
-        GroupMembership groupMembership = groupMembershipOptional.get();
+        GroupMembership groupMembership = groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(id, identityService.currentUserID())
+                .orElseThrow(() -> {
+                    String logMessage = String.format("User with id = {%s} is not a member of a group with id = {%d}",
+                            identityService.currentUserID(), id);
+                    return new ResponseStatusException(HttpStatus.FORBIDDEN, logMessage);
+                });
         groupMembership.setActive(false);
         groupMembership.setLastTimeLeft(ZonedDateTime.now());
         groupMembershipRepository.save(groupMembership);
     }
 
+    /**
+     * @param id
+     *         id of a {@link Group} to find {@link Spending}
+     *
+     * @return all {@link Spending} from given {@link Group}
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} if {@link AppUser} is not an active member of {@link
+     *         Group}
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#NOT_FOUND} when {@link Group} eith given id is not found
+     */
     @Override
     public GroupSpendingsDto groupSpendings(Long id) {
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
