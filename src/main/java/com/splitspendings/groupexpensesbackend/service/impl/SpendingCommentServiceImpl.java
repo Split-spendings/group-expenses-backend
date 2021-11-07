@@ -135,10 +135,8 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
 
         SpendingComment spendingComment = spendingCommentModelById(id);
         UUID currentAppUserId = identityService.currentUserID();
-        Long groupId = spendingComment.getSpending().getAddedByGroupMembership().getGroup().getId();
 
-        groupMembershipService.verifyUserActiveMembershipByGroupId(currentAppUserId, groupId);
-        verifyHasRightsToUpdateComment(currentAppUserId, spendingComment, groupId);
+        verifyHasRightsToUpdateComment(currentAppUserId, spendingComment);
 
         spendingCommentMapper.copyUpdateSpendingCommentDtoToSpendingComment(updateSpendingCommentDto, spendingComment);
         spendingComment.setLastModifiedByAppUser(appUserService.appUserModelById(currentAppUserId));
@@ -157,7 +155,9 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
         groupMembershipService.verifyUserActiveMembershipByGroupId(appUserId, groupId);
     }
 
-    private void verifyHasRightsToUpdateComment(UUID appUserId, SpendingComment spendingComment, Long groupId) {
+    private void verifyHasRightsToUpdateComment(UUID appUserId, SpendingComment spendingComment) {
+        Long groupId = spendingComment.getSpending().getAddedByGroupMembership().getGroup().getId();
+
         GroupMembership groupMembership = groupMembershipService.groupActiveMembershipModelByGroupId(appUserId, groupId);
 
         boolean isAuthorOfComment = Objects.equals(spendingComment.getAddedByAppUser().getId(), appUserId);
