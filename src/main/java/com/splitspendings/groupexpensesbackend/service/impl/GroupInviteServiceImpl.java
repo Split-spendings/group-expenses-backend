@@ -17,6 +17,7 @@ import com.splitspendings.groupexpensesbackend.service.GroupInviteService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
+import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,11 +64,8 @@ public class GroupInviteServiceImpl implements GroupInviteService {
     @Override
     public GroupInvite groupInviteModelById(Long id) {
         return groupInviteRepository.findById(id)
-                .orElseThrow(() -> {
-                    String logMessage = String.format("Group invite with id = {%d} not found", id);
-                    log.info(logMessage);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
-                });
+                .orElseThrow(() -> LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.NOT_FOUND,
+                        String.format("Group invite with id = {%d} not found", id)));
     }
 
     /**
@@ -88,11 +86,10 @@ public class GroupInviteServiceImpl implements GroupInviteService {
         if (hasAccessToGroupInvite(groupInvite)) {
             return groupInviteMapper.groupInviteToGroupInviteDto(groupInvite);
         }
-        String logMessage = String.format("User with id = {%s} has no right to access GroupInvite with id = {%d}",
-                identityService.currentUserID(),
-                id);
-        log.info(logMessage);
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, logMessage);
+        throw LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.FORBIDDEN,
+                String.format("User with id = {%s} has no right to access GroupInvite with id = {%d}",
+                    identityService.currentUserID(),
+                    id));
     }
 
     /**
@@ -123,20 +120,20 @@ public class GroupInviteServiceImpl implements GroupInviteService {
         UUID currentAppUserId = identityService.currentUserID();
 
         if (invitedAppUserId.equals(currentAppUserId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot invite self in a group");
+            throw LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.BAD_REQUEST, "Cannot invite self in a group");
         }
 
         GroupMembership invitedByGroupMembership = groupMembershipService.groupActiveMembershipModelByGroupId(currentAppUserId, groupId);
 
         if (groupMembershipService.isAppUserActiveMemberOfGroup(invitedAppUserId, groupId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invited user is already an active group member");
+            throw LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.NOT_FOUND, "Invited user is already an active group member");
         }
 
         AppUser invitedAppUser = appUserService.appUserModelById(invitedAppUserId);
 
         Optional<GroupInvite> existingGroupInvite = groupInviteRepository.findByInvitedAppUserAndInvitedByGroupMembership(invitedAppUser, invitedByGroupMembership);
         if (existingGroupInvite.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already invited by the current user");
+            throw LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.BAD_REQUEST, "User is already invited by the current user");
         }
 
         GroupInvite newGroupInvite = new GroupInvite();

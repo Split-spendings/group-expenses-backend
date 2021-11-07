@@ -5,6 +5,7 @@ import com.splitspendings.groupexpensesbackend.dto.spendingcomment.SpendingComme
 import com.splitspendings.groupexpensesbackend.dto.spendingcomment.UpdateSpendingCommentDto;
 import com.splitspendings.groupexpensesbackend.mapper.SpendingCommentMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
+import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import com.splitspendings.groupexpensesbackend.model.Spending;
 import com.splitspendings.groupexpensesbackend.model.SpendingComment;
 import com.splitspendings.groupexpensesbackend.repository.SpendingCommentRepository;
@@ -13,6 +14,7 @@ import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.service.SpendingCommentService;
 import com.splitspendings.groupexpensesbackend.service.SpendingService;
+import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +60,7 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
     @Override
     public SpendingComment spendingCommentModelById(Long id) {
         return spendingCommentRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.NOT_FOUND,
                         String.format("Spending comment with id = {%d} not found", id)));
     }
 
@@ -124,8 +126,8 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
      * @throws ResponseStatusException
      *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link SpendingComment} with given id
      * @throws ResponseStatusException
-     *         with status {@link HttpStatus#FORBIDDEN} when current user has no rights to update {@link SpendingComment} with
-     *         given id
+     *         with status {@link HttpStatus#FORBIDDEN} when current user has no rights to update {@link
+     *         SpendingComment} with given id
      */
     @Override
     public SpendingCommentDto updateSpendingComment(Long id, UpdateSpendingCommentDto updateSpendingCommentDto) {
@@ -134,23 +136,13 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
         SpendingComment spendingComment = spendingCommentModelById(id);
         UUID currentAppUserId = identityService.currentUserID();
 
-        if (!isCommentAddedByUserWithId(spendingComment, currentAppUserId)
-                && !isAdminOfGroup(currentAppUserId, spendingComment)) {
-            String logMessage = String.format(
-                    "User with id = {%s} is not an author of comment with id = {%d} and does not have admin rights",
-                    currentAppUserId.toString(),
-                    spendingComment.getId());
-            log.info(logMessage);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, logMessage);
-        }
+        verifyHasRightsToUpdateComment(currentAppUserId, spendingComment);
 
         spendingCommentMapper.copyUpdateSpendingCommentDtoToSpendingComment(updateSpendingCommentDto, spendingComment);
+        spendingComment.setLastModifiedByAppUser(appUserService.appUserModelById(currentAppUserId));
+
         spendingCommentRepository.save(spendingComment);
         return spendingCommentMapper.spendingCommentToSpendingCommentDto(spendingComment);
-    }
-
-    private boolean isCommentAddedByUserWithId(SpendingComment spendingComment, UUID currentAppUserId) {
-        return Objects.equals(spendingComment.getAddedByAppUser().getId(), currentAppUserId);
     }
 
     private void verifyCurrentUserActiveMembershipBySpendingComment(SpendingComment spendingComment) {
@@ -163,8 +155,19 @@ public class SpendingCommentServiceImpl implements SpendingCommentService {
         groupMembershipService.verifyUserActiveMembershipByGroupId(appUserId, groupId);
     }
 
-    private boolean isAdminOfGroup(UUID appUserId, SpendingComment spendingComment) {
-        Long groupID = spendingComment.getSpending().getAddedByGroupMembership().getGroup().getId();
-        return groupMembershipService.isAdminOfGroup(appUserId, groupID);
+    private void verifyHasRightsToUpdateComment(UUID appUserId, SpendingComment spendingComment) {
+        Long groupId = spendingComment.getSpending().getAddedByGroupMembership().getGroup().getId();
+
+        GroupMembership groupMembership = groupMembershipService.groupActiveMembershipModelByGroupId(appUserId, groupId);
+
+        boolean isAuthorOfComment = Objects.equals(spendingComment.getAddedByAppUser().getId(), appUserId);
+        boolean hasAdminRights = groupMembership.getHasAdminRights();
+
+        if (!(isAuthorOfComment || hasAdminRights)) {
+            throw LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.FORBIDDEN,
+                    String.format("User with id = {%s} is not an author of comment with id = {%d} and does not have admin rights",
+                            appUserId,
+                            spendingComment.getId()));
+        }
     }
 }

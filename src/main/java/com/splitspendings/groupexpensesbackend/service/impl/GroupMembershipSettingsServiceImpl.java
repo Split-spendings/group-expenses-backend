@@ -11,6 +11,7 @@ import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipSettingsRepository;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipSettingsService;
+import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,11 +78,8 @@ public class GroupMembershipSettingsServiceImpl implements GroupMembershipSettin
     @Override
     public GroupMembershipSettings groupMembershipSettingsModelById(Long id) {
         return groupMembershipSettingsRepository.findById(id)
-                .orElseThrow(() -> {
-                    String logMessage = String.format("GroupMembershipSettings with id = {%d} not found", id);
-                    log.info(logMessage);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
-                });
+                .orElseThrow(() -> LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.NOT_FOUND,
+                        String.format("GroupMembershipSettings with id = {%d} not found", id)));
     }
 
     /**

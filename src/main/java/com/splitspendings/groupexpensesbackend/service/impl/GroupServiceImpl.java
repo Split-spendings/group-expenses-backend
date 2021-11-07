@@ -24,6 +24,7 @@ import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
+import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,12 +72,9 @@ public class GroupServiceImpl implements GroupService {
      */
     @Override
     public Group groupModelById(Long id) {
-        return groupRepository.findById(id)
-                .orElseThrow(() -> {
-                    String logMessage = String.format("Group with id = {%d} not found", id);
-                    log.info(logMessage);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, logMessage);
-                });
+        return groupRepository.findById(id).orElseThrow(() ->
+                LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.NOT_FOUND,
+                        String.format("Group with id = {%d} not found", id)));
     }
 
     /**
@@ -216,11 +214,10 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void leaveGroup(Long id) {
         GroupMembership groupMembership = groupMembershipRepository.queryByGroupIdAndAppUserIdAndActiveTrue(id, identityService.currentUserID())
-                .orElseThrow(() -> {
-                    String logMessage = String.format("User with id = {%s} is not a member of a group with id = {%d}",
-                            identityService.currentUserID(), id);
-                    return new ResponseStatusException(HttpStatus.FORBIDDEN, logMessage);
-                });
+                .orElseThrow(() -> LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.FORBIDDEN,
+                        String.format("User with id = {%s} is not a member of a group with id = {%d}",
+                                identityService.currentUserID(),
+                                id)));
         groupMembership.setActive(false);
         groupMembership.setLastTimeLeft(ZonedDateTime.now());
         groupMembershipRepository.save(groupMembership);

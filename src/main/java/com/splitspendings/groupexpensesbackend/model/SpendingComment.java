@@ -41,4 +41,8 @@ public class SpendingComment {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "added_by_app_user_id", foreignKey = @ForeignKey(name = "fk_spending_comment_added_by_user"))
     private AppUser addedByAppUser;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_modified_by_app_user_id", foreignKey = @ForeignKey(name = "fk_spending_comment_last_modified_by_user"))
+    private AppUser lastModifiedByAppUser;
 }
