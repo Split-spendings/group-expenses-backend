@@ -35,6 +35,9 @@ public class Group {
     @Column(name = "group_name", nullable = false, length = NAME_MAX_LENGTH)
     private String name;
 
+    @Column(name = "simplify_debts", nullable = false)
+    private Boolean simplifyDebts = false;
+
     @Column(name = "time_created", nullable = false)
     private ZonedDateTime timeCreated = ZonedDateTime.now();
 
