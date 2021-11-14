@@ -48,4 +48,16 @@ public class UserBalance {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "second_app_user_id", foreignKey = @ForeignKey(name = "fk_user_balance_second_app_user"))
     private AppUser secondAppUser;
+
+    @Override
+    public String toString() {
+        return "UserBalance{" +
+                "id=" + id +
+                ", balance=" + balance +
+                ", currency=" + currency +
+                ", group=" + group.getId() +
+                ", firstAppUser=" + firstAppUser.getLoginName() +
+                ", secondAppUser=" + secondAppUser.getLoginName() +
+                '}';
+    }
 }

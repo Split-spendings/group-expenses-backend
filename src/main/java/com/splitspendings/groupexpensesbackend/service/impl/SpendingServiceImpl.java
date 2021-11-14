@@ -19,6 +19,7 @@ import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import com.splitspendings.groupexpensesbackend.repository.ItemRepository;
 import com.splitspendings.groupexpensesbackend.repository.ShareRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
+import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.service.SpendingService;
@@ -56,6 +57,7 @@ public class SpendingServiceImpl implements SpendingService {
 
     private final GroupMembershipService groupMembershipService;
     private final IdentityService identityService;
+    private final AppUserBalanceService appUserBalanceService;
 
     /**
      * @param id
@@ -176,6 +178,7 @@ public class SpendingServiceImpl implements SpendingService {
         Spending createdSpending = spendingRepository.save(spending);
         itemRepository.saveAll(items);
         shareRepository.saveAll(shares);
+        appUserBalanceService.recalculateAppUserBalanceByGroupId(group);
 
         return spendingMapper.spendingToSpendingDto(createdSpending);
     }
