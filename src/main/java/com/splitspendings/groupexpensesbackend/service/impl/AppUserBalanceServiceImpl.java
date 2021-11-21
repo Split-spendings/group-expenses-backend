@@ -1,5 +1,7 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
+import com.splitspendings.groupexpensesbackend.dto.appuserbalance.AppUserBalanceDto;
+import com.splitspendings.groupexpensesbackend.mapper.AppUserBalanceMapper;
 import com.splitspendings.groupexpensesbackend.mapper.NetChangeMapper;
 import com.splitspendings.groupexpensesbackend.mapper.TransactionMapper;
 import com.splitspendings.groupexpensesbackend.model.Group;
@@ -10,12 +12,16 @@ import com.splitspendings.groupexpensesbackend.repository.AppUserBalanceReposito
 import com.splitspendings.groupexpensesbackend.repository.PayoffRepository;
 import com.splitspendings.groupexpensesbackend.repository.ShareRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
+import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.impl.balance.Transaction;
 import com.splitspendings.groupexpensesbackend.util.BalanceCalculatorUtil;
+import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,8 +36,45 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
     private final ShareRepository shareRepository;
     private final PayoffRepository payoffRepository;
 
+    private final GroupMembershipService groupMembershipService;
+
     private final TransactionMapper transactionMapper;
     private final NetChangeMapper netChangeMapper;
+    private final AppUserBalanceMapper appUserBalanceMapper;
+
+    /**
+     * @param id
+     *         id of a {@link UserBalance} to be returned
+     *
+     * @return valid {@link UserBalance}
+     *
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link UserBalance} with given id
+     */
+    @Override
+    public UserBalance appUserBalanceModelById(Long id) {
+        return appUserBalanceRepository.findById(id)
+                .orElseThrow(() -> LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.NOT_FOUND,
+                        String.format("UserBalance with id = {%d} not found", id)));
+    }
+
+    /**
+     * @param id
+     *         id of a {@link Payoff} to be returned
+     *
+     * @return valid {@link Payoff}
+     *
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link Payoff} with given id
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#FORBIDDEN} when current user has no rights to access Payoff with given id
+     */
+    @Override
+    public AppUserBalanceDto appUserBalanceById(Long id) {
+        UserBalance userBalanceModel = appUserBalanceModelById(id);
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(userBalanceModel.getGroup().getId());
+        return appUserBalanceMapper.userBalanceToAppUserBalance(userBalanceModel);
+    }
 
     /**
      * @param group

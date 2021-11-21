@@ -33,6 +33,7 @@ import com.splitspendings.groupexpensesbackend.repository.PayoffRepository;
 import com.splitspendings.groupexpensesbackend.repository.ShareRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingCommentRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
+import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -61,6 +62,8 @@ public class DatabaseLoader implements CommandLineRunner {
 
     private final AppUserFactory appUserFactory;
     private final GroupFactory groupFactory;
+
+    private final AppUserBalanceService appUserBalanceService;
 
     private final AppUserSettingsRepository appUserSettingsRepository;
     private final GroupRepository groupRepository;
@@ -168,6 +171,14 @@ public class DatabaseLoader implements CommandLineRunner {
         setUpItems();
         setUpShares();
         setUpPayoffs();
+        recalculate();
+    }
+
+    private void recalculate(){
+        appUserBalanceService.recalculateAppUserBalanceByGroup(group1);
+        appUserBalanceService.recalculateAppUserBalanceByGroup(group2);
+        appUserBalanceService.recalculateAppUserBalanceByGroup(group3);
+        appUserBalanceService.recalculateAppUserBalanceByGroup(group4);
     }
 
     private void setUpPayoffs() {
