@@ -178,7 +178,7 @@ public class SpendingServiceImpl implements SpendingService {
         Spending createdSpending = spendingRepository.save(spending);
         itemRepository.saveAll(items);
         shareRepository.saveAll(shares);
-        appUserBalanceService.recalculateAppUserBalanceByGroupId(group);
+        appUserBalanceService.recalculateAppUserBalanceByGroup(group);
 
         return spendingMapper.spendingToSpendingDto(createdSpending);
     }

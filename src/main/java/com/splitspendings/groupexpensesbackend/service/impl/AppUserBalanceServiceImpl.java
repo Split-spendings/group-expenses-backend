@@ -6,13 +6,10 @@ import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.Payoff;
 import com.splitspendings.groupexpensesbackend.model.Share;
 import com.splitspendings.groupexpensesbackend.model.UserBalance;
-import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import com.splitspendings.groupexpensesbackend.repository.AppUserBalanceRepository;
 import com.splitspendings.groupexpensesbackend.repository.PayoffRepository;
 import com.splitspendings.groupexpensesbackend.repository.ShareRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
-import com.splitspendings.groupexpensesbackend.service.GroupService;
-import com.splitspendings.groupexpensesbackend.service.impl.balance.NetChange;
 import com.splitspendings.groupexpensesbackend.service.impl.balance.Transaction;
 import com.splitspendings.groupexpensesbackend.util.BalanceCalculatorUtil;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -37,34 +33,27 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
     private final TransactionMapper transactionMapper;
     private final NetChangeMapper netChangeMapper;
 
-    private final GroupService groupService;
-
+    /**
+     * @param group
+     *          {@link Group} to recalculate {@link UserBalance}
+     */
     @Override
-    public void recalculateAppUserBalanceByGroupId(Group group) {
+    public void recalculateAppUserBalanceByGroup(Group group) {
         appUserBalanceRepository.deleteAllByGroup(group);
-        Set<Transaction> transactionSet;
+        Set<Transaction> transactionSet = getAllTransactionsByGroupId(group.getId());
         if (group.getSimplifyDebts()){
-            transactionSet = getSimplifiedTransactions(group.getId());
-        } else {
-            transactionSet = getAllTransactionsByGroupId(group.getId());
+            transactionSet = BalanceCalculatorUtil.calculate(netChangeMapper.transactionListToNetChangeList(transactionSet));
         }
         Set<UserBalance> userBalanceSet = transactionMapper.transactionSetToUserBalanceSet(transactionSet, group);
         appUserBalanceRepository.saveAll(userBalanceSet);
     }
 
-    @Override
-    public void recalculateAppUserBalanceByGroupId(Long groupId) {
-        recalculateAppUserBalanceByGroupId(groupService.groupModelById(groupId));
-    }
-
-    private Set<Transaction> getSimplifiedTransactions(Long groupId){
-        return BalanceCalculatorUtil.calculate(getAllNetChangesByGroupId(groupId));
-    }
-
-    private Map<Currency, Set<NetChange>> getAllNetChangesByGroupId(Long groupId){
-        return netChangeMapper.transactionListToNetChangeList(getAllTransactionsByGroupId(groupId));
-    }
-
+    /**
+     *
+     * @param groupId
+     *      id of a {@link Group} to retrieve {@link Transaction} from
+     * @return {@link Set<Transaction>} found in {@link Group} with given id
+     */
     private Set<Transaction> getAllTransactionsByGroupId(Long groupId){
         //retrieve Shares and Payoffs by GroupId
         Set<Share> sharesByGroupId = shareRepository.findAllByGroupId(groupId);

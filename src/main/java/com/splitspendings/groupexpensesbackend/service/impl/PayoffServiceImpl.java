@@ -8,6 +8,7 @@ import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.Payoff;
 import com.splitspendings.groupexpensesbackend.repository.PayoffRepository;
+import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.util.UUID;
 
@@ -35,6 +37,7 @@ public class PayoffServiceImpl implements PayoffService {
 
     private final PayoffRepository payoffRepository;
 
+    private final AppUserBalanceService appUserBalanceService;
     private final AppUserService appUserService;
     private final IdentityService identityService;
     private final GroupMembershipService groupMembershipService;
@@ -76,6 +79,21 @@ public class PayoffServiceImpl implements PayoffService {
         return payoffMapper.payoffToPayoffDto(payoffModel);
     }
 
+    /**
+     *
+     * @param newPayoffDto
+     *          data to create new {@link Payoff}
+     *
+     * @return created {@link PayoffDto}
+     *
+     * @throws ConstraintViolationException
+     *         when {@link NewPayoffDto} is invalid
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link Group} with given id
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} if any of {@link AppUser} are not an active member of
+     *         {@link Group}
+     */
     @Override
     public PayoffDto createPayoff(NewPayoffDto newPayoffDto) {
         ValidatorUtil.validate(validator, newPayoffDto);
@@ -89,10 +107,26 @@ public class PayoffServiceImpl implements PayoffService {
 
         Payoff payoff = payoffMapper.newPayoffDtoToPayoff(newPayoffDto, group, currentAppUser, paidForAppUser, paidToAppUser);
         payoffRepository.save(payoff);
+        appUserBalanceService.recalculateAppUserBalanceByGroup(group);
 
         return payoffMapper.payoffToPayoffDto(payoff);
     }
 
+    /**
+     * @param id
+     *      id of a {@link Payoff} to be updated
+     * @param updatePayoffDto
+     *          data to update {@link Payoff} with
+     * @return updated {@link PayoffDto}
+     *
+     * @throws ConstraintViolationException
+     *         when {@link UpdatePayoffDto} is invalid
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link Payoff} with given id
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} if any of {@link AppUser} are not an active member of
+     *         {@link Group}
+     */
     @Override
     public PayoffDto updatePayoff(Long id, UpdatePayoffDto updatePayoffDto) {
         ValidatorUtil.validate(validator, updatePayoffDto);
@@ -106,10 +140,24 @@ public class PayoffServiceImpl implements PayoffService {
 
         payoffMapper.copyUpdatePayoffDtoToPayoff(updatePayoffDto, currentAppUser, paidForAppUser, paidToAppUser, payoff);
         payoffRepository.save(payoff);
+        appUserBalanceService.recalculateAppUserBalanceByGroup(group);
 
         return payoffMapper.payoffToPayoffDto(payoff);
     }
 
+    /**
+     * verifies whether current and passed {@link AppUser}s are active group members
+     * @param groupId
+     *          id of a {@link Group}
+     * @param paidForAppUser
+     *         id of a {@link AppUser} to be checked
+     * @param paidToAppUser
+     *         id of a {@link AppUser} to be checked
+     *
+     * @throws ResponseStatusException
+     *         with status code {@link HttpStatus#FORBIDDEN} if any of {@link AppUser} are not an active member of
+     *         {@link Group}
+     */
     private void verifyUsersActiveMembership(Long groupId, UUID paidForAppUser, UUID paidToAppUser){
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(groupId);
         groupMembershipService.verifyUserActiveMembershipByGroupId(paidForAppUser, groupId);
