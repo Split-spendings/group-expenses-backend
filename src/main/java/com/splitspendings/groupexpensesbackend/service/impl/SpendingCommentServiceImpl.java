@@ -1,8 +1,8 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
-import com.splitspendings.groupexpensesbackend.dto.spendingcomment.NewSpendingCommentDto;
-import com.splitspendings.groupexpensesbackend.dto.spendingcomment.SpendingCommentDto;
-import com.splitspendings.groupexpensesbackend.dto.spendingcomment.UpdateSpendingCommentDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.comment.NewSpendingCommentDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.comment.SpendingCommentDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.comment.UpdateSpendingCommentDto;
 import com.splitspendings.groupexpensesbackend.mapper.SpendingCommentMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;

@@ -1,7 +1,7 @@
 package com.splitspendings.groupexpensesbackend.mapper;
 
-import com.splitspendings.groupexpensesbackend.dto.spendingcomment.SpendingCommentDto;
-import com.splitspendings.groupexpensesbackend.dto.spendingcomment.UpdateSpendingCommentDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.comment.SpendingCommentDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.comment.UpdateSpendingCommentDto;
 import com.splitspendings.groupexpensesbackend.model.SpendingComment;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

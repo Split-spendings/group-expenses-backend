@@ -1,4 +1,4 @@
-package com.splitspendings.groupexpensesbackend.dto.appusersettings;
+package com.splitspendings.groupexpensesbackend.dto.appuser.settings;
 
 import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import com.splitspendings.groupexpensesbackend.model.enums.GroupInviteOption;
@@ -8,17 +8,22 @@ import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
 import com.splitspendings.groupexpensesbackend.model.enums.Theme;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.Set;
-import java.util.UUID;
 
 @Data
-public class AppUserSettingsWithIdDto {
+public class UpdateAppUserSettingsDto {
 
-    private UUID id;
+    @NotNull
     private Language language;
+    @NotNull
     private Theme theme;
+    @NotNull
     private Currency defaultCurrency;
+    @NotNull
     private NotificationOption notificationOption;
+    @NotNull
     private GroupInviteOption groupInviteOption;
+    @NotNull
     private Set<NotificationCategory> notificationCategories;
 }

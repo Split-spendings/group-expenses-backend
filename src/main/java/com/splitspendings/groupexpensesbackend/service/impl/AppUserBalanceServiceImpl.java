@@ -1,6 +1,6 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
-import com.splitspendings.groupexpensesbackend.dto.appuserbalance.AppUserBalanceDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.balance.AppUserBalanceDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserBalanceMapper;
 import com.splitspendings.groupexpensesbackend.mapper.NetChangeMapper;
 import com.splitspendings.groupexpensesbackend.mapper.TransactionMapper;

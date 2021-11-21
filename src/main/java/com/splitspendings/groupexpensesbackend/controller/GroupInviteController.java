@@ -1,8 +1,8 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
-import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteAcceptedDto;
-import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
-import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
+import com.splitspendings.groupexpensesbackend.dto.group.invite.GroupInviteAcceptedDto;
+import com.splitspendings.groupexpensesbackend.dto.group.invite.GroupInviteDto;
+import com.splitspendings.groupexpensesbackend.dto.group.invite.NewGroupInviteDto;
 import com.splitspendings.groupexpensesbackend.service.GroupInviteService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;

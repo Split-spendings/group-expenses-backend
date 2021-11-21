@@ -1,6 +1,6 @@
 package com.splitspendings.groupexpensesbackend.dto.appuser;
 
-import com.splitspendings.groupexpensesbackend.dto.appusersettings.AppUserSettingsDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.settings.AppUserSettingsDto;
 import lombok.Data;
 
 import java.time.ZonedDateTime;

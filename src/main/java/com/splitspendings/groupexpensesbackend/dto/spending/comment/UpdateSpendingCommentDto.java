@@ -1,4 +1,4 @@
-package com.splitspendings.groupexpensesbackend.dto.spendingcomment;
+package com.splitspendings.groupexpensesbackend.dto.spending.comment;
 
 import com.splitspendings.groupexpensesbackend.model.SpendingComment;
 import com.splitspendings.groupexpensesbackend.util.TrimUtil;
@@ -8,10 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Data
-public class NewSpendingCommentDto {
-
-    @NotNull
-    private Long spendingId;
+public class UpdateSpendingCommentDto {
 
     @NotNull
     @Size(min = SpendingComment.MESSAGE_MIN_LENGTH, max = SpendingComment.MESSAGE_MAX_LENGTH)

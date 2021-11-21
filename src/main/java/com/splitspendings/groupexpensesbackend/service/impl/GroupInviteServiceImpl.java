@@ -1,8 +1,8 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
-import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteAcceptedDto;
-import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
-import com.splitspendings.groupexpensesbackend.dto.groupinvite.NewGroupInviteDto;
+import com.splitspendings.groupexpensesbackend.dto.group.invite.GroupInviteAcceptedDto;
+import com.splitspendings.groupexpensesbackend.dto.group.invite.GroupInviteDto;
+import com.splitspendings.groupexpensesbackend.dto.group.invite.NewGroupInviteDto;
 import com.splitspendings.groupexpensesbackend.exception.InvalidGroupInviteException;
 import com.splitspendings.groupexpensesbackend.mapper.GroupInviteMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMembershipMapper;
