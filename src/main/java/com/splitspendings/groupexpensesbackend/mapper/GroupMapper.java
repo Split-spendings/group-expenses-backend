@@ -20,7 +20,7 @@ public interface GroupMapper {
 
     Group newGroupDtoToGroup(NewGroupDto newGroupDto);
 
-    Group copyUpdateGroupInfoDtoToGroup(UpdateGroupDto updateGroupDto, @MappingTarget Group group);
+    void copyUpdateGroupInfoDtoToGroup(UpdateGroupDto updateGroupDto, @MappingTarget Group group);
 
     GroupActiveMembersDto groupToGroupActiveMembersDto(Group group);
 

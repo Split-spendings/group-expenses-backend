@@ -150,19 +150,17 @@ public class GroupServiceImpl implements GroupService {
     public GroupDto updateGroup(Long id, UpdateGroupDto updateGroupDto) {
         ValidatorUtil.validate(validator, updateGroupDto);
 
+        Group group = groupModelById(id);
+
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
+        groupMapper.copyUpdateGroupInfoDtoToGroup(updateGroupDto, group);
+        groupRepository.save(group);
 
-        Group existingGroup = groupModelById(id);
-
-        existingGroup = groupMapper.copyUpdateGroupInfoDtoToGroup(updateGroupDto, existingGroup);
-
-        Group updatedGroup = groupRepository.save(existingGroup);
-
-        if (existingGroup.getSimplifyDebts().equals(updateGroupDto.getSimplifyDebts())){
-            appUserBalanceService.recalculateAppUserBalanceByGroup(existingGroup);
+        if (group.getSimplifyDebts().equals(updateGroupDto.getSimplifyDebts())){
+            appUserBalanceService.recalculateAppUserBalanceByGroup(group);
         }
 
-        return groupMapper.groupToGroupInfoDto(updatedGroup);
+        return groupMapper.groupToGroupInfoDto(group);
     }
 
     /**
