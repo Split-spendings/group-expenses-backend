@@ -11,7 +11,7 @@ import com.splitspendings.groupexpensesbackend.dto.appuser.UpdateLoginNameDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.settings.AppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.settings.AppUserSettingsWithIdDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.settings.UpdateAppUserSettingsDto;
-import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.invite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserSettingsMapper;
@@ -147,10 +147,10 @@ public class AppUserServiceImpl implements AppUserService {
     public AppUserGroupsDto appUserActiveGroups() {
         UUID currentUserId = identityService.currentUserID();
         List<Group> appUserGroups = groupMembershipRepository.queryGroupsWithAppUserActiveMembership(currentUserId);
-        List<GroupInfoDto> groupInfoDtoList = groupMapper.groupListToGroupInfoDtoList(appUserGroups);
+        List<GroupDto> groupDtoList = groupMapper.groupListToGroupInfoDtoList(appUserGroups);
         AppUserGroupsDto appUserGroupsDto = new AppUserGroupsDto();
         appUserGroupsDto.setId(currentUserId);
-        appUserGroupsDto.setGroups(groupInfoDtoList);
+        appUserGroupsDto.setGroups(groupDtoList);
         return appUserGroupsDto;
     }
 

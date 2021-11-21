@@ -1,6 +1,6 @@
 package com.splitspendings.groupexpensesbackend.dto.appuser;
 
-import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import lombok.Data;
 
 import java.util.List;
@@ -10,5 +10,5 @@ import java.util.UUID;
 public class AppUserGroupsDto {
 
     private UUID id;
-    private List<GroupInfoDto> groups;
+    private List<GroupDto> groups;
 }

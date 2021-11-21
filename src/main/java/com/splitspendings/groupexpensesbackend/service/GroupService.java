@@ -1,10 +1,10 @@
 package com.splitspendings.groupexpensesbackend.service;
 
 import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
-import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
-import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.model.Group;
 
@@ -14,11 +14,11 @@ public interface GroupService {
 
     Group groupModelById(Long id);
 
-    GroupInfoDto groupInfoById(Long id);
+    GroupDto groupById(Long id);
 
-    GroupInfoDto createGroup(NewGroupDto newGroupDto);
+    GroupDto createGroup(NewGroupDto newGroupDto);
 
-    GroupInfoDto updateGroupInfo(Long id, UpdateGroupInfoDto updateGroupInfoDto);
+    GroupDto updateGroup(Long id, UpdateGroupDto updateGroupDto);
 
     GroupActiveMembersDto groupActiveMembersById(Long id);
 
