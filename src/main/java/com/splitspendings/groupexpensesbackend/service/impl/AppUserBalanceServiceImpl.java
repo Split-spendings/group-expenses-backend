@@ -11,6 +11,7 @@ import com.splitspendings.groupexpensesbackend.repository.AppUserBalanceReposito
 import com.splitspendings.groupexpensesbackend.repository.PayoffRepository;
 import com.splitspendings.groupexpensesbackend.repository.ShareRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
+import com.splitspendings.groupexpensesbackend.service.GroupService;
 import com.splitspendings.groupexpensesbackend.service.impl.balance.NetChange;
 import com.splitspendings.groupexpensesbackend.service.impl.balance.Transaction;
 import com.splitspendings.groupexpensesbackend.util.BalanceCalculatorUtil;
@@ -36,13 +37,24 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
     private final TransactionMapper transactionMapper;
     private final NetChangeMapper netChangeMapper;
 
+    private final GroupService groupService;
+
     @Override
     public void recalculateAppUserBalanceByGroupId(Group group) {
         appUserBalanceRepository.deleteAllByGroup(group);
-
-        Set<Transaction> simplifiedTransactionSet = getSimplifiedTransactions(group.getId());
-        Set<UserBalance> userBalanceSet = transactionMapper.transactionSetToUserBalanceSet(simplifiedTransactionSet, group);
+        Set<Transaction> transactionSet;
+        if (group.getSimplifyDebts()){
+            transactionSet = getSimplifiedTransactions(group.getId());
+        } else {
+            transactionSet = getAllTransactionsByGroupId(group.getId());
+        }
+        Set<UserBalance> userBalanceSet = transactionMapper.transactionSetToUserBalanceSet(transactionSet, group);
         appUserBalanceRepository.saveAll(userBalanceSet);
+    }
+
+    @Override
+    public void recalculateAppUserBalanceByGroupId(Long groupId) {
+        recalculateAppUserBalanceByGroupId(groupService.groupModelById(groupId));
     }
 
     private Set<Transaction> getSimplifiedTransactions(Long groupId){

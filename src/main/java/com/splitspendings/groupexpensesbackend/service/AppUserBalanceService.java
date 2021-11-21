@@ -4,4 +4,5 @@ import com.splitspendings.groupexpensesbackend.model.Group;
 
 public interface AppUserBalanceService {
     void recalculateAppUserBalanceByGroupId(Group group);
+    void recalculateAppUserBalanceByGroupId(Long groupId);
 }
