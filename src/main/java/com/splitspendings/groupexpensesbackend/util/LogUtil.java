@@ -14,4 +14,9 @@ public class LogUtil {
         log.info(message);
         return new ResponseStatusException(status, message);
     }
+
+    public static<T extends Exception> T logMessageAndReturnException(Logger log, T t){
+        log.info(t.getMessage());
+        return t;
+    }
 }
