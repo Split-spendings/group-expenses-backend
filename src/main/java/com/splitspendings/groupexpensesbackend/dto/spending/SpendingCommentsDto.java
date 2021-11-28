@@ -1,6 +1,6 @@
 package com.splitspendings.groupexpensesbackend.dto.spending;
 
-import com.splitspendings.groupexpensesbackend.dto.spendingcomment.SpendingCommentShortDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.comment.SpendingCommentShortDto;
 import lombok.Data;
 
 import java.util.List;

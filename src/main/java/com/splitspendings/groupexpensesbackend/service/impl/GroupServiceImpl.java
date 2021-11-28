@@ -6,7 +6,7 @@ import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
-import com.splitspendings.groupexpensesbackend.dto.groupmembership.GroupMembershipDto;
+import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingShortDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;

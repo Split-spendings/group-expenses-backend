@@ -1,7 +1,7 @@
-package com.splitspendings.groupexpensesbackend.dto.groupinvite;
+package com.splitspendings.groupexpensesbackend.dto.group.invite;
 
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
-import com.splitspendings.groupexpensesbackend.dto.groupmembership.GroupMembershipShortDto;
+import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipShortDto;
 import lombok.Data;
 
 import java.time.ZonedDateTime;

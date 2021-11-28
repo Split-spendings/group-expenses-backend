@@ -1,4 +1,4 @@
-package com.splitspendings.groupexpensesbackend.dto.groupinvite;
+package com.splitspendings.groupexpensesbackend.dto.group.invite;
 
 import com.splitspendings.groupexpensesbackend.model.GroupInvite;
 import com.splitspendings.groupexpensesbackend.util.TrimUtil;

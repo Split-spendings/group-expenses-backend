@@ -1,6 +1,6 @@
 package com.splitspendings.groupexpensesbackend.dto.spending;
 
-import com.splitspendings.groupexpensesbackend.dto.groupmembership.GroupMembershipWithIdShortDto;
+import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipWithIdShortDto;
 import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import lombok.Data;
 

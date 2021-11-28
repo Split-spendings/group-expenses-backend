@@ -1,8 +1,8 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
-import com.splitspendings.groupexpensesbackend.dto.spendingcomment.NewSpendingCommentDto;
-import com.splitspendings.groupexpensesbackend.dto.spendingcomment.SpendingCommentDto;
-import com.splitspendings.groupexpensesbackend.dto.spendingcomment.UpdateSpendingCommentDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.comment.NewSpendingCommentDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.comment.SpendingCommentDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.comment.UpdateSpendingCommentDto;
 import com.splitspendings.groupexpensesbackend.service.SpendingCommentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;

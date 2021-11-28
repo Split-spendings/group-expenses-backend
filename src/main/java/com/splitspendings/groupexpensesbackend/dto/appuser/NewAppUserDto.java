@@ -1,6 +1,6 @@
 package com.splitspendings.groupexpensesbackend.dto.appuser;
 
-import com.splitspendings.groupexpensesbackend.dto.appusersettings.NewAppUserSettingsDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.settings.NewAppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.util.TrimUtil;
 import lombok.Data;

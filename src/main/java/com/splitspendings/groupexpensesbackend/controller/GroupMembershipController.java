@@ -1,7 +1,7 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
-import com.splitspendings.groupexpensesbackend.dto.groupmembershipsettings.GroupMembershipSettingsDto;
-import com.splitspendings.groupexpensesbackend.dto.groupmembershipsettings.UpdateGroupMembershipSettingsDto;
+import com.splitspendings.groupexpensesbackend.dto.group.membership.settings.GroupMembershipSettingsDto;
+import com.splitspendings.groupexpensesbackend.dto.group.membership.settings.UpdateGroupMembershipSettingsDto;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipSettingsService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;

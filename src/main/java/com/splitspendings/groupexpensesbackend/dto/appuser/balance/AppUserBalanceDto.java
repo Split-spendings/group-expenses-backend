@@ -1,4 +1,4 @@
-package com.splitspendings.groupexpensesbackend.dto.appuserbalance;
+package com.splitspendings.groupexpensesbackend.dto.appuser.balance;
 
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;

@@ -1,4 +1,4 @@
-package com.splitspendings.groupexpensesbackend.dto.spendingcomment;
+package com.splitspendings.groupexpensesbackend.dto.spending.comment;
 
 import lombok.Data;
 

@@ -1,6 +1,6 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
-import com.splitspendings.groupexpensesbackend.dto.appuserbalance.AppUserBalanceDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.balance.AppUserBalanceDto;
 import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;

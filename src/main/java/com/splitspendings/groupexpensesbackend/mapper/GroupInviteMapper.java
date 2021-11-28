@@ -1,6 +1,6 @@
 package com.splitspendings.groupexpensesbackend.mapper;
 
-import com.splitspendings.groupexpensesbackend.dto.groupinvite.GroupInviteDto;
+import com.splitspendings.groupexpensesbackend.dto.group.invite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.model.GroupInvite;
 import org.mapstruct.Mapper;
 
