@@ -1,10 +1,10 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
 import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
-import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
-import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -30,18 +30,18 @@ public class GroupController {
     private final GroupService groupService;
 
     @GetMapping("/{id}")
-    public GroupInfoDto groupInfo(@PathVariable Long id) {
-        return groupService.groupInfoById(id);
+    public GroupDto getGroupById(@PathVariable Long id) {
+        return groupService.groupById(id);
     }
 
     @PostMapping
-    public GroupInfoDto createGroup(@RequestBody NewGroupDto newGroupDto) {
+    public GroupDto createGroup(@RequestBody NewGroupDto newGroupDto) {
         return groupService.createGroup(newGroupDto);
     }
 
     @PatchMapping("/{id}")
-    public GroupInfoDto updateGroupInfo(@PathVariable Long id, @RequestBody UpdateGroupInfoDto updateGroupInfoDto) {
-        return groupService.updateGroupInfo(id, updateGroupInfoDto);
+    public GroupDto updateGroup(@PathVariable Long id, @RequestBody UpdateGroupDto updateGroupDto) {
+        return groupService.updateGroup(id, updateGroupDto);
     }
 
     @GetMapping("/{id}/members")

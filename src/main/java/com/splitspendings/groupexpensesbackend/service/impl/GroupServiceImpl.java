@@ -2,10 +2,10 @@ package com.splitspendings.groupexpensesbackend.service.impl;
 
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
-import com.splitspendings.groupexpensesbackend.dto.group.GroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
-import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupInfoDto;
+import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingShortDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
@@ -83,13 +83,13 @@ public class GroupServiceImpl implements GroupService {
      * @param id
      *         id of {@link Group} to be found in the database
      *
-     * @return {@link GroupInfoDto} with given id
+     * @return {@link GroupDto} with given id
      *
      * @throws ResponseStatusException
      *         with status code {@link HttpStatus#NOT_FOUND} if not found
      */
     @Override
-    public GroupInfoDto groupInfoById(Long id) {
+    public GroupDto groupById(Long id) {
         return groupMapper.groupToGroupInfoDto(groupModelById(id));
     }
 
@@ -97,7 +97,7 @@ public class GroupServiceImpl implements GroupService {
      * @param newGroupDto
      *         data to save new {@link Group}
      *
-     * @return created {@link GroupInfoDto}
+     * @return created {@link GroupDto}
      *
      * @throws ConstraintViolationException
      *         if {@link NewGroupDto} is not valid
@@ -105,7 +105,7 @@ public class GroupServiceImpl implements GroupService {
      *         with status code {@link HttpStatus#NOT_FOUND} if not found
      */
     @Override
-    public GroupInfoDto createGroup(NewGroupDto newGroupDto) {
+    public GroupDto createGroup(NewGroupDto newGroupDto) {
         ValidatorUtil.validate(validator, newGroupDto);
 
         UUID currentAppUserId = identityService.currentUserID();
@@ -134,35 +134,33 @@ public class GroupServiceImpl implements GroupService {
     /**
      * @param id
      *         id of {@link Group} to be updated
-     * @param updateGroupInfoDto
+     * @param updateGroupDto
      *         data to update {@link Group} with
      *
-     * @return {@link GroupInfoDto} with updated data
+     * @return {@link GroupDto} with updated data
      *
      * @throws ConstraintViolationException
-     *         if {@link UpdateGroupInfoDto} is not valid
+     *         if {@link UpdateGroupDto} is not valid
      * @throws ResponseStatusException
      *         with status code {@link HttpStatus#NOT_FOUND} if not found
      * @throws ResponseStatusException
      *         with status code {@link HttpStatus#NOT_FOUND} if current user has no rights to update {@link Group}
      */
     @Override
-    public GroupInfoDto updateGroupInfo(Long id, UpdateGroupInfoDto updateGroupInfoDto) {
-        ValidatorUtil.validate(validator, updateGroupInfoDto);
+    public GroupDto updateGroup(Long id, UpdateGroupDto updateGroupDto) {
+        ValidatorUtil.validate(validator, updateGroupDto);
+
+        Group group = groupModelById(id);
 
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
+        groupMapper.copyUpdateGroupInfoDtoToGroup(updateGroupDto, group);
+        groupRepository.save(group);
 
-        Group existingGroup = groupModelById(id);
-
-        existingGroup = groupMapper.copyUpdateGroupInfoDtoToGroup(updateGroupInfoDto, existingGroup);
-
-        Group updatedGroup = groupRepository.save(existingGroup);
-
-        if (existingGroup.getSimplifyDebts().equals(updateGroupInfoDto.getSimplifyDebts())){
-            appUserBalanceService.recalculateAppUserBalanceByGroup(existingGroup);
+        if (group.getSimplifyDebts().equals(updateGroupDto.getSimplifyDebts())){
+            appUserBalanceService.recalculateAppUserBalanceByGroup(group);
         }
 
-        return groupMapper.groupToGroupInfoDto(updatedGroup);
+        return groupMapper.groupToGroupInfoDto(group);
     }
 
     /**
