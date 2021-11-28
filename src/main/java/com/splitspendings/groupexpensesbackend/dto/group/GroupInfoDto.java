@@ -13,4 +13,5 @@ public class GroupInfoDto {
     private ZonedDateTime lastTimeOpened;
     private ZonedDateTime lastTimeClosed;
     private Boolean personal;
+    private Boolean simplifyDebts;
 }

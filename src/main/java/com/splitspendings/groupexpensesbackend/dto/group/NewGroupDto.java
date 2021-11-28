@@ -19,6 +19,9 @@ public class NewGroupDto {
     private Boolean personal;
 
     @NotNull
+    private Boolean simplifyDebts;
+
+    @NotNull
     private InviteOption inviteOption;
 
     public void setName(String name) {

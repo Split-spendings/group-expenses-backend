@@ -19,6 +19,7 @@ import com.splitspendings.groupexpensesbackend.model.Spending;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
+import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipSettingsService;
@@ -58,6 +59,7 @@ public class GroupServiceImpl implements GroupService {
 
     private final IdentityService identityService;
     private final AppUserService appUserService;
+    private final AppUserBalanceService appUserBalanceService;
     private final GroupMembershipService groupMembershipService;
     private final GroupMembershipSettingsService groupMembershipSettingsService;
 
@@ -155,6 +157,11 @@ public class GroupServiceImpl implements GroupService {
         existingGroup = groupMapper.copyUpdateGroupInfoDtoToGroup(updateGroupInfoDto, existingGroup);
 
         Group updatedGroup = groupRepository.save(existingGroup);
+
+        if (existingGroup.getSimplifyDebts().equals(updateGroupInfoDto.getSimplifyDebts())){
+            appUserBalanceService.recalculateAppUserBalanceByGroup(existingGroup);
+        }
+
         return groupMapper.groupToGroupInfoDto(updatedGroup);
     }
 
