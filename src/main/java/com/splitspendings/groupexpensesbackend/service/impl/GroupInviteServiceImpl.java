@@ -5,7 +5,6 @@ import com.splitspendings.groupexpensesbackend.dto.group.invite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.dto.group.invite.NewGroupInviteDto;
 import com.splitspendings.groupexpensesbackend.exception.InvalidGroupInviteException;
 import com.splitspendings.groupexpensesbackend.mapper.GroupInviteMapper;
-import com.splitspendings.groupexpensesbackend.mapper.GroupMembershipMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupInvite;
@@ -44,7 +43,6 @@ public class GroupInviteServiceImpl implements GroupInviteService {
     private final GroupMembershipRepository groupMembershipRepository;
     private final GroupInviteRepository groupInviteRepository;
 
-    private final GroupMembershipMapper groupMembershipMapper;
     private final GroupInviteMapper groupInviteMapper;
 
     private final IdentityService identityService;
@@ -88,8 +86,8 @@ public class GroupInviteServiceImpl implements GroupInviteService {
         }
         throw LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.FORBIDDEN,
                 String.format("User with id = {%s} has no right to access GroupInvite with id = {%d}",
-                    identityService.currentUserID(),
-                    id));
+                        identityService.currentUserID(),
+                        id));
     }
 
     /**
@@ -168,54 +166,39 @@ public class GroupInviteServiceImpl implements GroupInviteService {
     public GroupInviteAcceptedDto acceptGroupInvite(Long id) {
         GroupInvite groupInvite = groupInviteModelById(id);
 
+        verifyUserCreatedInviteIsActiveMember(groupInvite);
+
         AppUser invitedAppUser = groupInvite.getInvitedAppUser();
         identityService.verifyAuthorization(invitedAppUser.getId());
 
-        GroupMembership invitedByGroupMembership = groupInvite.getInvitedByGroupMembership();
-
-        if (!invitedByGroupMembership.getActive()) {
-            groupInviteRepository.delete(groupInvite);
-            String logMessage =
-                    String.format("AppUser with id = {%s} who made an invite with id = {%d} is no longer an active member of a group with id = {%d}",
-                            invitedByGroupMembership.getAppUser().getId(),
-                            id,
-                            invitedByGroupMembership.getGroup().getId());
-            log.info(logMessage);
-            throw new InvalidGroupInviteException(HttpStatus.BAD_REQUEST, logMessage);
-        }
-
-        Group group = invitedByGroupMembership.getGroup();
+        Group group = groupInvite.getInvitedByGroupMembership().getGroup();
 
         groupInviteRepository.deleteAllByInvitedByGroupMembershipGroupAndInvitedAppUser(group, invitedAppUser);
 
         Optional<GroupMembership> groupMembershipOptional = groupMembershipRepository.findByGroupAndAppUser(group, invitedAppUser);
-        GroupMembership groupMembership;
 
-        if (groupMembershipOptional.isPresent() && !groupMembershipOptional.get().getActive()) {
-            groupMembership = groupMembershipOptional.get();
-            groupMembership.setActive(true);
-            groupMembership.setLastTimeJoined(ZonedDateTime.now());
-            groupMembershipRepository.save(groupMembership);
-        } else if (groupMembershipOptional.isEmpty()) {
-            groupMembership = new GroupMembership();
+        if (groupMembershipOptional.map(GroupMembership::getActive).orElse(false)) {
+            throw LogUtil.logMessageAndReturnException(log, new InvalidGroupInviteException(HttpStatus.BAD_REQUEST,
+                    String.format(
+                            "Invited user with id = {%s} is already an active member of a group with id = {%d}",
+                            groupInvite.getInvitedByGroupMembership().getAppUser().getId(),
+                            group.getId())));
+        }
+        ZonedDateTime now = ZonedDateTime.now();
+        GroupMembership groupMembership = groupMembershipOptional.orElse(new GroupMembership());
+        groupMembership.setActive(true);
+        groupMembership.setLastTimeJoined(now);
+
+        if (groupMembershipOptional.isEmpty()) {
             groupMembership.setAppUser(invitedAppUser);
             groupMembership.setGroup(group);
-            groupMembership.setActive(true);
             groupMembership.setHasAdminRights(false);
-            groupMembership.setFirstTimeJoined(ZonedDateTime.now());
-            groupMembership.setLastTimeJoined(ZonedDateTime.now());
-            groupMembershipRepository.save(groupMembership);
+            groupMembership.setFirstTimeJoined(now);
             groupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(groupMembership);
-        } else {
-            String logMessage = String.format("Invited user with id = {%s} is already an active member of a group with id = {%d}",
-                    invitedByGroupMembership.getAppUser().getId(), group.getId());
-            log.info(logMessage);
-            throw new InvalidGroupInviteException(HttpStatus.BAD_REQUEST, logMessage);
         }
+        groupMembershipRepository.save(groupMembership);
 
-        GroupInviteAcceptedDto groupInviteAcceptedDto = new GroupInviteAcceptedDto();
-        groupInviteAcceptedDto.setGroupMembership(groupMembershipMapper.groupMembershipToGroupMembershipDto(groupMembership));
-        return groupInviteAcceptedDto;
+        return groupInviteMapper.groupMembershipToGroupInviteAcceptedDto(groupMembership);
     }
 
     /**
@@ -235,6 +218,20 @@ public class GroupInviteServiceImpl implements GroupInviteService {
         GroupInvite groupInvite = groupInviteModelById(id);
         identityService.verifyAuthorization(groupInvite.getInvitedAppUser().getId());
         groupInviteRepository.delete(groupInvite);
+    }
+
+    private void verifyUserCreatedInviteIsActiveMember(GroupInvite groupInvite) {
+        GroupMembership invitedBy = groupInvite.getInvitedByGroupMembership();
+        if (!invitedBy.getActive()) {
+            groupInviteRepository.delete(groupInvite);
+            String logMessage =
+                    String.format("AppUser with id = {%s} who made an invite with id = {%d} is no longer an active member of a group with id = {%d}",
+                            invitedBy.getAppUser().getId(),
+                            groupInvite.getId(),
+                            invitedBy.getGroup().getId());
+            log.info(logMessage);
+            throw new InvalidGroupInviteException(HttpStatus.BAD_REQUEST, logMessage);
+        }
     }
 
     private boolean hasAccessToGroupInvite(GroupInvite groupInvite) {
