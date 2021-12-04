@@ -9,5 +9,4 @@ public class GroupExpensesBackendApplication {
     public static void main(String[] args) {
         SpringApplication.run(GroupExpensesBackendApplication.class, args);
     }
-
 }
