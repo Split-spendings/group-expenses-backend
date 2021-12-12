@@ -153,12 +153,13 @@ public class GroupServiceImpl implements GroupService {
         ValidatorUtil.validate(validator, updateGroupDto);
 
         Group group = groupModelById(id);
+        boolean recalculateUserBalances = !group.getSimplifyDebts().equals(updateGroupDto.getSimplifyDebts());
 
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
         groupMapper.copyUpdateGroupInfoDtoToGroup(updateGroupDto, group);
         groupRepository.save(group);
 
-        if (group.getSimplifyDebts().equals(updateGroupDto.getSimplifyDebts())){
+        if (recalculateUserBalances){
             appUserBalanceService.recalculateAppUserBalanceByGroup(group);
         }
 

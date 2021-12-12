@@ -1,5 +1,6 @@
 package com.splitspendings.groupexpensesbackend.dto.group;
 
+import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
@@ -14,5 +15,6 @@ public class GroupDto {
     private ZonedDateTime lastTimeClosed;
     private Boolean personal;
     private Boolean simplifyDebts;
+    private Currency defaultCurrency;
     private Boolean isActiveMember;
 }

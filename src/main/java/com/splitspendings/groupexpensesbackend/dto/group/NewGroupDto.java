@@ -1,6 +1,7 @@
 package com.splitspendings.groupexpensesbackend.dto.group;
 
 import com.splitspendings.groupexpensesbackend.model.Group;
+import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import com.splitspendings.groupexpensesbackend.model.enums.InviteOption;
 import com.splitspendings.groupexpensesbackend.util.TrimUtil;
 import lombok.Data;
@@ -23,6 +24,9 @@ public class NewGroupDto {
 
     @NotNull
     private InviteOption inviteOption;
+
+    @NotNull
+    private Currency defaultCurrency;
 
     public void setName(String name) {
         this.name = TrimUtil.trimAndRemoveExtraSpaces(name);

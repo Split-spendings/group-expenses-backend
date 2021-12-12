@@ -1,6 +1,7 @@
 package com.splitspendings.groupexpensesbackend.dto.group;
 
 import com.splitspendings.groupexpensesbackend.model.Group;
+import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import com.splitspendings.groupexpensesbackend.util.TrimUtil;
 import lombok.Data;
 
@@ -16,6 +17,9 @@ public class UpdateGroupDto {
 
     @NotNull
     private Boolean simplifyDebts;
+
+    @NotNull
+    private Currency defaultCurrency;
 
     public void setName(String name) {
         this.name = TrimUtil.trimAndRemoveExtraSpaces(name);
