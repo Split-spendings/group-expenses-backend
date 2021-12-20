@@ -66,7 +66,7 @@ public class GroupController {
         return groupService.groupSpendings(id);
     }
 
-    @GetMapping("/{groupFilter}")
+    @GetMapping("/filter/{groupFilter}")
     public List<GroupDto> getFilteredGroups(@PathVariable GroupFilter groupFilter){
         return groupService.getAllGroupsFilterBy(groupFilter);
     }
