@@ -174,11 +174,11 @@ public class GroupServiceImpl implements GroupService {
         UUID appUserId = identityService.currentUserID();
         switch (groupFilter){
             case ALL:
-                return groupMapper.groupListToGroupInfoDtoList(groupMembershipRepository.findAllByAppUserId(appUserId));
+                return groupMapper.groupListToGroupInfoDtoList(groupMembershipRepository.findAllGroupsByAppUserId(appUserId));
             case CURRENT:
-                return groupMapper.groupListToGroupInfoDtoList(groupMembershipRepository.findAllByAppUserIdAndIsActive(appUserId, true));
+                return groupMapper.groupListToGroupInfoDtoList(groupMembershipRepository.findAllGroupsByAppUserIdAndIsActive(appUserId, true));
             case FORMER:
-                return groupMapper.groupListToGroupInfoDtoList(groupMembershipRepository.findAllByAppUserIdAndIsActive(appUserId, false));
+                return groupMapper.groupListToGroupInfoDtoList(groupMembershipRepository.findAllGroupsByAppUserIdAndIsActive(appUserId, false));
             default:
                 throw new IllegalStateException();
         }

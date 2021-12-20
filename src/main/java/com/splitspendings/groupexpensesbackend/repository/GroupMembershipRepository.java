@@ -14,10 +14,10 @@ import java.util.UUID;
 public interface GroupMembershipRepository extends JpaRepository<GroupMembership, Long> {
 
     @Query("select gm.group from GroupMembership gm where gm.appUser.id = :app_user_id and gm.active=:isActive")
-    List<Group> findAllByAppUserIdAndIsActive(@Param("app_user_id") UUID appUserId, @Param("isActive") boolean isActive);
+    List<Group> findAllGroupsByAppUserIdAndIsActive(@Param("app_user_id") UUID appUserId, @Param("isActive") boolean isActive);
 
     @Query("select gm.group from GroupMembership gm where gm.appUser.id = :app_user_id")
-    List<Group> findAllByAppUserId(@Param("app_user_id") UUID appUserId);
+    List<Group> findAllGroupsByAppUserId(@Param("app_user_id") UUID appUserId);
 
     @Query("select gm from GroupMembership gm where gm.group.id = :group_id and gm.appUser.id = :app_user_id and gm.active=true")
     Optional<GroupMembership> queryByGroupIdAndAppUserIdAndActiveTrue(@Param("group_id") Long groupId, @Param("app_user_id") UUID appUserId);
