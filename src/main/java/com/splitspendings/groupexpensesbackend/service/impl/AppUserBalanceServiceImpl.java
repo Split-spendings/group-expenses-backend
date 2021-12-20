@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,8 +36,8 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
     private final AppUserBalanceRepository appUserBalanceRepository;
     private final ShareRepository shareRepository;
     private final PayoffRepository payoffRepository;
-    private final IdentityService identityService;
 
+    private final IdentityService identityService;
     private final GroupMembershipService groupMembershipService;
 
     private final TransactionMapper transactionMapper;
@@ -92,10 +93,18 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
      */
     @Override
     public AppUserBalanceDto appUserBalanceByGroupIdAndAppUserIdAndCurrency(Long groupId, UUID appUserId, Currency currency) {
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(groupId);
+
+        Optional<UserBalance> userBalanceOptional = appUserBalanceRepository
+                .findByAppUserIdsAndGroupIdAndCurrency(appUserId, identityService.currentUserID(), groupId, currency);
+        if (userBalanceOptional.isPresent()){
+            return appUserBalanceMapper.userBalanceToAppUserBalance(userBalanceOptional.get());
+        }
+
         UserBalance userBalance = appUserBalanceRepository
                 .findByAppUserIdsAndGroupIdAndCurrency(identityService.currentUserID(), appUserId, groupId, currency)
                 .orElseThrow(() -> LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.NOT_FOUND,
-                        String.format("UserBalance with firstAppUserId = {%s}, secondAppUserId = {%s}, Group Id = {%d} and Currency = {%s} not found",
+                        String.format("UserBalance with appUserIds = {%s, %s}, Group Id = {%d} and Currency = {%s} not found",
                                  identityService.currentUserID(), appUserId, groupId, currency)));
         return appUserBalanceMapper.userBalanceToAppUserBalance(userBalance);
     }
@@ -113,6 +122,7 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
      */
     @Override
     public Iterable<AppUserBalanceDto> appUserBalancesByGroupIdAndAppUserId(Long groupId, UUID appUserId) {
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(groupId);
         return appUserBalanceMapper.userBalanceListToAppUserBalanceList(appUserBalanceRepository
                 .findAllByAppUserIdsAndGroupId(identityService.currentUserID(), appUserId, groupId));
     }
