@@ -3,7 +3,6 @@ package com.splitspendings.groupexpensesbackend.controller;
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserFullInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserFullInfoWithSettingsDto;
-import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserGroupsDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserReceivedGroupInvitesDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.NewAppUserDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.UpdateLoginNameDto;
@@ -55,11 +54,6 @@ public class AppUserController {
     @PostMapping
     public AppUserFullInfoWithSettingsDto createAppUser(@RequestBody NewAppUserDto newAppUserDto) {
         return appUserService.createAppUser(newAppUserDto);
-    }
-
-    @GetMapping("/groups")
-    public AppUserGroupsDto appUserActiveGroups() {
-        return appUserService.appUserActiveGroups();
     }
 
     @PatchMapping("/login-name")

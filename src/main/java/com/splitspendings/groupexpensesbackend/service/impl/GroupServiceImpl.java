@@ -91,6 +91,7 @@ public class GroupServiceImpl implements GroupService {
      */
     @Override
     public GroupDto groupById(Long id) {
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
         return groupMapper.groupToGroupInfoDto(groupModelById(id));
     }
 
@@ -174,11 +175,11 @@ public class GroupServiceImpl implements GroupService {
         UUID appUserId = identityService.currentUserID();
         switch (groupFilter){
             case ALL:
-                return groupMapper.groupListToGroupInfoDtoList(groupMembershipRepository.findAllGroupsByAppUserId(appUserId));
+                return groupMapper.groupMembershipListToGroupInfoDtoList(groupMembershipRepository.findAllByAppUserId(appUserId));
             case CURRENT:
-                return groupMapper.groupListToGroupInfoDtoList(groupMembershipRepository.findAllGroupsByAppUserIdAndIsActive(appUserId, true));
+                return groupMapper.groupMembershipListToGroupInfoDtoList(groupMembershipRepository.findAllByAppUserIdAndIsActive(appUserId, true));
             case FORMER:
-                return groupMapper.groupListToGroupInfoDtoList(groupMembershipRepository.findAllGroupsByAppUserIdAndIsActive(appUserId, false));
+                return groupMapper.groupMembershipListToGroupInfoDtoList(groupMembershipRepository.findAllByAppUserIdAndIsActive(appUserId, false));
             default:
                 throw new IllegalStateException();
         }
