@@ -4,7 +4,11 @@ import com.splitspendings.groupexpensesbackend.dto.appuser.balance.AppUserBalanc
 import com.splitspendings.groupexpensesbackend.mapper.AppUserBalanceMapper;
 import com.splitspendings.groupexpensesbackend.mapper.NetChangeMapper;
 import com.splitspendings.groupexpensesbackend.mapper.TransactionMapper;
-import com.splitspendings.groupexpensesbackend.model.*;
+import com.splitspendings.groupexpensesbackend.model.AppUser;
+import com.splitspendings.groupexpensesbackend.model.Group;
+import com.splitspendings.groupexpensesbackend.model.Payoff;
+import com.splitspendings.groupexpensesbackend.model.Share;
+import com.splitspendings.groupexpensesbackend.model.UserBalance;
 import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import com.splitspendings.groupexpensesbackend.repository.AppUserBalanceRepository;
 import com.splitspendings.groupexpensesbackend.repository.PayoffRepository;
@@ -168,20 +172,10 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
      * @return {@link Set<Transaction>} found in {@link Group} with given id
      */
     private Set<Transaction> getAllTransactionsByGroupId(Long groupId){
-        //retrieve Shares and Payoffs by GroupId
-        Set<Share> sharesByGroupId = shareRepository.findAllByGroupId(groupId);
-        Set<Payoff> payoffsByGroupId = payoffRepository.findAllByGroupId(groupId);
+        Set<Share> shares = shareRepository.findAllByGroupId(groupId);
+        Set<Payoff> payoffs = payoffRepository.findAllByGroupId(groupId);
 
-        //map Shares and Payoffs to Transactions
-        Set<Transaction> sharesAsTransactions = transactionMapper.shareSetToTransactionSet(sharesByGroupId);
-        Set<Transaction> payoffsAsTransactions = transactionMapper.payoffSetToTransactionSet(payoffsByGroupId);
-
-        //combine Shares and Payoffs
-        Set<Transaction> allTransactionsById = new HashSet<>();
-        allTransactionsById.addAll(sharesAsTransactions);
-        allTransactionsById.addAll(payoffsAsTransactions);
-
-        return allTransactionsById;
+        return mapSharesAndPayoffsToTransactions(shares, payoffs);
     }
 
     /**
@@ -193,19 +187,22 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
      * @return {@link Set<Transaction>} found in {@link Group} with given id
      */
     private Set<Transaction> getAllTransactionsByGroupIdAndCurrency(Long groupId, Currency currency){
-        //retrieve Shares and Payoffs by GroupId and Currency
-        Set<Share> sharesByGroupId = shareRepository.findAllByGroupIdAndCurrency(groupId, currency);
-        Set<Payoff> payoffsByGroupId = payoffRepository.findAllByGroupIdAndCurrency(groupId, currency);
+        Set<Share> shares = shareRepository.findAllByGroupIdAndCurrency(groupId, currency);
+        Set<Payoff> payoffs = payoffRepository.findAllByGroupIdAndCurrency(groupId, currency);
 
+        return mapSharesAndPayoffsToTransactions(shares, payoffs);
+    }
+
+    private Set<Transaction> mapSharesAndPayoffsToTransactions(Set<Share> shares, Set<Payoff> payoffs){
         //map Shares and Payoffs to Transactions
-        Set<Transaction> sharesAsTransactions = transactionMapper.shareSetToTransactionSet(sharesByGroupId);
-        Set<Transaction> payoffsAsTransactions = transactionMapper.payoffSetToTransactionSet(payoffsByGroupId);
+        Set<Transaction> sharesAsTransactions = transactionMapper.shareSetToTransactionSet(shares);
+        Set<Transaction> payoffsAsTransactions = transactionMapper.payoffSetToTransactionSet(payoffs);
 
         //combine Shares and Payoffs
-        Set<Transaction> allTransactionsById = new HashSet<>();
-        allTransactionsById.addAll(sharesAsTransactions);
-        allTransactionsById.addAll(payoffsAsTransactions);
+        Set<Transaction> allTransactions = new HashSet<>();
+        allTransactions.addAll(sharesAsTransactions);
+        allTransactions.addAll(payoffsAsTransactions);
 
-        return allTransactionsById;
+        return allTransactions;
     }
 }
