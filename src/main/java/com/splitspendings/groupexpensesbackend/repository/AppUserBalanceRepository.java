@@ -18,17 +18,31 @@ public interface AppUserBalanceRepository extends JpaRepository<UserBalance, Lon
 
     @Query(" SELECT u_b " +
             "FROM UserBalance  u_b " +
-            "WHERE u_b.firstAppUser.id = ?1 " +
-                "AND u_b.secondAppUser.id = ?2 " +
-                "AND u_b.group.id = ?3 " +
-                "AND u_b.currency = ?4")
-    Optional<UserBalance> findByAppUserIdsAndGroupIdAndCurrency(UUID firstAppUserId, UUID secondAppUserId, Long groupId, Currency currency);
-
+            "WHERE u_b.firstAppUser.id = ?1 OR u_b.secondAppUser.id = ?1 ")
+    List<UserBalance> findAllByAppUserId(UUID firstAppUserId);
 
     @Query(" SELECT u_b " +
             "FROM UserBalance  u_b " +
-            "WHERE u_b.firstAppUser.id = ?1 " +
-            "AND u_b.secondAppUser.id = ?2 " +
-            "AND u_b.group.id = ?3")
+            "WHERE u_b.group.id = ?2 AND " +
+            "(u_b.firstAppUser.id = ?1 " +
+            "OR " +
+            "u_b.secondAppUser.id = ?1) ")
+    List<UserBalance> findAllByAppUserIdAndGroupId(UUID firstAppUserId, Long groupId);
+
+    @Query(" SELECT u_b " +
+            "FROM UserBalance  u_b " +
+            "WHERE u_b.group.id = ?3 AND " +
+                "((u_b.firstAppUser.id = ?1 AND u_b.secondAppUser.id = ?2) " +
+                "OR " +
+                "(u_b.firstAppUser.id = ?2 AND u_b.secondAppUser.id = ?1)) ")
     List<UserBalance> findAllByAppUserIdsAndGroupId(UUID firstAppUserId, UUID secondAppUserId, Long groupId);
+
+    @Query(" SELECT u_b " +
+            "FROM UserBalance  u_b " +
+            "WHERE u_b.group.id = ?3 AND " +
+            "u_b.currency = ?4 AND " +
+            "((u_b.firstAppUser.id = ?1 AND u_b.secondAppUser.id = ?2) " +
+            "OR " +
+            "(u_b.firstAppUser.id = ?2 AND u_b.secondAppUser.id = ?1)) ")
+    Optional<UserBalance> findByAppUserIdsAndGroupIdAndCurrency(UUID firstAppUserId, UUID secondAppUserId, Long groupId, Currency currency);
 }

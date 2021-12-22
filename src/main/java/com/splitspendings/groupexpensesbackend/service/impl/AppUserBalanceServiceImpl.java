@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -83,6 +84,35 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
     }
 
     /**
+     * Retrieves {@link UserBalance}s from database based on parameters, converts to {@link AppUserBalanceDto}
+     * @return valid {@link AppUserBalanceDto}
+     *
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link UserBalance} with given parameters
+     */
+    @Override
+    public Iterable<AppUserBalanceDto> appUserBalancesByCurrentAppUser() {
+        return appUserBalanceMapper.userBalanceListToAppUserBalanceList(
+                appUserBalanceRepository.findAllByAppUserId(identityService.currentUserID()));
+    }
+
+    /**
+     * Retrieves {@link UserBalance}s from database based on parameters, converts to {@link AppUserBalanceDto}
+     * @param groupId
+     *         id of a {@link Group} stored {@link UserBalance}
+     * @return valid {@link AppUserBalanceDto}
+     *
+     * @throws ResponseStatusException
+     *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link UserBalance} with given parameters
+     */
+    @Override
+    public Iterable<AppUserBalanceDto> appUserBalancesByGroupId(Long groupId) {
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(groupId);
+        return appUserBalanceMapper.userBalanceListToAppUserBalanceList(
+                appUserBalanceRepository.findAllByAppUserIdAndGroupId(identityService.currentUserID(), groupId));
+    }
+
+    /**
      * Retrieves {@link UserBalance} from database based on parameters, converts to {@link AppUserBalanceDto}
      * @param groupId
      *         id of a {@link Group} stored {@link UserBalance}
@@ -98,12 +128,6 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
     @Override
     public AppUserBalanceDto appUserBalanceByGroupIdAndAppUserIdAndCurrency(Long groupId, UUID appUserId, Currency currency) {
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(groupId);
-
-        Optional<UserBalance> userBalanceOptional = appUserBalanceRepository
-                .findByAppUserIdsAndGroupIdAndCurrency(appUserId, identityService.currentUserID(), groupId, currency);
-        if (userBalanceOptional.isPresent()){
-            return appUserBalanceMapper.userBalanceToAppUserBalance(userBalanceOptional.get());
-        }
 
         UserBalance userBalance = appUserBalanceRepository
                 .findByAppUserIdsAndGroupIdAndCurrency(identityService.currentUserID(), appUserId, groupId, currency)

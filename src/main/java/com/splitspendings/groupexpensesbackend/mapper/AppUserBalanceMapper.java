@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = GroupMapper.class)
 public interface AppUserBalanceMapper {
     AppUserBalanceDto userBalanceToAppUserBalance(UserBalance userBalance);
     List<AppUserBalanceDto> userBalanceListToAppUserBalanceList(List<UserBalance> userBalanceList);

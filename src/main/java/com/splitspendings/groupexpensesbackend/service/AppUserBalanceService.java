@@ -13,9 +13,13 @@ public interface AppUserBalanceService {
 
     AppUserBalanceDto appUserBalanceById(Long id);
 
-    AppUserBalanceDto appUserBalanceByGroupIdAndAppUserIdAndCurrency(Long groupId, UUID appUserId, Currency currency);
+    Iterable<AppUserBalanceDto> appUserBalancesByCurrentAppUser();
+
+    Iterable<AppUserBalanceDto> appUserBalancesByGroupId(Long groupId);
 
     Iterable<AppUserBalanceDto> appUserBalancesByGroupIdAndAppUserId(Long groupId, UUID appUserId);
+
+    AppUserBalanceDto appUserBalanceByGroupIdAndAppUserIdAndCurrency(Long groupId, UUID appUserId, Currency currency);
 
     void recalculateAppUserBalanceByGroup(Group group);
 
