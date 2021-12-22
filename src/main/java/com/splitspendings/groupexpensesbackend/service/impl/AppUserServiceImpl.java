@@ -3,7 +3,6 @@ package com.splitspendings.groupexpensesbackend.service.impl;
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserFullInfoDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserFullInfoWithSettingsDto;
-import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserGroupsDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserIdentityDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserReceivedGroupInvitesDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.NewAppUserDto;
@@ -11,19 +10,15 @@ import com.splitspendings.groupexpensesbackend.dto.appuser.UpdateLoginNameDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.settings.AppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.settings.AppUserSettingsWithIdDto;
 import com.splitspendings.groupexpensesbackend.dto.appuser.settings.UpdateAppUserSettingsDto;
-import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.invite.GroupInviteDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserSettingsMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupInviteMapper;
-import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.AppUserSettings;
-import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupInvite;
 import com.splitspendings.groupexpensesbackend.repository.AppUserRepository;
 import com.splitspendings.groupexpensesbackend.repository.AppUserSettingsRepository;
-import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
@@ -50,11 +45,9 @@ public class AppUserServiceImpl implements AppUserService {
 
     private final AppUserRepository appUserRepository;
     private final AppUserSettingsRepository appUserSettingsRepository;
-    private final GroupMembershipRepository groupMembershipRepository;
 
     private final AppUserMapper appUserMapper;
     private final AppUserSettingsMapper appUserSettingsMapper;
-    private final GroupMapper groupMapper;
     private final GroupInviteMapper groupInviteMapper;
 
     private final IdentityService identityService;
@@ -141,17 +134,6 @@ public class AppUserServiceImpl implements AppUserService {
         appUserFullInfoWithSettingsDto.setAppUserSettingsDto(appUserSettingsDto);
 
         return appUserFullInfoWithSettingsDto;
-    }
-
-    @Override
-    public AppUserGroupsDto appUserActiveGroups() {
-        UUID currentUserId = identityService.currentUserID();
-        List<Group> appUserGroups = groupMembershipRepository.findAllGroupsByAppUserIdAndIsActive(currentUserId, true);
-        List<GroupDto> groupDtoList = groupMapper.groupListToGroupInfoDtoList(appUserGroups);
-        AppUserGroupsDto appUserGroupsDto = new AppUserGroupsDto();
-        appUserGroupsDto.setId(currentUserId);
-        appUserGroupsDto.setGroups(groupDtoList);
-        return appUserGroupsDto;
     }
 
     @Override

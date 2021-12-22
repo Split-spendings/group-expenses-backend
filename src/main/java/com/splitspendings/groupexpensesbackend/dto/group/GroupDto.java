@@ -14,4 +14,5 @@ public class GroupDto {
     private ZonedDateTime lastTimeClosed;
     private Boolean personal;
     private Boolean simplifyDebts;
+    private Boolean isActiveMember;
 }
