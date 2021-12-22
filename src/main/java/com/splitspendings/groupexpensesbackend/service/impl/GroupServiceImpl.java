@@ -6,6 +6,7 @@ import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
+import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupFilter;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingShortDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
@@ -161,6 +162,26 @@ public class GroupServiceImpl implements GroupService {
         }
 
         return groupMapper.groupToGroupInfoDto(group);
+    }
+
+    /**
+     * @param groupFilter
+     *          used to filter groups
+     * @return {@link List} of {@link GroupDto} filtered by {@link GroupFilter}
+     */
+    @Override
+    public List<GroupDto> getAllGroupsFilterBy(GroupFilter groupFilter) {
+        UUID appUserId = identityService.currentUserID();
+        switch (groupFilter){
+            case ALL:
+                return groupMapper.groupListToGroupInfoDtoList(groupMembershipRepository.findAllGroupsByAppUserId(appUserId));
+            case CURRENT:
+                return groupMapper.groupListToGroupInfoDtoList(groupMembershipRepository.findAllGroupsByAppUserIdAndIsActive(appUserId, true));
+            case FORMER:
+                return groupMapper.groupListToGroupInfoDtoList(groupMembershipRepository.findAllGroupsByAppUserIdAndIsActive(appUserId, false));
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     /**

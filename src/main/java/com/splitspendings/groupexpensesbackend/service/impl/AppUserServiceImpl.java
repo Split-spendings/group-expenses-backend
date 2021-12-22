@@ -146,7 +146,7 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public AppUserGroupsDto appUserActiveGroups() {
         UUID currentUserId = identityService.currentUserID();
-        List<Group> appUserGroups = groupMembershipRepository.queryGroupsWithAppUserActiveMembership(currentUserId);
+        List<Group> appUserGroups = groupMembershipRepository.findAllGroupsByAppUserIdAndIsActive(currentUserId, true);
         List<GroupDto> groupDtoList = groupMapper.groupListToGroupInfoDtoList(appUserGroups);
         AppUserGroupsDto appUserGroupsDto = new AppUserGroupsDto();
         appUserGroupsDto.setId(currentUserId);

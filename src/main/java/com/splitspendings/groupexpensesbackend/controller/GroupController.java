@@ -5,6 +5,7 @@ import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
+import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupFilter;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -62,5 +64,10 @@ public class GroupController {
     @GetMapping("/{id}/spendings")
     public GroupSpendingsDto groupSpendings(@PathVariable Long id) {
         return groupService.groupSpendings(id);
+    }
+
+    @GetMapping("/filter/{groupFilter}")
+    public List<GroupDto> getFilteredGroups(@PathVariable GroupFilter groupFilter){
+        return groupService.getAllGroupsFilterBy(groupFilter);
     }
 }
