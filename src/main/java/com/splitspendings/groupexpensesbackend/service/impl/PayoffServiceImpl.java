@@ -107,7 +107,7 @@ public class PayoffServiceImpl implements PayoffService {
 
         Payoff payoff = payoffMapper.newPayoffDtoToPayoff(newPayoffDto, group, currentAppUser, paidForAppUser, paidToAppUser);
         payoffRepository.save(payoff);
-        appUserBalanceService.recalculateAppUserBalanceByGroup(group);
+        appUserBalanceService.recalculateAppUserBalanceByGroupAndCurrency(group, newPayoffDto.getCurrency());
 
         return payoffMapper.payoffToPayoffDto(payoff);
     }

@@ -1,5 +1,6 @@
 package com.splitspendings.groupexpensesbackend.model;
 
+import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import com.splitspendings.groupexpensesbackend.model.enums.InviteOption;
 import lombok.Getter;
 import lombok.Setter;
@@ -57,6 +58,10 @@ public class Group {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "owner_id", foreignKey = @ForeignKey(name = "fk_group_owner"))
     private AppUser owner;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "default_currency_code", nullable = false, length = Currency.MAX_LENGTH)
+    private Currency defaultCurrency;
 
     @OneToMany(mappedBy = "group")
     private Set<GroupMembership> groupMemberships;

@@ -10,7 +10,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {AppUserMapper.class, GroupMapper.class})
 public interface PayoffMapper {
     PayoffDto payoffToPayoffDto(Payoff payoff);
 

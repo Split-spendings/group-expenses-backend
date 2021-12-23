@@ -19,8 +19,6 @@ public interface AppUserMapper {
 
     List<AppUserDto> appUserListToAppUserDtoList(List<AppUser> appUserList);
 
-    AppUser appUserDtoToAppUser(AppUserDto appUserDto);
-
     AppUser newAppUserDtoToAppUser(NewAppUserDto newAppUserDto);
 
     AppUser copyFromAppUserIdentityDtoToAppUser(AppUserIdentityDto updateLoginNameDto, @MappingTarget AppUser appUser);

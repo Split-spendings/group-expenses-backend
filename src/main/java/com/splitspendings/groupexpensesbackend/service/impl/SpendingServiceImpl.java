@@ -137,6 +137,10 @@ public class SpendingServiceImpl implements SpendingService {
         Spending spending = spendingMapper.newSpendingDtoToSpending(newSpendingDto);
         spending.setAddedByGroupMembership(addedByGroupMembership);
 
+        if (spending.getCurrency() == null){
+            spending.setCurrency(group.getDefaultCurrency());
+        }
+
         Currency currency = spending.getCurrency();
 
         List<Item> items = new ArrayList<>();
@@ -178,7 +182,7 @@ public class SpendingServiceImpl implements SpendingService {
         Spending createdSpending = spendingRepository.save(spending);
         itemRepository.saveAll(items);
         shareRepository.saveAll(shares);
-        appUserBalanceService.recalculateAppUserBalanceByGroup(group);
+        appUserBalanceService.recalculateAppUserBalanceByGroupAndCurrency(group, currency);
 
         return spendingMapper.spendingToSpendingDto(createdSpending);
     }

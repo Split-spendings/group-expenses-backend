@@ -4,7 +4,10 @@ import com.splitspendings.groupexpensesbackend.dto.appuser.balance.AppUserBalanc
 import com.splitspendings.groupexpensesbackend.model.UserBalance;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+import java.util.List;
+
+@Mapper(componentModel = "spring", uses = GroupMapper.class)
 public interface AppUserBalanceMapper {
     AppUserBalanceDto userBalanceToAppUserBalance(UserBalance userBalance);
+    List<AppUserBalanceDto> userBalanceListToAppUserBalanceList(List<UserBalance> userBalanceList);
 }

@@ -25,7 +25,6 @@ public class NewSpendingDto {
 
     private ZonedDateTime timePayed;
 
-    @NotNull
     private Currency currency;
 
     @NotNull
