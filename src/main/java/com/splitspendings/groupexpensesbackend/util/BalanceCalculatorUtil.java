@@ -65,7 +65,7 @@ public class BalanceCalculatorUtil {
                 }
                 //checks if current negative debt is the last one
                 if (negativeNetChangeList.get(negativeNetChangeList.size() - 1).equals(negative)){
-                    performTransaction(negative, positive, positive.getAmount());
+                    performTransaction(negative, positive, positive.getAmount().min(absNegativeAmount));
                     return;
                 }
                 //finds the closest negative dept to current positive
