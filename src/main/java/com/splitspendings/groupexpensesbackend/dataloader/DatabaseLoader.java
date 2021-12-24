@@ -34,11 +34,6 @@ import com.splitspendings.groupexpensesbackend.repository.ShareRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingCommentRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -50,6 +45,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -57,8 +56,8 @@ import java.util.UUID;
 public class DatabaseLoader implements CommandLineRunner {
 
     private static final String ID = "id";
-    private static final String USERS_PATH = "gitignored/test_user_IDs.txt";
-    private static final String ADMINS_PATH = "gitignored/test_admin_IDs.txt";
+    private static final String USERS_PATH = "test-users/test_user_IDs.txt";
+    private static final String ADMINS_PATH = "test-users/test_admin_IDs.txt";
 
     private final AppUserFactory appUserFactory;
     private final GroupFactory groupFactory;
