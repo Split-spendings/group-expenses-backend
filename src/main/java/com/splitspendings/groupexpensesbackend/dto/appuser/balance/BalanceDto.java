@@ -7,6 +7,7 @@ import lombok.Data;
 
 @Data
 public class BalanceDto {
+    private Long id;
     private BigDecimal balance;
     private Currency currency;
     private AppUserDto withAppUser;
