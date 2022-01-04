@@ -1,10 +1,10 @@
 package com.splitspendings.groupexpensesbackend.service;
 
 import com.splitspendings.groupexpensesbackend.dto.appuser.balance.AppUserBalanceDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.balance.GroupBalancesDto;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.UserBalance;
 import com.splitspendings.groupexpensesbackend.model.enums.Currency;
-
 import java.util.UUID;
 
 public interface AppUserBalanceService {
@@ -15,7 +15,7 @@ public interface AppUserBalanceService {
 
     Iterable<AppUserBalanceDto> appUserBalancesByCurrentAppUser();
 
-    Iterable<AppUserBalanceDto> appUserBalancesByGroupId(Long groupId);
+    GroupBalancesDto appUserBalancesByGroupId(Long groupId);
 
     Iterable<AppUserBalanceDto> appUserBalancesByGroupIdAndAppUserId(Long groupId, UUID appUserId);
 
