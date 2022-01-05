@@ -1,7 +1,10 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
 import com.splitspendings.groupexpensesbackend.dto.appuser.balance.AppUserBalanceDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.balance.BalanceDto;
+import com.splitspendings.groupexpensesbackend.dto.appuser.balance.GroupBalancesDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserBalanceMapper;
+import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
 import com.splitspendings.groupexpensesbackend.mapper.NetChangeMapper;
 import com.splitspendings.groupexpensesbackend.mapper.TransactionMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
@@ -19,18 +22,17 @@ import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.service.impl.balance.Transaction;
 import com.splitspendings.groupexpensesbackend.util.BalanceCalculatorUtil;
 import com.splitspendings.groupexpensesbackend.util.LogUtil;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -48,6 +50,7 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
     private final TransactionMapper transactionMapper;
     private final NetChangeMapper netChangeMapper;
     private final AppUserBalanceMapper appUserBalanceMapper;
+    private final AppUserMapper appUserMapper;
 
     /**
      * @param id
@@ -85,6 +88,7 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
 
     /**
      * Retrieves {@link UserBalance}s from database based on parameters, converts to {@link AppUserBalanceDto}
+     *
      * @return valid {@link AppUserBalanceDto}
      *
      * @throws ResponseStatusException
@@ -98,28 +102,49 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
 
     /**
      * Retrieves {@link UserBalance}s from database based on parameters, converts to {@link AppUserBalanceDto}
+     *
      * @param groupId
      *         id of a {@link Group} stored {@link UserBalance}
+     *
      * @return valid {@link AppUserBalanceDto}
      *
      * @throws ResponseStatusException
      *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link UserBalance} with given parameters
      */
     @Override
-    public Iterable<AppUserBalanceDto> appUserBalancesByGroupId(Long groupId) {
-        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(groupId);
-        return appUserBalanceMapper.userBalanceListToAppUserBalanceList(
-                appUserBalanceRepository.findAllByAppUserIdAndGroupId(identityService.currentUserID(), groupId));
+    public GroupBalancesDto appUserBalancesByGroupId(Long groupId) {
+        UUID currentUserID = identityService.currentUserID();
+        groupMembershipService.verifyUserActiveMembershipByGroupId(currentUserID, groupId);
+
+        List<UserBalance> balances = appUserBalanceRepository.findAllByAppUserIdAndGroupId(currentUserID, groupId);
+
+        GroupBalancesDto groupBalancesDto = new GroupBalancesDto();
+        groupBalancesDto.setGroupId(groupId);
+        groupBalancesDto.setBalances(mapBalancesForUser(currentUserID, balances));
+        return groupBalancesDto;
+    }
+
+    private List<BalanceDto> mapBalancesForUser(UUID currentUserID, List<UserBalance> balances) {
+        return balances.stream().map(userBalance -> {
+            BalanceDto balanceDto = appUserBalanceMapper.userBalanceToBalanceDto(userBalance);
+            AppUser withUser = userBalance.getFirstAppUser().getId().equals(currentUserID) ?
+                    userBalance.getSecondAppUser() :
+                    userBalance.getFirstAppUser();
+            balanceDto.setWithAppUser(appUserMapper.appUserToAppUserDto(withUser));
+            return balanceDto;
+        }).collect(Collectors.toList());
     }
 
     /**
      * Retrieves {@link UserBalance} from database based on parameters, converts to {@link AppUserBalanceDto}
+     *
      * @param groupId
      *         id of a {@link Group} stored {@link UserBalance}
      * @param appUserId
-     *          id of second {@link AppUser} stored in {@link UserBalance}
+     *         id of second {@link AppUser} stored in {@link UserBalance}
      * @param currency
-     *          currency of {@link UserBalance}
+     *         currency of {@link UserBalance}
+     *
      * @return valid {@link AppUserBalanceDto}
      *
      * @throws ResponseStatusException
@@ -133,16 +158,18 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
                 .findByAppUserIdsAndGroupIdAndCurrency(identityService.currentUserID(), appUserId, groupId, currency)
                 .orElseThrow(() -> LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.NOT_FOUND,
                         String.format("UserBalance with appUserIds = {%s, %s}, Group Id = {%d} and Currency = {%s} not found",
-                                 identityService.currentUserID(), appUserId, groupId, currency)));
+                                identityService.currentUserID(), appUserId, groupId, currency)));
         return appUserBalanceMapper.userBalanceToAppUserBalance(userBalance);
     }
 
     /**
      * Retrieves {@link UserBalance} from database based on parameters, converts to {@link AppUserBalanceDto}
+     *
      * @param groupId
      *         id of a {@link Group} stored {@link UserBalance}
      * @param appUserId
-     *          id of second {@link AppUser} stored in {@link UserBalance}
+     *         id of second {@link AppUser} stored in {@link UserBalance}
+     *
      * @return valid {@link AppUserBalanceDto}
      *
      * @throws ResponseStatusException
@@ -157,14 +184,15 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
 
     /**
      * Recalculates {@link UserBalance}s for every member on a given {@link Group}
+     *
      * @param group
-     *          {@link Group} to recalculate {@link UserBalance}
+     *         {@link Group} to recalculate {@link UserBalance}
      */
     @Override
     public void recalculateAppUserBalanceByGroup(Group group) {
         appUserBalanceRepository.deleteAllByGroup(group);
         Set<Transaction> transactionSet = getAllTransactionsByGroupId(group.getId());
-        if (group.getSimplifyDebts()){
+        if (group.getSimplifyDebts()) {
             transactionSet = BalanceCalculatorUtil.calculate(netChangeMapper.transactionListToNetChangeList(transactionSet));
         }
         Set<UserBalance> userBalanceSet = transactionMapper.transactionSetToUserBalanceSet(transactionSet, group);
@@ -173,16 +201,17 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
 
     /**
      * Recalculates {@link UserBalance}s for every member on a given {@link Group} and {@link Currency}
+     *
      * @param group
-     *          {@link Group} to recalculate {@link UserBalance}
+     *         {@link Group} to recalculate {@link UserBalance}
      * @param currency
-     *          {@link Currency} to recalculate {@link UserBalance}
+     *         {@link Currency} to recalculate {@link UserBalance}
      */
     @Override
     public void recalculateAppUserBalanceByGroupAndCurrency(Group group, Currency currency) {
         appUserBalanceRepository.deleteAllByGroupAndCurrency(group, currency);
         Set<Transaction> transactionSet = getAllTransactionsByGroupIdAndCurrency(group.getId(), currency);
-        if (group.getSimplifyDebts()){
+        if (group.getSimplifyDebts()) {
             transactionSet = BalanceCalculatorUtil.calculate(netChangeMapper.transactionListToNetChangeList(transactionSet));
         }
         Set<UserBalance> userBalanceSet = transactionMapper.transactionSetToUserBalanceSet(transactionSet, group);
@@ -190,12 +219,12 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
     }
 
     /**
-     *
      * @param groupId
-     *      id of a {@link Group} to retrieve {@link Transaction} from
+     *         id of a {@link Group} to retrieve {@link Transaction} from
+     *
      * @return {@link Set<Transaction>} found in {@link Group} with given id
      */
-    private Set<Transaction> getAllTransactionsByGroupId(Long groupId){
+    private Set<Transaction> getAllTransactionsByGroupId(Long groupId) {
         Set<Share> shares = shareRepository.findAllByGroupId(groupId);
         Set<Payoff> payoffs = payoffRepository.findAllByGroupId(groupId);
 
@@ -203,21 +232,21 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
     }
 
     /**
-     *
      * @param groupId
-     *      id of a {@link Group} to retrieve {@link Transaction} from
+     *         id of a {@link Group} to retrieve {@link Transaction} from
      * @param currency
-     *      currency of {@link UserBalance} to retrieve {@link Transaction} from
+     *         currency of {@link UserBalance} to retrieve {@link Transaction} from
+     *
      * @return {@link Set<Transaction>} found in {@link Group} with given id
      */
-    private Set<Transaction> getAllTransactionsByGroupIdAndCurrency(Long groupId, Currency currency){
+    private Set<Transaction> getAllTransactionsByGroupIdAndCurrency(Long groupId, Currency currency) {
         Set<Share> shares = shareRepository.findAllByGroupIdAndCurrency(groupId, currency);
         Set<Payoff> payoffs = payoffRepository.findAllByGroupIdAndCurrency(groupId, currency);
 
         return mapSharesAndPayoffsToTransactions(shares, payoffs);
     }
 
-    private Set<Transaction> mapSharesAndPayoffsToTransactions(Set<Share> shares, Set<Payoff> payoffs){
+    private Set<Transaction> mapSharesAndPayoffsToTransactions(Set<Share> shares, Set<Payoff> payoffs) {
         //map Shares and Payoffs to Transactions
         Set<Transaction> sharesAsTransactions = transactionMapper.shareSetToTransactionSet(shares);
         Set<Transaction> payoffsAsTransactions = transactionMapper.payoffSetToTransactionSet(payoffs);
