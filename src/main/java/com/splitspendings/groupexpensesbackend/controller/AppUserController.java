@@ -10,6 +10,7 @@ import com.splitspendings.groupexpensesbackend.dto.appuser.settings.AppUserSetti
 import com.splitspendings.groupexpensesbackend.dto.appuser.settings.UpdateAppUserSettingsDto;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/users")
@@ -69,5 +68,10 @@ public class AppUserController {
     @GetMapping("/invites")
     public AppUserReceivedGroupInvitesDto appUserReceivedGroupInvites() {
         return appUserService.appUserReceivedGroupInvites();
+    }
+
+    @PostMapping("/synchronise")
+    public AppUserDto synchroniseAppUser() {
+        return appUserService.synchroniseAppUser();
     }
 }

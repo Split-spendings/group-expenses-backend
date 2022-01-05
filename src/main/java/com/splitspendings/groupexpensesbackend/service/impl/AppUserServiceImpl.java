@@ -22,18 +22,17 @@ import com.splitspendings.groupexpensesbackend.repository.AppUserSettingsReposit
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import javax.validation.Validator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -183,5 +182,16 @@ public class AppUserServiceImpl implements AppUserService {
         AppUserReceivedGroupInvitesDto appUserInvites = new AppUserReceivedGroupInvitesDto();
         appUserInvites.setReceivedGroupInvites(groupInviteDtoList);
         return appUserInvites;
+    }
+
+    @Override
+    public AppUserDto synchroniseAppUser() {
+        AppUserIdentityDto currentUserIdentity = identityService.currentUser();
+        AppUser userEntity = appUserRepository.getById(currentUserIdentity.getId());
+        if(userEntity == null) {
+            //TODO create new app user with default settings and data from AppUserIdentityDto (loginName = email)
+            userEntity = new AppUser();
+        }
+        return appUserMapper.appUserToAppUserDto(userEntity);
     }
 }
