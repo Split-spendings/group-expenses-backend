@@ -124,17 +124,6 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
         return groupBalancesDto;
     }
 
-    private List<BalanceDto> mapBalancesForUser(UUID currentUserID, List<UserBalance> balances) {
-        return balances.stream().map(userBalance -> {
-            BalanceDto balanceDto = appUserBalanceMapper.userBalanceToBalanceDto(userBalance);
-            AppUser withUser = userBalance.getFirstAppUser().getId().equals(currentUserID) ?
-                    userBalance.getSecondAppUser() :
-                    userBalance.getFirstAppUser();
-            balanceDto.setWithAppUser(appUserMapper.appUserToAppUserDto(withUser));
-            return balanceDto;
-        }).collect(Collectors.toList());
-    }
-
     /**
      * Retrieves {@link UserBalance} from database based on parameters, converts to {@link AppUserBalanceDto}
      *
@@ -216,6 +205,21 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
         }
         Set<UserBalance> userBalanceSet = transactionMapper.transactionSetToUserBalanceSet(transactionSet, group);
         appUserBalanceRepository.saveAll(userBalanceSet);
+    }
+
+    private List<BalanceDto> mapBalancesForUser(UUID currentUserID, List<UserBalance> balances) {
+        return balances.stream().map(userBalance -> {
+            AppUser withUser = userBalance.getFirstAppUser();
+            BalanceDto balanceDto = appUserBalanceMapper.userBalanceToBalanceDto(userBalance);
+
+            if (withUser.getId().equals(currentUserID)) {
+                withUser = userBalance.getSecondAppUser();
+                userBalance.setBalance(userBalance.getBalance().negate());
+            }
+
+            balanceDto.setWithAppUser(appUserMapper.appUserToAppUserDto(withUser));
+            return balanceDto;
+        }).collect(Collectors.toList());
     }
 
     /**
