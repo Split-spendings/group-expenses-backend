@@ -214,7 +214,7 @@ public class AppUserBalanceServiceImpl implements AppUserBalanceService {
 
             if (withUser.getId().equals(currentUserID)) {
                 withUser = userBalance.getSecondAppUser();
-                userBalance.setBalance(userBalance.getBalance().negate());
+                balanceDto.negate();
             }
 
             balanceDto.setWithAppUser(appUserMapper.appUserToAppUserDto(withUser));

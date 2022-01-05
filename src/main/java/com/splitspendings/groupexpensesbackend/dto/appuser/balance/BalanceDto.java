@@ -11,4 +11,8 @@ public class BalanceDto {
     private BigDecimal balance;
     private Currency currency;
     private AppUserDto withAppUser;
+
+    public void negate(){
+        balance = balance.negate();
+    }
 }
