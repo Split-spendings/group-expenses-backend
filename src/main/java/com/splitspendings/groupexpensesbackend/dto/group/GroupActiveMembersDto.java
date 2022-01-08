@@ -1,14 +1,13 @@
 package com.splitspendings.groupexpensesbackend.dto.group;
 
-import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
-import lombok.Data;
-
+import com.splitspendings.groupexpensesbackend.dto.group.membership.settings.GroupMemberDto;
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class GroupActiveMembersDto {
 
     private Long id;
     private String name;
-    private List<AppUserDto> members;
+    private List<GroupMemberDto> members;
 }
