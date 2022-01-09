@@ -349,6 +349,13 @@ public class DatabaseLoader implements CommandLineRunner {
         item4_3_4.setPrice(new BigDecimal("30.50"));
 
         itemRepository.save(item1_1_3);
+        itemRepository.save(item1_1_2);
+        itemRepository.save(item4_1_4);
+        itemRepository.save(item4_1_5);
+        itemRepository.save(item4_2_1);
+        itemRepository.save(item4_2_3);
+        itemRepository.save(item4_3_1);
+        itemRepository.save(item4_3_4);
     }
 
     private void setUpItemCategories() {
@@ -407,8 +414,16 @@ public class DatabaseLoader implements CommandLineRunner {
         spending4_4_2.setTotalAmount(new BigDecimal("234.56"));
         spending4_4_2.setTitle("Dummy spending2");
 
+        spending4_4_3 = new Spending();
+        spending4_4_3.setAddedByGroupMembership(groupMembership4_3);
+        spending4_4_3.setCurrency(Currency.PLN);
+        spending4_4_3.setTotalAmount(new BigDecimal("234.56"));
+        spending4_4_3.setTitle("Dummy spending2");
+
         spendingRepository.save(spending1_1);
         spendingRepository.save(spending4_4_1);
+        spendingRepository.save(spending4_4_2);
+        spendingRepository.save(spending4_4_3);
     }
 
     private void setUpGroupInvites() {
