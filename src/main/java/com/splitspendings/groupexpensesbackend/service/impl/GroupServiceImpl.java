@@ -1,6 +1,5 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
-import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
@@ -8,6 +7,7 @@ import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupFilter;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
+import com.splitspendings.groupexpensesbackend.dto.group.membership.settings.GroupMemberDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingShortDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
@@ -28,18 +28,17 @@ import com.splitspendings.groupexpensesbackend.service.GroupService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.UUID;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -203,13 +202,9 @@ public class GroupServiceImpl implements GroupService {
 
         Group group = groupModelById(id);
 
-        List<AppUser> appUserList = groupMembershipRepository.queryActiveMembersOfGroupWithId(id);
+        List<GroupMembership> groupMembers = groupMembershipRepository.getActiveMembersOfGroupWithId(id);
 
-        List<AppUserDto> appUserDtoList = appUserMapper.appUserListToAppUserDtoList(appUserList);
-
-        GroupActiveMembersDto groupMembersDto = groupMapper.groupToGroupActiveMembersDto(group);
-        groupMembersDto.setMembers(appUserDtoList);
-        return groupMembersDto;
+        return groupMapper.groupToGroupActiveMembersDto(group, groupMembers);
     }
 
     /**

@@ -5,6 +5,7 @@ import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
+import com.splitspendings.groupexpensesbackend.dto.group.membership.settings.GroupMemberDto;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import org.mapstruct.Mapper;
@@ -13,7 +14,7 @@ import org.mapstruct.MappingTarget;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {GroupMembershipMapper.class})
 public interface GroupMapper {
 
     GroupDto groupToGroupInfoDto(Group group, boolean isActiveMember);
@@ -39,7 +40,7 @@ public interface GroupMapper {
 
     void copyUpdateGroupInfoDtoToGroup(UpdateGroupDto updateGroupDto, @MappingTarget Group group);
 
-    GroupActiveMembersDto groupToGroupActiveMembersDto(Group group);
+    GroupActiveMembersDto groupToGroupActiveMembersDto(Group group, List<GroupMembership> members);
 
     GroupSpendingsDto groupToGroupSpendingsDto(Group group);
 }
