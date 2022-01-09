@@ -11,6 +11,6 @@ public interface ShareMapper {
 
     Share newShareDtoToShare(NewShareDto newShareDto);
 
-    @Mapping(target = "paidForGroupMembershipId", source = "paidForGroupMembership.appUser")
+    @Mapping(target = "paidFor", source = "paidForGroupMembership.appUser")
     ShareDto shareToShareDto(Share share);
 }
