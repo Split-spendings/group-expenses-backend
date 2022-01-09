@@ -204,11 +204,7 @@ public class GroupServiceImpl implements GroupService {
 
         List<GroupMembership> groupMembers = groupMembershipRepository.getActiveMembersOfGroupWithId(id);
 
-        List<GroupMemberDto> groupMemberDtoList = groupMembershipMapper.groupMembershipListToGroupMemberDtoList(groupMembers);
-
-        GroupActiveMembersDto groupMembersDto = groupMapper.groupToGroupActiveMembersDto(group);
-        groupMembersDto.setMembers(groupMemberDtoList);
-        return groupMembersDto;
+        return groupMapper.groupToGroupActiveMembersDto(group, groupMembers);
     }
 
     /**
