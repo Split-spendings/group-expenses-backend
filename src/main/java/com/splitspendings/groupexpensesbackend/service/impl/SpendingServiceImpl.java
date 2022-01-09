@@ -25,19 +25,18 @@ import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.service.SpendingService;
 import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -91,7 +90,9 @@ public class SpendingServiceImpl implements SpendingService {
     public SpendingDto spendingById(Long id) {
         Spending spending = spendingModelById(id);
         verifyCurrentUserActiveMembershipBySpending(spending);
-        return spendingMapper.spendingToSpendingDto(spending);
+        var spendingDto = spendingMapper.spendingToSpendingDto(spending);
+        log.info("spendingById {}", spendingDto.toString());
+        return spendingDto;
     }
 
     /**
@@ -137,7 +138,7 @@ public class SpendingServiceImpl implements SpendingService {
         Spending spending = spendingMapper.newSpendingDtoToSpending(newSpendingDto);
         spending.setAddedByGroupMembership(addedByGroupMembership);
 
-        if (spending.getCurrency() == null){
+        if (spending.getCurrency() == null) {
             spending.setCurrency(group.getDefaultCurrency());
         }
 
