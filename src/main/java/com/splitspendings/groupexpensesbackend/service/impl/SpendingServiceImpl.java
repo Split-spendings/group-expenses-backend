@@ -91,7 +91,10 @@ public class SpendingServiceImpl implements SpendingService {
     public SpendingDto spendingById(Long id) {
         Spending spending = spendingModelById(id);
         verifyCurrentUserActiveMembershipBySpending(spending);
-        return spendingMapper.spendingToSpendingDto(spending);
+        var s = spendingMapper.spendingToSpendingDto(spending);
+        log.info("asss");
+        log.info(s.toString());
+        return s;
     }
 
     /**
