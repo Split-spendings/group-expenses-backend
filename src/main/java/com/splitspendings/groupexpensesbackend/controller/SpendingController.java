@@ -3,6 +3,7 @@ package com.splitspendings.groupexpensesbackend.controller;
 import com.splitspendings.groupexpensesbackend.dto.spending.NewSpendingDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingCommentsDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.SpendingShortDto;
 import com.splitspendings.groupexpensesbackend.service.SpendingService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class SpendingController {
     }
 
     @PostMapping
-    public SpendingDto createSpending(@RequestBody NewSpendingDto newSpendingDto) {
+    public SpendingShortDto createSpending(@RequestBody NewSpendingDto newSpendingDto) {
         return spendingService.createSpending(newSpendingDto);
     }
 

@@ -5,6 +5,7 @@ import com.splitspendings.groupexpensesbackend.dto.share.NewShareDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.NewSpendingDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingCommentsDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingDto;
+import com.splitspendings.groupexpensesbackend.dto.spending.SpendingShortDto;
 import com.splitspendings.groupexpensesbackend.mapper.ItemMapper;
 import com.splitspendings.groupexpensesbackend.mapper.ShareMapper;
 import com.splitspendings.groupexpensesbackend.mapper.SpendingMapper;
@@ -121,7 +122,7 @@ public class SpendingServiceImpl implements SpendingService {
      *         {@link Group} with given id
      */
     @Override
-    public SpendingDto createSpending(NewSpendingDto newSpendingDto) {
+    public SpendingShortDto createSpending(NewSpendingDto newSpendingDto) {
         ValidatorUtil.validate(validator, newSpendingDto);
 
         UUID currentAppUserId = identityService.currentUserID();
@@ -185,7 +186,7 @@ public class SpendingServiceImpl implements SpendingService {
         shareRepository.saveAll(shares);
         appUserBalanceService.recalculateAppUserBalanceByGroupAndCurrency(group, currency);
 
-        return spendingMapper.spendingToSpendingDto(createdSpending);
+        return spendingMapper.spendingToSpendingShortDto(createdSpending);
     }
 
     /**
