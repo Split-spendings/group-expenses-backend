@@ -178,6 +178,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     }
 
     @Override
+    @Transactional
     public Group joinGroup(String inviteCode) {
         GroupMembership groupMembership = groupMembershipModelByInviteCode(inviteCode);
 
@@ -213,6 +214,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     }
 
     @Override
+    @Transactional
     public GroupMembership createOrUpdateGroupMembershipForCurrentUser(Group group){
         AppUser currentUser = appUserService.appUserModelById(identityService.currentUserID());
         Optional<GroupMembership> groupMembershipOptional = groupMembershipRepository.findByGroupAndAppUser(group, currentUser);
