@@ -1,5 +1,6 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
+import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -25,7 +26,7 @@ public class GroupInviteController {
     }
 
     @PostMapping("/join/{inviteCode}")
-    public Group createGroupInviteCode(@PathVariable String inviteCode) {
+    public GroupDto createGroupInviteCode(@PathVariable String inviteCode) {
         return groupMembershipService.joinGroup(inviteCode);
     }
 }

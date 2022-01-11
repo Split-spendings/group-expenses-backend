@@ -1,5 +1,6 @@
 package com.splitspendings.groupexpensesbackend.service;
 
+import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 
@@ -25,5 +26,5 @@ public interface GroupMembershipService {
 
     void verifyCurrentUserActiveMembershipById(Long id);
 
-    Group joinGroup(String inviteCode);
+    GroupDto joinGroup(String inviteCode);
 }

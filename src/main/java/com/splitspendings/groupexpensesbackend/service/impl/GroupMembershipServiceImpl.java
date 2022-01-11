@@ -1,7 +1,8 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
+import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.exception.InvalidGroupInviteException;
-import com.splitspendings.groupexpensesbackend.mapper.GroupMembershipMapper;
+import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
@@ -35,7 +36,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     private final AppUserService appUserService;
     private final DefaultGroupMembershipSettingsService defaultGroupMembershipSettingsService;
 
-    private final GroupMembershipMapper groupMembershipMapper;
+    private final GroupMapper groupMapper;
 
     /**
      * @param id
@@ -179,7 +180,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
 
     @Override
     @Transactional
-    public Group joinGroup(String inviteCode) {
+    public GroupDto joinGroup(String inviteCode) {
         GroupMembership groupMembership = groupMembershipModelByInviteCode(inviteCode);
 
         if (!groupMembership.getActive()){
@@ -191,7 +192,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
         Group group = groupMembership.getGroup();
         createOrUpdateGroupMembershipForCurrentUser(group);
 
-        return group;
+        return groupMapper.groupToGroupInfoDto(group);
     }
 
     @Override
