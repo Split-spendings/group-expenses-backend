@@ -7,21 +7,26 @@ import com.splitspendings.groupexpensesbackend.repository.GroupMembershipReposit
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.util.LogUtil;
+import com.splitspendings.groupexpensesbackend.util.RandomInviteCodeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class GroupMembershipServiceImpl implements GroupMembershipService {
+
+    private final static int INVITE_CODE_LENGTH = 6;
 
     private final GroupMembershipRepository groupMembershipRepository;
 
@@ -147,6 +152,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
      *         GroupMembership}
      */
     @Override
+    @Transactional
     public void verifyCurrentUserActiveMembershipById(Long id) {
         UUID appUserId = identityService.currentUserID();
         GroupMembership groupMembership = groupMembershipModelById(id);
@@ -164,5 +170,24 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
                         appUserId.toString(),
                         groupMembership.getId()));
         }
+    }
+
+    @Override
+    public String createGroupInviteCode(Long groupId) {
+        GroupMembership groupMembership = groupActiveMembershipModelByGroupId(identityService.currentUserID(), groupId);
+
+        String inviteCode = RandomInviteCodeUtil.generateInviteCode();
+
+        while (true){
+            try{
+                groupMembership.setInviteCode(inviteCode);
+                groupMembershipRepository.save(groupMembership);
+            }catch (DataIntegrityViolationException dataIntegrityViolationException){
+                inviteCode = RandomInviteCodeUtil.generateInviteCode();
+                continue;
+            }
+            break;
+        }
+        return inviteCode;
     }
 }

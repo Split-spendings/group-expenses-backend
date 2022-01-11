@@ -10,6 +10,8 @@ public interface GroupMembershipService {
 
     GroupMembership groupActiveMembershipModelByGroupId(UUID appUserId, Long groupId);
 
+    String createGroupInviteCode(Long groupId);
+
     boolean isAppUserActiveMemberOfGroup(UUID appUserId, Long groupId);
 
     boolean isAdminOfGroup(UUID appUserId, Long groupId);
