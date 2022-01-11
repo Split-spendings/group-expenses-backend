@@ -7,7 +7,6 @@ import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupFilter;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
-import com.splitspendings.groupexpensesbackend.dto.group.membership.settings.GroupMemberDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingShortDto;
 import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
@@ -22,8 +21,8 @@ import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
+import com.splitspendings.groupexpensesbackend.service.DefaultGroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
-import com.splitspendings.groupexpensesbackend.service.GroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.util.LogUtil;
@@ -61,7 +60,7 @@ public class GroupServiceImpl implements GroupService {
     private final AppUserService appUserService;
     private final AppUserBalanceService appUserBalanceService;
     private final GroupMembershipService groupMembershipService;
-    private final GroupMembershipSettingsService groupMembershipSettingsService;
+    private final DefaultGroupMembershipSettingsService defaultGroupMembershipSettingsService;
 
     /**
      * @param id
@@ -127,7 +126,7 @@ public class GroupServiceImpl implements GroupService {
 
         GroupMembership createdGroupMembership = groupMembershipRepository.save(groupMembership);
 
-        groupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(createdGroupMembership);
+        defaultGroupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(createdGroupMembership);
 
         return groupMapper.groupToGroupInfoDto(createdGroup);
     }

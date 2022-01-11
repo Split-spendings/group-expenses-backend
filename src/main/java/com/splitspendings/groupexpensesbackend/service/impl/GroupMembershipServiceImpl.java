@@ -7,11 +7,15 @@ import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
+import com.splitspendings.groupexpensesbackend.service.DefaultGroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
-import com.splitspendings.groupexpensesbackend.service.GroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.RandomInviteCodeUtil;
+import java.time.ZonedDateTime;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -19,11 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.time.ZonedDateTime;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +33,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
 
     private final IdentityService identityService;
     private final AppUserService appUserService;
-    private final GroupMembershipSettingsService groupMembershipSettingsService;
+    private final DefaultGroupMembershipSettingsService defaultGroupMembershipSettingsService;
 
     private final GroupMembershipMapper groupMembershipMapper;
 
@@ -236,7 +235,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
             groupMembership.setGroup(group);
             groupMembership.setHasAdminRights(false);
             groupMembership.setFirstTimeJoined(now);
-            groupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(groupMembership);
+            defaultGroupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(groupMembership);
         }
 
         return groupMembershipRepository.save(groupMembership);
