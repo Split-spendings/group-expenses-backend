@@ -1,24 +1,28 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
+import com.splitspendings.groupexpensesbackend.exception.InvalidGroupInviteException;
+import com.splitspendings.groupexpensesbackend.mapper.GroupMembershipMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
+import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
+import com.splitspendings.groupexpensesbackend.service.GroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.RandomInviteCodeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.Random;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,11 +30,13 @@ import java.util.UUID;
 @Slf4j
 public class GroupMembershipServiceImpl implements GroupMembershipService {
 
-    private final static int INVITE_CODE_LENGTH = 6;
-
     private final GroupMembershipRepository groupMembershipRepository;
 
     private final IdentityService identityService;
+    private final AppUserService appUserService;
+    private final GroupMembershipSettingsService groupMembershipSettingsService;
+
+    private final GroupMembershipMapper groupMembershipMapper;
 
     /**
      * @param id
@@ -173,6 +179,22 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     }
 
     @Override
+    public Group joinGroup(String inviteCode) {
+        GroupMembership groupMembership = groupMembershipModelByInviteCode(inviteCode);
+
+        if (!groupMembership.getActive()){
+            throw LogUtil.logMessageAndReturnResponseStatusException(log,HttpStatus.BAD_REQUEST,
+                    String.format("Invite code = {%s} is not valid, as user who created it is no longer an active member",
+                            inviteCode));
+        }
+
+        Group group = groupMembership.getGroup();
+        createOrUpdateGroupMembershipForCurrentUser(group);
+
+        return group;
+    }
+
+    @Override
     public String createGroupInviteCode(Long groupId) {
         GroupMembership groupMembership = groupActiveMembershipModelByGroupId(identityService.currentUserID(), groupId);
 
@@ -189,5 +211,40 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
             break;
         }
         return inviteCode;
+    }
+
+    @Override
+    public GroupMembership createOrUpdateGroupMembershipForCurrentUser(Group group){
+        AppUser currentUser = appUserService.appUserModelById(identityService.currentUserID());
+        Optional<GroupMembership> groupMembershipOptional = groupMembershipRepository.findByGroupAndAppUser(group, currentUser);
+
+        if (groupMembershipOptional.map(GroupMembership::getActive).orElse(false)) {
+            throw LogUtil.logMessageAndReturnException(log, new InvalidGroupInviteException(HttpStatus.BAD_REQUEST,
+                    String.format(
+                            "Invited user with id = {%s} is already an active member of a group with id = {%d}",
+                            currentUser.getId(),
+                            group.getId())));
+        }
+
+        ZonedDateTime now = ZonedDateTime.now();
+        GroupMembership groupMembership = groupMembershipOptional.orElse(new GroupMembership());
+        groupMembership.setActive(true);
+        groupMembership.setLastTimeJoined(now);
+
+        if (groupMembershipOptional.isEmpty()) {
+            groupMembership.setAppUser(currentUser);
+            groupMembership.setGroup(group);
+            groupMembership.setHasAdminRights(false);
+            groupMembership.setFirstTimeJoined(now);
+            groupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(groupMembership);
+        }
+
+        return groupMembershipRepository.save(groupMembership);
+    }
+
+    private GroupMembership groupMembershipModelByInviteCode(String inviteCode) {
+        return groupMembershipRepository.findByInviteCode(inviteCode).
+                orElseThrow(() -> LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.NOT_FOUND,
+                        String.format("Invite code = {%s} is not valid", inviteCode)));
     }
 }

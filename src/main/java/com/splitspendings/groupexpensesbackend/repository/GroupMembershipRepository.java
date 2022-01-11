@@ -28,4 +28,6 @@ public interface GroupMembershipRepository extends JpaRepository<GroupMembership
     List<GroupMembership> getActiveMembersOfGroupWithId(@Param("group_id") Long groupId);
 
     Optional<GroupMembership> findByGroupAndAppUser(Group group, AppUser appUser);
+
+    Optional<GroupMembership> findByInviteCode(String inviteCode);
 }

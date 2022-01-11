@@ -27,7 +27,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
-import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -175,28 +174,7 @@ public class GroupInviteServiceImpl implements GroupInviteService {
 
         groupInviteRepository.deleteAllByInvitedByGroupMembershipGroupAndInvitedAppUser(group, invitedAppUser);
 
-        Optional<GroupMembership> groupMembershipOptional = groupMembershipRepository.findByGroupAndAppUser(group, invitedAppUser);
-
-        if (groupMembershipOptional.map(GroupMembership::getActive).orElse(false)) {
-            throw LogUtil.logMessageAndReturnException(log, new InvalidGroupInviteException(HttpStatus.BAD_REQUEST,
-                    String.format(
-                            "Invited user with id = {%s} is already an active member of a group with id = {%d}",
-                            groupInvite.getInvitedByGroupMembership().getAppUser().getId(),
-                            group.getId())));
-        }
-        ZonedDateTime now = ZonedDateTime.now();
-        GroupMembership groupMembership = groupMembershipOptional.orElse(new GroupMembership());
-        groupMembership.setActive(true);
-        groupMembership.setLastTimeJoined(now);
-
-        if (groupMembershipOptional.isEmpty()) {
-            groupMembership.setAppUser(invitedAppUser);
-            groupMembership.setGroup(group);
-            groupMembership.setHasAdminRights(false);
-            groupMembership.setFirstTimeJoined(now);
-            groupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(groupMembership);
-        }
-        groupMembershipRepository.save(groupMembership);
+        GroupMembership groupMembership = groupMembershipService.createOrUpdateGroupMembershipForCurrentUser(group);
 
         return groupInviteMapper.groupMembershipToGroupInviteAcceptedDto(groupMembership);
     }
