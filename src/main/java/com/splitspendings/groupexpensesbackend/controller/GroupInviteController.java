@@ -1,7 +1,7 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
 import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
-import com.splitspendings.groupexpensesbackend.model.Group;
+import com.splitspendings.groupexpensesbackend.dto.group.invite.GroupInviteCodeDto;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +21,12 @@ public class GroupInviteController {
     private final GroupMembershipService groupMembershipService;
 
     @PostMapping("/generate/{groupId}")
-    public String createGroupInviteCode(@PathVariable Long groupId) {
+    public GroupInviteCodeDto generateGroupInviteCode(@PathVariable Long groupId) {
         return groupMembershipService.createGroupInviteCode(groupId);
     }
 
     @PostMapping("/join/{inviteCode}")
-    public GroupDto createGroupInviteCode(@PathVariable String inviteCode) {
+    public GroupDto joinGroupByInviteCode(@PathVariable String inviteCode) {
         return groupMembershipService.joinGroup(inviteCode);
     }
 }

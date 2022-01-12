@@ -1,7 +1,7 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
 import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
-import com.splitspendings.groupexpensesbackend.exception.InvalidGroupInviteException;
+import com.splitspendings.groupexpensesbackend.dto.group.invite.GroupInviteCodeDto;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
@@ -196,7 +196,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     }
 
     @Override
-    public String createGroupInviteCode(Long groupId) {
+    public GroupInviteCodeDto createGroupInviteCode(Long groupId) {
         GroupMembership groupMembership = groupActiveMembershipModelByGroupId(identityService.currentUserID(), groupId);
 
         String inviteCode = RandomInviteCodeUtil.generateInviteCode();
@@ -211,7 +211,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
             }
             break;
         }
-        return inviteCode;
+        return new GroupInviteCodeDto(inviteCode);
     }
 
     @Override
