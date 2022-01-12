@@ -220,33 +220,40 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
         AppUser currentUser = appUserService.appUserModelById(identityService.currentUserID());
         Optional<GroupMembership> groupMembershipOptional = groupMembershipRepository.findByGroupAndAppUser(group, currentUser);
 
-        if (groupMembershipOptional.map(GroupMembership::getActive).orElse(false)) {
-            throw LogUtil.logMessageAndReturnException(log, new InvalidGroupInviteException(HttpStatus.BAD_REQUEST,
-                    String.format(
-                            "Invited user with id = {%s} is already an active member of a group with id = {%d}",
-                            currentUser.getId(),
-                            group.getId())));
+        if (groupMembershipOptional.isPresent()){
+            GroupMembership groupMembership = groupMembershipOptional.get();
+
+            if (!groupMembership.getActive()){
+                groupMembership.setActive(true);
+                groupMembership.setLastTimeJoined(ZonedDateTime.now());
+            }
+
+            return groupMembershipRepository.save(groupMembership);
         }
 
-        ZonedDateTime now = ZonedDateTime.now();
-        GroupMembership groupMembership = groupMembershipOptional.orElse(new GroupMembership());
-        groupMembership.setActive(true);
-        groupMembership.setLastTimeJoined(now);
-
-        if (groupMembershipOptional.isEmpty()) {
-            groupMembership.setAppUser(currentUser);
-            groupMembership.setGroup(group);
-            groupMembership.setHasAdminRights(false);
-            groupMembership.setFirstTimeJoined(now);
-            defaultGroupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(groupMembership);
-        }
-
-        return groupMembershipRepository.save(groupMembership);
+        return createGroupMembershipWithDefaultValues(currentUser, group);
     }
 
     private GroupMembership groupMembershipModelByInviteCode(String inviteCode) {
         return groupMembershipRepository.findByInviteCode(inviteCode).
                 orElseThrow(() -> LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.NOT_FOUND,
                         String.format("Invite code = {%s} is not valid", inviteCode)));
+    }
+
+    private GroupMembership createGroupMembershipWithDefaultValues(AppUser appUser, Group group){
+        ZonedDateTime now = ZonedDateTime.now();
+
+        GroupMembership groupMembership = new GroupMembership();
+        groupMembership.setActive(true);
+        groupMembership.setLastTimeJoined(now);
+        groupMembership.setAppUser(appUser);
+        groupMembership.setGroup(group);
+        groupMembership.setHasAdminRights(false);
+        groupMembership.setFirstTimeJoined(now);
+
+        defaultGroupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(groupMembership);
+        groupMembershipRepository.save(groupMembership);
+
+        return groupMembership;
     }
 }
