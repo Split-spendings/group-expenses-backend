@@ -50,6 +50,9 @@ public class GroupMembership {
     @Column(name = "last_time_left")
     private ZonedDateTime lastTimeLeft;
 
+    @Column(name = "invite_code", unique = true)
+    private String inviteCode;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "group_id", foreignKey = @ForeignKey(name = "fk_membership_group"))
     private Group group;

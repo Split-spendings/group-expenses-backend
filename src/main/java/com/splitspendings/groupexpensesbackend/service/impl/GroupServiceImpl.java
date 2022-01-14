@@ -1,6 +1,5 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
-import com.splitspendings.groupexpensesbackend.dto.appuser.AppUserDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
@@ -22,24 +21,23 @@ import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
+import com.splitspendings.groupexpensesbackend.service.DefaultGroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
-import com.splitspendings.groupexpensesbackend.service.GroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.UUID;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -62,7 +60,7 @@ public class GroupServiceImpl implements GroupService {
     private final AppUserService appUserService;
     private final AppUserBalanceService appUserBalanceService;
     private final GroupMembershipService groupMembershipService;
-    private final GroupMembershipSettingsService groupMembershipSettingsService;
+    private final DefaultGroupMembershipSettingsService defaultGroupMembershipSettingsService;
 
     /**
      * @param id
@@ -128,7 +126,7 @@ public class GroupServiceImpl implements GroupService {
 
         GroupMembership createdGroupMembership = groupMembershipRepository.save(groupMembership);
 
-        groupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(createdGroupMembership);
+        defaultGroupMembershipSettingsService.createAndSaveDefaultGroupMembershipSettingsForGroupMembership(createdGroupMembership);
 
         return groupMapper.groupToGroupInfoDto(createdGroup);
     }
@@ -203,13 +201,9 @@ public class GroupServiceImpl implements GroupService {
 
         Group group = groupModelById(id);
 
-        List<AppUser> appUserList = groupMembershipRepository.queryActiveMembersOfGroupWithId(id);
+        List<GroupMembership> groupMembers = groupMembershipRepository.getActiveMembersOfGroupWithId(id);
 
-        List<AppUserDto> appUserDtoList = appUserMapper.appUserListToAppUserDtoList(appUserList);
-
-        GroupActiveMembersDto groupMembersDto = groupMapper.groupToGroupActiveMembersDto(group);
-        groupMembersDto.setMembers(appUserDtoList);
-        return groupMembersDto;
+        return groupMapper.groupToGroupActiveMembersDto(group, groupMembers);
     }
 
     /**

@@ -3,13 +3,12 @@ package com.splitspendings.groupexpensesbackend.repository;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface GroupMembershipRepository extends JpaRepository<GroupMembership, Long> {
 
@@ -25,5 +24,10 @@ public interface GroupMembershipRepository extends JpaRepository<GroupMembership
     @Query("select gm.appUser from GroupMembership gm where gm.group.id = :group_id and gm.active=true")
     List<AppUser> queryActiveMembersOfGroupWithId(@Param("group_id") Long groupId);
 
+    @Query("select gm from GroupMembership gm where gm.group.id = :group_id and gm.active=true")
+    List<GroupMembership> getActiveMembersOfGroupWithId(@Param("group_id") Long groupId);
+
     Optional<GroupMembership> findByGroupAndAppUser(Group group, AppUser appUser);
+
+    Optional<GroupMembership> findByInviteCode(String inviteCode);
 }

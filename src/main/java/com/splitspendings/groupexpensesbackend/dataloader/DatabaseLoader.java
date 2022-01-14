@@ -122,8 +122,10 @@ public class DatabaseLoader implements CommandLineRunner {
     private GroupMembershipSettings groupMembershipSettings4_4;
     private GroupMembershipSettings groupMembershipSettings4_5;
 
-    private Spending spending1;
-    private Spending spending2;
+    private Spending spending1_1;
+    private Spending spending4_4_1;
+    private Spending spending4_4_2;
+    private Spending spending4_4_3;
 
     @SuppressWarnings("all")
     private SpendingComment spendingComment1;
@@ -136,7 +138,14 @@ public class DatabaseLoader implements CommandLineRunner {
     @SuppressWarnings("all")
     private ItemCategory itemCategory2;
 
-    private Item item1;
+    private Item item1_1_3;
+    private Item item1_1_2;
+    private Item item4_1_4;
+    private Item item4_1_5;
+    private Item item4_2_1;
+    private Item item4_2_3;
+    private Item item4_3_1;
+    private Item item4_3_4;
 
     @SuppressWarnings("all")
 
@@ -226,56 +235,56 @@ public class DatabaseLoader implements CommandLineRunner {
     private void setUpShares() {
         Share share1_1_3 = new Share();
         share1_1_3.setAmount(new BigDecimal("20.02"));
-        share1_1_3.setItem(item1);
+        share1_1_3.setItem(item1_1_3);
         share1_1_3.setCurrency(Currency.EUR);
         share1_1_3.setPaidByGroupMembership(groupMembership1_1);
         share1_1_3.setPaidForGroupMembership(groupMembership1_3);
 
         Share share1_1_2 = new Share();
         share1_1_2.setAmount(new BigDecimal("30.03"));
-        share1_1_2.setItem(item1);
+        share1_1_2.setItem(item1_1_2);
         share1_1_2.setCurrency(Currency.EUR);
         share1_1_2.setPaidByGroupMembership(groupMembership1_1);
         share1_1_2.setPaidForGroupMembership(groupMembership1_2);
 
         Share share4_1_4 = new Share();
         share4_1_4.setAmount(new BigDecimal(10));
-        share4_1_4.setItem(item1);
+        share4_1_4.setItem(item4_1_4);
         share4_1_4.setCurrency(Currency.EUR);
         share4_1_4.setPaidByGroupMembership(groupMembership4_1);
         share4_1_4.setPaidForGroupMembership(groupMembership4_4);
 
         Share share4_1_5 = new Share();
         share4_1_5.setAmount(new BigDecimal(5));
-        share4_1_5.setItem(item1);
+        share4_1_5.setItem(item4_1_5);
         share4_1_5.setCurrency(Currency.EUR);
         share4_1_5.setPaidByGroupMembership(groupMembership4_1);
         share4_1_5.setPaidForGroupMembership(groupMembership4_5);
 
         Share share4_2_1 = new Share();
         share4_2_1.setAmount(new BigDecimal(10));
-        share4_2_1.setItem(item1);
+        share4_2_1.setItem(item4_2_1);
         share4_2_1.setCurrency(Currency.EUR);
         share4_2_1.setPaidByGroupMembership(groupMembership4_2);
         share4_2_1.setPaidForGroupMembership(groupMembership4_1);
 
         Share share4_2_3 = new Share();
         share4_2_3.setAmount(new BigDecimal(20));
-        share4_2_3.setItem(item1);
+        share4_2_3.setItem(item4_2_3);
         share4_2_3.setCurrency(Currency.EUR);
         share4_2_3.setPaidByGroupMembership(groupMembership4_2);
         share4_2_3.setPaidForGroupMembership(groupMembership4_3);
 
         Share share4_3_1 = new Share();
         share4_3_1.setAmount(new BigDecimal(10));
-        share4_3_1.setItem(item1);
+        share4_3_1.setItem(item4_3_1);
         share4_3_1.setCurrency(Currency.EUR);
         share4_3_1.setPaidByGroupMembership(groupMembership4_3);
         share4_3_1.setPaidForGroupMembership(groupMembership4_1);
 
         Share share4_3_4 = new Share();
         share4_3_4.setAmount(new BigDecimal(20));
-        share4_3_4.setItem(item1);
+        share4_3_4.setItem(item4_3_4);
         share4_3_4.setCurrency(Currency.EUR);
         share4_3_4.setPaidByGroupMembership(groupMembership4_3);
         share4_3_4.setPaidForGroupMembership(groupMembership4_4);
@@ -291,13 +300,62 @@ public class DatabaseLoader implements CommandLineRunner {
     }
 
     private void setUpItems() {
-        item1 = new Item();
-        item1.setItemCategory(itemCategory1);
-        item1.setSpending(spending1);
-        item1.setTitle("Dummy item 1");
-        item1.setPrice(new BigDecimal("30.50"));
+        item1_1_3 = new Item();
+        item1_1_3.setItemCategory(itemCategory1);
+        item1_1_3.setSpending(spending1_1);
+        item1_1_3.setTitle("Dummy item 1");
+        item1_1_3.setPrice(new BigDecimal("30.50"));
 
-        itemRepository.save(item1);
+        item1_1_2 = new Item();
+        item1_1_2.setItemCategory(itemCategory1);
+        item1_1_2.setSpending(spending1_1);
+        item1_1_2.setTitle("Dummy item 1");
+        item1_1_2.setPrice(new BigDecimal("30.50"));
+
+        item4_1_4 = new Item();
+        item4_1_4.setItemCategory(itemCategory1);
+        item4_1_4.setSpending(spending4_4_1);
+        item4_1_4.setTitle("Dummy item 1");
+        item4_1_4.setPrice(new BigDecimal("30.50"));
+
+        item4_1_5 = new Item();
+        item4_1_5.setItemCategory(itemCategory1);
+        item4_1_5.setSpending(spending4_4_1);
+        item4_1_5.setTitle("Dummy item 1");
+        item4_1_5.setPrice(new BigDecimal("30.50"));
+
+        item4_2_1 = new Item();
+        item4_2_1.setItemCategory(itemCategory1);
+        item4_2_1.setSpending(spending4_4_1);
+        item4_2_1.setTitle("Dummy item 1");
+        item4_2_1.setPrice(new BigDecimal("30.50"));
+
+        item4_2_3 = new Item();
+        item4_2_3.setItemCategory(itemCategory1);
+        item4_2_3.setSpending(spending4_4_2);
+        item4_2_3.setTitle("Dummy item 1");
+        item4_2_3.setPrice(new BigDecimal("30.50"));
+
+        item4_3_1 = new Item();
+        item4_3_1.setItemCategory(itemCategory1);
+        item4_3_1.setSpending(spending4_4_2);
+        item4_3_1.setTitle("Dummy item 1");
+        item4_3_1.setPrice(new BigDecimal("30.50"));
+
+        item4_3_4 = new Item();
+        item4_3_4.setItemCategory(itemCategory1);
+        item4_3_4.setSpending(spending4_4_3);
+        item4_3_4.setTitle("Dummy item 1");
+        item4_3_4.setPrice(new BigDecimal("30.50"));
+
+        itemRepository.save(item1_1_3);
+        itemRepository.save(item1_1_2);
+        itemRepository.save(item4_1_4);
+        itemRepository.save(item4_1_5);
+        itemRepository.save(item4_2_1);
+        itemRepository.save(item4_2_3);
+        itemRepository.save(item4_3_1);
+        itemRepository.save(item4_3_4);
     }
 
     private void setUpItemCategories() {
@@ -315,19 +373,19 @@ public class DatabaseLoader implements CommandLineRunner {
 
     private void setUpSpendingComments() {
         spendingComment1 = new SpendingComment();
-        spendingComment1.setSpending(spending1);
+        spendingComment1.setSpending(spending1_1);
         spendingComment1.setMessage("Dummy comment 1");
         spendingComment1.setAddedByAppUser(appUser1);
         spendingComment1.setTimeAdded(ZonedDateTime.of(LocalDateTime.of(2020, 8, 27, 12, 34, 56), ZoneId.of("+02:00")));
 
         spendingComment2 = new SpendingComment();
-        spendingComment2.setSpending(spending1);
+        spendingComment2.setSpending(spending1_1);
         spendingComment2.setMessage("Dummy comment 2");
         spendingComment2.setAddedByAppUser(appUser1);
         spendingComment2.setTimeAdded(ZonedDateTime.of(LocalDateTime.of(2021, 9, 24, 11, 30, 34), ZoneId.of("-02:00")));
 
         spendingComment3 = new SpendingComment();
-        spendingComment3.setSpending(spending2);
+        spendingComment3.setSpending(spending4_4_1);
         spendingComment3.setMessage("Dummy comment 3");
         spendingComment3.setAddedByAppUser(appUser2);
         spendingComment3.setTimeAdded(ZonedDateTime.of(LocalDateTime.of(2020, 9, 24, 11, 30, 34), ZoneId.of("-02:00")));
@@ -338,20 +396,34 @@ public class DatabaseLoader implements CommandLineRunner {
     }
 
     private void setUpSpendings() {
-        spending1 = new Spending();
-        spending1.setAddedByGroupMembership(groupMembership1_1);
-        spending1.setCurrency(Currency.EUR);
-        spending1.setTotalAmount(new BigDecimal("123.50"));
-        spending1.setTitle("Dummy spending1");
+        spending1_1 = new Spending();
+        spending1_1.setAddedByGroupMembership(groupMembership1_1);
+        spending1_1.setCurrency(Currency.EUR);
+        spending1_1.setTotalAmount(new BigDecimal("123.50"));
+        spending1_1.setTitle("Dummy spending1");
 
-        spending2 = new Spending();
-        spending2.setAddedByGroupMembership(groupMembership2_2);
-        spending2.setCurrency(Currency.PLN);
-        spending2.setTotalAmount(new BigDecimal("234.56"));
-        spending2.setTitle("Dummy spending2");
+        spending4_4_1 = new Spending();
+        spending4_4_1.setAddedByGroupMembership(groupMembership4_2);
+        spending4_4_1.setCurrency(Currency.PLN);
+        spending4_4_1.setTotalAmount(new BigDecimal("234.56"));
+        spending4_4_1.setTitle("Dummy spending2");
 
-        spendingRepository.save(spending1);
-        spendingRepository.save(spending2);
+        spending4_4_2 = new Spending();
+        spending4_4_2.setAddedByGroupMembership(groupMembership4_4);
+        spending4_4_2.setCurrency(Currency.PLN);
+        spending4_4_2.setTotalAmount(new BigDecimal("234.56"));
+        spending4_4_2.setTitle("Dummy spending2");
+
+        spending4_4_3 = new Spending();
+        spending4_4_3.setAddedByGroupMembership(groupMembership4_3);
+        spending4_4_3.setCurrency(Currency.PLN);
+        spending4_4_3.setTotalAmount(new BigDecimal("234.56"));
+        spending4_4_3.setTitle("Dummy spending2");
+
+        spendingRepository.save(spending1_1);
+        spendingRepository.save(spending4_4_1);
+        spendingRepository.save(spending4_4_2);
+        spendingRepository.save(spending4_4_3);
     }
 
     private void setUpGroupInvites() {
