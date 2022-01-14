@@ -6,22 +6,19 @@ import com.splitspendings.groupexpensesbackend.mapper.GroupMembershipSettingsMap
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import com.splitspendings.groupexpensesbackend.model.GroupMembershipSettings;
-import com.splitspendings.groupexpensesbackend.model.enums.GroupTheme;
-import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipSettingsRepository;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
 
 @Service
 @Transactional
@@ -36,34 +33,6 @@ public class GroupMembershipSettingsServiceImpl implements GroupMembershipSettin
     private final GroupMembershipSettingsMapper groupMembershipSettingsMapper;
 
     private final GroupMembershipService groupMembershipService;
-
-    /**
-     * Creates {@link GroupMembershipSettings} with default values
-     *
-     * @return created {@link GroupMembershipSettings}
-     */
-    @Override
-    public GroupMembershipSettings createDefaultGroupMembershipSettings() {
-        GroupMembershipSettings groupMembershipSettings = new GroupMembershipSettings();
-        groupMembershipSettings.setGroupTheme(GroupTheme.DEFAULT);
-        groupMembershipSettings.setNotificationOption(NotificationOption.ALL);
-        return groupMembershipSettings;
-    }
-
-    /**
-     * Creates and saves default {@link GroupMembershipSettings}
-     *
-     * @param groupMembership
-     *         {@link GroupMembership} to be used for saving default {@link GroupMembershipSettings}
-     *
-     * @return newly created {@link GroupMembershipSettings}
-     */
-    @Override
-    public GroupMembershipSettings createAndSaveDefaultGroupMembershipSettingsForGroupMembership(GroupMembership groupMembership) {
-        GroupMembershipSettings defaultGroupMembershipSettings = createDefaultGroupMembershipSettings();
-        defaultGroupMembershipSettings.setGroupMembership(groupMembership);
-        return groupMembershipSettingsRepository.save(defaultGroupMembershipSettings);
-    }
 
     /**
      * @param id
