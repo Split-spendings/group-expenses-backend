@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class ShareDto {
 
+    private Long id;
     private BigDecimal amount;
     private AppUserDto paidFor;
 }
