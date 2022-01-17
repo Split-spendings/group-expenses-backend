@@ -17,6 +17,8 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -212,6 +214,12 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
             break;
         }
         return new GroupInviteCodeDto(inviteCode);
+    }
+
+    @Override
+    public GroupInviteCodeDto getOrCreateGroupInviteCode(Long groupId) {
+        return groupMembershipRepository.findInviteCodeByAppUserIdAndGroupId(identityService.currentUserID(), groupId)
+                .map(GroupInviteCodeDto::new).orElseGet(() -> createGroupInviteCode(groupId));
     }
 
     @Override
