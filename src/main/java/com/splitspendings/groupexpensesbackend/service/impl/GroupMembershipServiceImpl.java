@@ -220,10 +220,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     public GroupInviteCodeDto getOrCreateGroupInviteCode(Long groupId) {
         var s = groupMembershipRepository.findInviteCodeByAppUserIdAndGroupId(identityService.currentUserID(), groupId)
                 .map(GroupInviteCodeDto::new);
-        if (s.isPresent()){
-            return s.get();
-        }
-        return createGroupInviteCode(groupId);
+        return s.orElseGet(() -> createGroupInviteCode(groupId));
     }
 
     @Override
