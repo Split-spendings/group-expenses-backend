@@ -215,6 +215,12 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     }
 
     @Override
+    public GroupInviteCodeDto getOrCreateGroupInviteCode(Long groupId) {
+        return groupMembershipRepository.findInviteCodeByAppUserIdAndGroupId(identityService.currentUserID(), groupId)
+                .map(GroupInviteCodeDto::new).orElse(createGroupInviteCode(groupId));
+    }
+
+    @Override
     @Transactional
     public GroupMembership createOrUpdateGroupMembershipForCurrentUser(Group group){
         AppUser currentUser = appUserService.appUserModelById(identityService.currentUserID());

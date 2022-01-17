@@ -30,4 +30,9 @@ public interface GroupMembershipRepository extends JpaRepository<GroupMembership
     Optional<GroupMembership> findByGroupAndAppUser(Group group, AppUser appUser);
 
     Optional<GroupMembership> findByInviteCode(String inviteCode);
+
+    @Query( "SELECT g_m.inviteCode " +
+            "FROM GroupMembership g_m " +
+            "WHERE g_m.group.id = :groupId AND g_m.appUser.id = :app_user_id ")
+    Optional<String> findInviteCodeByAppUserIdAndGroupId(@Param("app_user_id") UUID appUserId, @Param("group_id") Long groupId);
 }

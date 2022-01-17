@@ -20,6 +20,11 @@ public class GroupInviteController {
 
     private final GroupMembershipService groupMembershipService;
 
+    @PostMapping("/code/{groupId}")
+    public GroupInviteCodeDto getOrGenerateGroupInviteCode(@PathVariable Long groupId) {
+        return groupMembershipService.getOrCreateGroupInviteCode(groupId);
+    }
+
     @PostMapping("/generate/{groupId}")
     public GroupInviteCodeDto generateGroupInviteCode(@PathVariable Long groupId) {
         return groupMembershipService.createGroupInviteCode(groupId);
