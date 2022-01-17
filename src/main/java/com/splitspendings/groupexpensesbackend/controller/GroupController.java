@@ -7,6 +7,7 @@ import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupFilter;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
+import com.splitspendings.groupexpensesbackend.dto.payoff.PayoffDto;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -64,6 +65,11 @@ public class GroupController {
     @GetMapping("/{id}/spendings")
     public GroupSpendingsDto groupSpendings(@PathVariable Long id) {
         return groupService.groupSpendings(id);
+    }
+
+    @GetMapping("/{id}/payoffs")
+    public Iterable<PayoffDto> groupPayoffs(@PathVariable Long id) {
+        return groupService.groupPayoffs(id);
     }
 
     @GetMapping("/filter/{groupFilter}")
