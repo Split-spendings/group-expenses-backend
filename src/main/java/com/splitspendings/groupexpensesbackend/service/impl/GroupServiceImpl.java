@@ -7,10 +7,11 @@ import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupFilter;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
+import com.splitspendings.groupexpensesbackend.dto.payoff.PayoffDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingShortDto;
-import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMembershipMapper;
+import com.splitspendings.groupexpensesbackend.mapper.PayoffMapper;
 import com.splitspendings.groupexpensesbackend.mapper.SpendingMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
@@ -18,6 +19,7 @@ import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import com.splitspendings.groupexpensesbackend.model.Spending;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
+import com.splitspendings.groupexpensesbackend.repository.PayoffRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
@@ -50,11 +52,12 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final GroupMembershipRepository groupMembershipRepository;
     private final SpendingRepository spendingRepository;
+    private final PayoffRepository payoffRepository;
 
     private final GroupMapper groupMapper;
-    private final AppUserMapper appUserMapper;
     private final GroupMembershipMapper groupMembershipMapper;
     private final SpendingMapper spendingMapper;
+    private final PayoffMapper payoffMapper;
 
     private final IdentityService identityService;
     private final AppUserService appUserService;
@@ -270,5 +273,12 @@ public class GroupServiceImpl implements GroupService {
         GroupSpendingsDto groupSpendingsDto = groupMapper.groupToGroupSpendingsDto(group);
         groupSpendingsDto.setSpendings(spendingShortDtoList);
         return groupSpendingsDto;
+    }
+
+    @Override
+    public Iterable<PayoffDto> groupPayoffs(Long id) {
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
+
+        return payoffMapper.payoffSetToPayoffDtoSet(payoffRepository.findAllByGroupId(id));
     }
 }

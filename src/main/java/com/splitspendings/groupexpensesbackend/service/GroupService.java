@@ -7,6 +7,7 @@ import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupFilter;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
+import com.splitspendings.groupexpensesbackend.dto.payoff.PayoffDto;
 import com.splitspendings.groupexpensesbackend.model.Group;
 
 import java.util.List;
@@ -31,4 +32,6 @@ public interface GroupService {
     void leaveGroup(Long id);
 
     GroupSpendingsDto groupSpendings(Long id);
+
+    Iterable<PayoffDto> groupPayoffs(Long id);
 }
