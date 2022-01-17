@@ -138,6 +138,7 @@ public class SpendingServiceImpl implements SpendingService {
 
         Spending spending = spendingMapper.newSpendingDtoToSpending(newSpendingDto);
         spending.setAddedByGroupMembership(addedByGroupMembership);
+        spending.setPaidByGroupMembership(paidByGroupMembership);
 
         if (spending.getCurrency() == null) {
             spending.setCurrency(group.getDefaultCurrency());

@@ -398,24 +398,28 @@ public class DatabaseLoader implements CommandLineRunner {
     private void setUpSpendings() {
         spending1_1 = new Spending();
         spending1_1.setAddedByGroupMembership(groupMembership1_1);
+        spending1_1.setPaidByGroupMembership(groupMembership1_1);
         spending1_1.setCurrency(Currency.EUR);
         spending1_1.setTotalAmount(new BigDecimal("123.50"));
         spending1_1.setTitle("Dummy spending1");
 
         spending4_4_1 = new Spending();
         spending4_4_1.setAddedByGroupMembership(groupMembership4_2);
+        spending4_4_1.setPaidByGroupMembership(groupMembership4_2);
         spending4_4_1.setCurrency(Currency.PLN);
         spending4_4_1.setTotalAmount(new BigDecimal("234.56"));
         spending4_4_1.setTitle("Dummy spending2");
 
         spending4_4_2 = new Spending();
         spending4_4_2.setAddedByGroupMembership(groupMembership4_4);
+        spending4_4_2.setPaidByGroupMembership(groupMembership4_4);
         spending4_4_2.setCurrency(Currency.PLN);
         spending4_4_2.setTotalAmount(new BigDecimal("234.56"));
         spending4_4_2.setTitle("Dummy spending2");
 
         spending4_4_3 = new Spending();
         spending4_4_3.setAddedByGroupMembership(groupMembership4_3);
+        spending4_4_3.setPaidByGroupMembership(groupMembership4_3);
         spending4_4_3.setCurrency(Currency.PLN);
         spending4_4_3.setTotalAmount(new BigDecimal("234.56"));
         spending4_4_3.setTitle("Dummy spending2");

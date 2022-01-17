@@ -8,13 +8,11 @@ import com.splitspendings.groupexpensesbackend.dto.spending.SpendingShortDto;
 import com.splitspendings.groupexpensesbackend.model.Item;
 import com.splitspendings.groupexpensesbackend.model.Share;
 import com.splitspendings.groupexpensesbackend.model.Spending;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {GroupMembershipMapper.class, SpendingCommentMapper.class, ShareMapper.class})
 public interface SpendingMapper {
@@ -23,7 +21,7 @@ public interface SpendingMapper {
 
     List<SpendingShortDto> spendingListToSpendingShortDtoList(List<Spending> spendingList);
 
-    @Mapping(target = "shareDtoSet", source = "items")
+    @Mapping(target = "shares", source = "items")
     SpendingDto spendingToSpendingDto(Spending spending);
 
     Spending newSpendingDtoToSpending(NewSpendingDto newSpendingDto);

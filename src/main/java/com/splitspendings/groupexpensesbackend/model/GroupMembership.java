@@ -1,8 +1,7 @@
 package com.splitspendings.groupexpensesbackend.model;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import java.time.ZonedDateTime;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,8 +15,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import java.time.ZonedDateTime;
-import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "group_membership",
@@ -65,7 +64,10 @@ public class GroupMembership {
     private Set<GroupInvite> invitesSent;
 
     @OneToMany(mappedBy = "addedByGroupMembership")
-    private Set<Spending> spendings;
+    private Set<Spending> spendingsAdded;
+
+    @OneToMany(mappedBy = "paidByGroupMembership")
+    private Set<Spending> spendingsPaidFor;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "groupMembership", optional = false)
     private GroupMembershipSettings groupMembershipSettings;
