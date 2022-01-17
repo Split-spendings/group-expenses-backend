@@ -17,6 +17,8 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -221,7 +223,7 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
         var s1 = s.map(GroupInviteCodeDto::new);
         log.warn(Boolean.toString(s1.isPresent()));
         log.warn(s1.get() + "");
-        var s2 = s1.orElse(createGroupInviteCode(groupId));
+        var s2 = s1.orElseGet(() -> createGroupInviteCode(groupId));
         log.warn(s2 + "");
         return s2;
     }
