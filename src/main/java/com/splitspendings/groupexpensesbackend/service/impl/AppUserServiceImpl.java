@@ -22,18 +22,17 @@ import com.splitspendings.groupexpensesbackend.repository.AppUserSettingsReposit
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import com.splitspendings.groupexpensesbackend.service.IdentityService;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import javax.validation.Validator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -95,6 +94,12 @@ public class AppUserServiceImpl implements AppUserService {
     public AppUserFullInfoDto profile() {
         AppUser synchronisedAppUser = synchroniseWithIdentity();
         return appUserMapper.appUserToAppUserFullInfoDto(synchronisedAppUser);
+    }
+
+    @Override
+    public AppUserDto profileShort() {
+        AppUser synchronisedAppUser = synchroniseWithIdentity();
+        return appUserMapper.appUserToAppUserDto(synchronisedAppUser);
     }
 
     @Override
