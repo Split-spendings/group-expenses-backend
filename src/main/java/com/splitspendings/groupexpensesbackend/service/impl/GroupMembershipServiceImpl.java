@@ -218,14 +218,12 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
 
     @Override
     public GroupInviteCodeDto getOrCreateGroupInviteCode(Long groupId) {
-        var s = groupMembershipRepository.findInviteCodeByAppUserIdAndGroupId(identityService.currentUserID(), groupId);
-        log.warn(Boolean.toString(s.isPresent()));
-        var s1 = s.map(GroupInviteCodeDto::new);
-        log.warn(Boolean.toString(s1.isPresent()));
-        log.warn(s1.get() + "");
-        var s2 = s1.orElseGet(() -> createGroupInviteCode(groupId));
-        log.warn(s2 + "");
-        return s2;
+        var s = groupMembershipRepository.findInviteCodeByAppUserIdAndGroupId(identityService.currentUserID(), groupId)
+                .map(GroupInviteCodeDto::new);
+        if (s.isPresent()){
+            return s.get();
+        }
+        return createGroupInviteCode(groupId);
     }
 
     @Override
