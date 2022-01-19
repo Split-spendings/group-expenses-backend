@@ -16,9 +16,6 @@ public class UpdateGroupDto {
     private String name;
 
     @NotNull
-    private Boolean simplifyDebts;
-
-    @NotNull
     private Currency defaultCurrency;
 
     public void setName(String name) {

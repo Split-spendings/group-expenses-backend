@@ -21,7 +21,6 @@ import com.splitspendings.groupexpensesbackend.repository.GroupMembershipReposit
 import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
 import com.splitspendings.groupexpensesbackend.repository.PayoffRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
-import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import com.splitspendings.groupexpensesbackend.service.DefaultGroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
@@ -61,7 +60,6 @@ public class GroupServiceImpl implements GroupService {
 
     private final IdentityService identityService;
     private final AppUserService appUserService;
-    private final AppUserBalanceService appUserBalanceService;
     private final GroupMembershipService groupMembershipService;
     private final DefaultGroupMembershipSettingsService defaultGroupMembershipSettingsService;
 
@@ -115,6 +113,7 @@ public class GroupServiceImpl implements GroupService {
         AppUser currentAppUser = appUserService.appUserModelById(currentAppUserId);
 
         Group newGroup = groupMapper.newGroupDtoToGroup(newGroupDto);
+        newGroup.setSimplifyDebts(true);
         newGroup.setOwner(currentAppUser);
 
         Group createdGroup = groupRepository.save(newGroup);
@@ -154,15 +153,10 @@ public class GroupServiceImpl implements GroupService {
         ValidatorUtil.validate(validator, updateGroupDto);
 
         Group group = groupModelById(id);
-        boolean recalculateUserBalances = !group.getSimplifyDebts().equals(updateGroupDto.getSimplifyDebts());
 
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
         groupMapper.copyUpdateGroupInfoDtoToGroup(updateGroupDto, group);
         groupRepository.save(group);
-
-        if (recalculateUserBalances){
-            appUserBalanceService.recalculateAppUserBalanceByGroup(group);
-        }
 
         return groupMapper.groupToGroupInfoDto(group);
     }
