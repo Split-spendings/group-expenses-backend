@@ -656,24 +656,28 @@ public class DatabaseLoader implements CommandLineRunner {
         group1 = groupFactory.generate();
         group1.setOwner(appUser1);
         group1.setPersonal(false);
+        group1.setSimplifyDebts(true);
         group1.setInviteOption(InviteOption.ALL_ACTIVE_MEMBERS);
         group1.setDefaultCurrency(Currency.EUR);
 
         group2 = groupFactory.generate();
         group2.setOwner(appUser2);
         group2.setPersonal(true);
+        group2.setSimplifyDebts(true);
         group2.setInviteOption(InviteOption.OWNER_ONLY);
         group2.setDefaultCurrency(Currency.PLN);
 
         group3 = groupFactory.generate();
         group3.setOwner(appUser3);
         group3.setPersonal(false);
+        group3.setSimplifyDebts(true);
         group3.setInviteOption(InviteOption.OWNER_ONLY);
         group3.setDefaultCurrency(Currency.USD);
 
         group4 = groupFactory.generate();
         group4.setOwner(appUser1);
         group4.setPersonal(false);
+        group4.setSimplifyDebts(true);
         group4.setInviteOption(InviteOption.OWNER_ONLY);
         group4.setDefaultCurrency(Currency.UAH);
 
