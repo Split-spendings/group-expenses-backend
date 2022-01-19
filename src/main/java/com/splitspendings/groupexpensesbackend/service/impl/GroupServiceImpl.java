@@ -1,6 +1,6 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
-import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
@@ -193,7 +193,7 @@ public class GroupServiceImpl implements GroupService {
      *         with status code {@link HttpStatus#FORBIDDEN} if current user has no rights to access {@link Group}
      */
     @Override
-    public GroupActiveMembersDto groupActiveMembersById(Long id) {
+    public GroupMembersDto groupActiveMembersById(Long id) {
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
 
         Group group = groupModelById(id);
@@ -201,6 +201,15 @@ public class GroupServiceImpl implements GroupService {
         List<GroupMembership> groupMembers = groupMembershipRepository.getActiveMembersOfGroupWithId(id);
 
         return groupMapper.groupToGroupActiveMembersDto(group, groupMembers);
+    }
+
+    @Override
+    public GroupMembersDto findAllGroupMembers(Long id) {
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
+
+        Group group = groupModelById(id);
+
+        return groupMapper.groupToGroupActiveMembersDto(group, group.getGroupMemberships());
     }
 
     /**

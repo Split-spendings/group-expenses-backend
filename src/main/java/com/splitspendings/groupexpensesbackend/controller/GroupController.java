@@ -1,6 +1,6 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
-import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
@@ -47,9 +47,14 @@ public class GroupController {
         return groupService.updateGroup(id, updateGroupDto);
     }
 
-    @GetMapping("/{id}/members")
-    public GroupActiveMembersDto groupActiveMembers(@PathVariable Long id) {
+    @GetMapping("/{id}/activeMembers")
+    public GroupMembersDto groupActiveMembers(@PathVariable Long id) {
         return groupService.groupActiveMembersById(id);
+    }
+
+    @GetMapping
+    public GroupMembersDto allGroupMembers(@PathVariable Long id) {
+        return groupService.findAllGroupMembers(id);
     }
 
     @GetMapping("/{id}/members/{appUserId}")

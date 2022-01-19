@@ -1,6 +1,6 @@
 package com.splitspendings.groupexpensesbackend.mapper;
 
-import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
@@ -8,10 +8,10 @@ import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {GroupMembershipMapper.class})
@@ -40,7 +40,7 @@ public interface GroupMapper {
 
     void copyUpdateGroupInfoDtoToGroup(UpdateGroupDto updateGroupDto, @MappingTarget Group group);
 
-    GroupActiveMembersDto groupToGroupActiveMembersDto(Group group, List<GroupMembership> members);
+    GroupMembersDto groupToGroupActiveMembersDto(Group group, Collection<GroupMembership> members);
 
     GroupSpendingsDto groupToGroupSpendingsDto(Group group);
 }
