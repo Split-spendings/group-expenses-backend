@@ -5,10 +5,10 @@ import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
-import com.splitspendings.groupexpensesbackend.dto.group.membership.settings.GroupMemberDto;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.ArrayList;
