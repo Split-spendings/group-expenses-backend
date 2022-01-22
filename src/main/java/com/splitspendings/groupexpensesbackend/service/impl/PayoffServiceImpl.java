@@ -7,6 +7,7 @@ import com.splitspendings.groupexpensesbackend.mapper.PayoffMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
 import com.splitspendings.groupexpensesbackend.model.Payoff;
+import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import com.splitspendings.groupexpensesbackend.repository.PayoffRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
@@ -143,6 +144,19 @@ public class PayoffServiceImpl implements PayoffService {
         appUserBalanceService.recalculateAppUserBalanceByGroup(group);
 
         return payoffMapper.payoffToPayoffDto(payoff);
+    }
+
+    @Override
+    public void deletePayoff(Long id) {
+        Payoff payoff = payoffModelById(id);
+
+        Group group = payoff.getGroup();
+        Currency currency = payoff.getCurrency();
+
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(group.getId());
+        payoffRepository.delete(payoff);
+
+        appUserBalanceService.recalculateAppUserBalanceByGroupAndCurrency(group, currency);
     }
 
     /**
