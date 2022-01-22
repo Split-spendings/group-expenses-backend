@@ -6,6 +6,7 @@ import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupFilter;
+import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupMembersFilter;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.dto.payoff.PayoffDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingShortDto;
@@ -30,6 +31,7 @@ import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
@@ -193,23 +195,26 @@ public class GroupServiceImpl implements GroupService {
      *         with status code {@link HttpStatus#FORBIDDEN} if current user has no rights to access {@link Group}
      */
     @Override
-    public GroupMembersDto groupActiveMembersById(Long id) {
+    public GroupMembersDto getFilteredGroupMembers(Long id, GroupMembersFilter groupMembersFilter) {
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
 
         Group group = groupModelById(id);
+        Set<GroupMembership> groupMembers;
 
-        List<GroupMembership> groupMembers = groupMembershipRepository.getActiveMembersOfGroupWithId(id);
+        switch (groupMembersFilter)
+        {
+            case ALL:
+                groupMembers = group.getGroupMemberships();
+                break;
+            case NOT_ACTIVE:
+                groupMembers = groupMembershipRepository.getMembersOfGroupWithId(id, false);
+                break;
+            case ACTIVE:
+            default:
+                groupMembers = groupMembershipRepository.getMembersOfGroupWithId(id, true);
+        }
 
         return groupMapper.groupToGroupActiveMembersDto(group, groupMembers);
-    }
-
-    @Override
-    public GroupMembersDto findAllGroupMembers(Long id) {
-        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
-
-        Group group = groupModelById(id);
-
-        return groupMapper.groupToGroupActiveMembersDto(group, group.getGroupMemberships());
     }
 
     /**

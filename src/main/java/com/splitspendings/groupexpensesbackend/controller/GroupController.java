@@ -1,11 +1,12 @@
 package com.splitspendings.groupexpensesbackend.controller;
 
-import com.splitspendings.groupexpensesbackend.dto.group.GroupMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupFilter;
+import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupMembersFilter;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.dto.payoff.PayoffDto;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
@@ -47,14 +48,9 @@ public class GroupController {
         return groupService.updateGroup(id, updateGroupDto);
     }
 
-    @GetMapping("/{id}/activeMembers")
-    public GroupMembersDto groupActiveMembers(@PathVariable Long id) {
-        return groupService.groupActiveMembersById(id);
-    }
-
-    @GetMapping
-    public GroupMembersDto allGroupMembers(@PathVariable Long id) {
-        return groupService.findAllGroupMembers(id);
+    @GetMapping("/{id}/members{groupMembersFilter}")
+    public GroupMembersDto getFilteredMembers(@PathVariable Long id, @PathVariable GroupMembersFilter groupMembersFilter) {
+        return groupService.getFilteredGroupMembers(id, groupMembersFilter);
     }
 
     @GetMapping("/{id}/members/{appUserId}")
