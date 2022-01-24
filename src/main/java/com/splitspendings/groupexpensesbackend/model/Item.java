@@ -2,6 +2,8 @@ package com.splitspendings.groupexpensesbackend.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -42,6 +44,7 @@ public class Item {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "spending_id", foreignKey = @ForeignKey(name = "fk_item_spending"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Spending spending;
 
     @ManyToOne(fetch = FetchType.LAZY)
