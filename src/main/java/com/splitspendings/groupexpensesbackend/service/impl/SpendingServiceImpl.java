@@ -41,6 +41,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 @Slf4j
 public class SpendingServiceImpl implements SpendingService {
 
@@ -68,7 +69,6 @@ public class SpendingServiceImpl implements SpendingService {
      *         with status {@link HttpStatus#NOT_FOUND} when there is no {@link Spending} with given id
      */
     @Override
-    @Transactional
     public Spending spendingModelById(Long id) {
         return spendingRepository.findById(id)
                 .orElseThrow(() -> LogUtil.logMessageAndReturnResponseStatusException(log, HttpStatus.NOT_FOUND,
@@ -88,7 +88,6 @@ public class SpendingServiceImpl implements SpendingService {
      *         Spending} with given id
      */
     @Override
-    @Transactional
     public SpendingDto spendingById(Long id) {
         Spending spending = spendingModelById(id);
         verifyCurrentUserActiveMembershipBySpending(spending);
@@ -123,7 +122,6 @@ public class SpendingServiceImpl implements SpendingService {
      *         {@link Group} with given id
      */
     @Override
-    @Transactional
     public SpendingShortDto createSpending(NewSpendingDto newSpendingDto) {
         ValidatorUtil.validate(validator, newSpendingDto);
 
@@ -205,7 +203,6 @@ public class SpendingServiceImpl implements SpendingService {
      *         {@link Group}
      */
     @Override
-    @Transactional
     public SpendingCommentsDto getSpendingComments(Long spendingId) {
         Spending spending = spendingModelById(spendingId);
         verifyCurrentUserActiveMembershipBySpending(spending);
