@@ -154,7 +154,9 @@ public class PayoffServiceImpl implements PayoffService {
         Currency currency = payoff.getCurrency();
 
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(group.getId());
+
         payoffRepository.delete(payoff);
+        payoffRepository.flush();
 
         appUserBalanceService.recalculateAppUserBalanceByGroupAndCurrency(group, currency);
     }
