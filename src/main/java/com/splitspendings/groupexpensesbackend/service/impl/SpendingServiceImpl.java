@@ -221,6 +221,7 @@ public class SpendingServiceImpl implements SpendingService {
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(group.getId());
 
         spendingRepository.delete(spending);
+        spendingRepository.flush();
 
         appUserBalanceService.recalculateAppUserBalanceByGroupAndCurrency(group, currency);
     }
