@@ -17,6 +17,11 @@ import com.splitspendings.groupexpensesbackend.mapper.GroupInviteMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.AppUserSettings;
 import com.splitspendings.groupexpensesbackend.model.GroupInvite;
+import com.splitspendings.groupexpensesbackend.model.enums.Currency;
+import com.splitspendings.groupexpensesbackend.model.enums.GroupInviteOption;
+import com.splitspendings.groupexpensesbackend.model.enums.Language;
+import com.splitspendings.groupexpensesbackend.model.enums.NotificationOption;
+import com.splitspendings.groupexpensesbackend.model.enums.Theme;
 import com.splitspendings.groupexpensesbackend.repository.AppUserRepository;
 import com.splitspendings.groupexpensesbackend.repository.AppUserSettingsRepository;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
@@ -192,12 +197,38 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public AppUserDto synchroniseAppUser() {
-        AppUserIdentityDto currentUserIdentity = identityService.currentUser();
-        AppUser userEntity = appUserRepository.getById(currentUserIdentity.getId());
-        if(userEntity == null) {
-            //TODO create new app user with default settings and data from AppUserIdentityDto (loginName = email)
-            userEntity = new AppUser();
+        AppUserIdentityDto appUserIdentityDto = identityService.currentUser();
+        Optional<AppUser> existingAppUser = appUserRepository.findById(appUserIdentityDto.getId());
+        AppUser synchronizedAppUser;
+        if(existingAppUser.isPresent()) {
+            synchronizedAppUser = appUserMapper.copyFromAppUserIdentityDtoToAppUser(appUserIdentityDto, existingAppUser.get());
+            synchronizedAppUser.setLoginName(synchronizedAppUser.getEmail());
+            synchronizedAppUser = appUserRepository.save(synchronizedAppUser);
+        } else {
+            synchronizedAppUser = createNewUserFromIdentity(appUserIdentityDto);
         }
-        return appUserMapper.appUserToAppUserDto(userEntity);
+        return appUserMapper.appUserToAppUserDto(synchronizedAppUser);
+    }
+
+    private AppUser createNewUserFromIdentity(AppUserIdentityDto appUserIdentityDto) {
+        AppUser newAppUser = new AppUser();
+        appUserMapper.copyFromAppUserIdentityDtoToAppUser(appUserIdentityDto, newAppUser);
+        newAppUser.setLoginName(newAppUser.getEmail());
+
+        AppUserSettings appUserSettings = createDefaultAppUserSettings();
+        appUserSettings.setAppUser(newAppUser);
+        appUserSettingsRepository.save(appUserSettings);
+
+        return newAppUser;
+    }
+
+    private AppUserSettings createDefaultAppUserSettings() {
+        AppUserSettings appUserSettings = new AppUserSettings();
+        appUserSettings.setDefaultCurrency(Currency.USD);
+        appUserSettings.setLanguage(Language.EN);
+        appUserSettings.setTheme(Theme.DARK);
+        appUserSettings.setGroupInviteOption(GroupInviteOption.ANYONE);
+        appUserSettings.setNotificationOption(NotificationOption.ALL);
+        return appUserSettings;
     }
 }
