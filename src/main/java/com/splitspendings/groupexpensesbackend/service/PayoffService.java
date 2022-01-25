@@ -14,4 +14,6 @@ public interface PayoffService {
     PayoffDto createPayoff(NewPayoffDto newPayoffDto);
 
     PayoffDto updatePayoff(Long id, UpdatePayoffDto updatePayoffDto);
+
+    void deletePayoff(Long id);
 }
