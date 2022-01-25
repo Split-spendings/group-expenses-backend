@@ -214,7 +214,7 @@ public class GroupServiceImpl implements GroupService {
                 groupMembers = groupMembershipRepository.getMembersOfGroupWithId(id, true);
         }
 
-        return groupMapper.groupToGroupActiveMembersDto(group, groupMembers);
+        return groupMapper.groupToGroupMembersDto(group, groupMembers);
     }
 
     /**
