@@ -209,6 +209,20 @@ public class SpendingServiceImpl implements SpendingService {
         return spendingMapper.spendingToSpendingCommentsDto(spending);
     }
 
+    @Override
+    public void deleteSpendingById(Long id) {
+        Spending spending = spendingModelById(id);
+        Group group = spending.getAddedByGroupMembership().getGroup();
+        Currency currency = spending.getCurrency();
+
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(group.getId());
+
+        spendingRepository.delete(spending);
+        spendingRepository.flush();
+
+        appUserBalanceService.recalculateAppUserBalanceByGroupAndCurrency(group, currency);
+    }
+
     /**
      * Delegates job of checking whether current {@link AppUser} is an active member of a {@link Group}
      */

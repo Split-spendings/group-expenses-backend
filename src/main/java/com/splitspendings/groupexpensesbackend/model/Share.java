@@ -3,6 +3,8 @@ package com.splitspendings.groupexpensesbackend.model;
 import com.splitspendings.groupexpensesbackend.model.enums.Currency;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -49,5 +51,6 @@ public class Share {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "item_id", foreignKey = @ForeignKey(name = "fk_share_item"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Item item;
 }

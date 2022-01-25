@@ -15,4 +15,6 @@ public interface SpendingService {
     SpendingShortDto createSpending(NewSpendingDto newSpendingDto);
 
     SpendingCommentsDto getSpendingComments(Long spendingId);
+
+    void deleteSpendingById(Long id);
 }
