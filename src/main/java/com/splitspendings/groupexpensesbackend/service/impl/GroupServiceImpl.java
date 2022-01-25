@@ -1,7 +1,7 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
-import com.splitspendings.groupexpensesbackend.dto.group.GroupMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
@@ -206,10 +206,10 @@ public class GroupServiceImpl implements GroupService {
             case ALL:
                 groupMembers = group.getGroupMemberships();
                 break;
-            case NOT_ACTIVE:
+            case FORMER:
                 groupMembers = groupMembershipRepository.getMembersOfGroupWithId(id, false);
                 break;
-            case ACTIVE:
+            case CURRENT:
             default:
                 groupMembers = groupMembershipRepository.getMembersOfGroupWithId(id, true);
         }
