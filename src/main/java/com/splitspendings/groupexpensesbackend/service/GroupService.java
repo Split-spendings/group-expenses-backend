@@ -1,11 +1,12 @@
 package com.splitspendings.groupexpensesbackend.service;
 
-import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupFilter;
+import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupMembersFilter;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
 import com.splitspendings.groupexpensesbackend.dto.payoff.PayoffDto;
 import com.splitspendings.groupexpensesbackend.model.Group;
@@ -25,7 +26,7 @@ public interface GroupService {
 
     List<GroupDto> getAllGroupsFilterBy(GroupFilter groupFilter);
 
-    GroupActiveMembersDto groupActiveMembersById(Long id);
+    GroupMembersDto getFilteredGroupMembers(Long id, GroupMembersFilter groupMembersFilter);
 
     GroupMembershipDto groupMembership(Long id, UUID appUserId);
 

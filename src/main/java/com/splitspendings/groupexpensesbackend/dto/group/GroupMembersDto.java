@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class GroupActiveMembersDto {
+public class GroupMembersDto {
 
     private Long id;
     private String name;
