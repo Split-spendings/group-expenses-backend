@@ -47,7 +47,7 @@ public class GroupController {
         return groupService.updateGroup(id, updateGroupDto);
     }
 
-    @GetMapping("/{id}/members/{groupMembersFilter}")
+    @GetMapping("/{id}/members/filter/{groupMembersFilter}")
     public GroupMembersDto getFilteredMembers(@PathVariable Long id, @PathVariable GroupMembersFilter groupMembersFilter) {
         return groupService.getFilteredGroupMembers(id, groupMembersFilter);
     }
