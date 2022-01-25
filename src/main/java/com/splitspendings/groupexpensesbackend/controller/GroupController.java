@@ -11,6 +11,8 @@ import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembers
 import com.splitspendings.groupexpensesbackend.dto.payoff.PayoffDto;
 import com.splitspendings.groupexpensesbackend.service.GroupService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/groups")
@@ -48,7 +47,7 @@ public class GroupController {
         return groupService.updateGroup(id, updateGroupDto);
     }
 
-    @GetMapping("/{id}/members{groupMembersFilter}")
+    @GetMapping("/{id}/members/{groupMembersFilter}")
     public GroupMembersDto getFilteredMembers(@PathVariable Long id, @PathVariable GroupMembersFilter groupMembersFilter) {
         return groupService.getFilteredGroupMembers(id, groupMembersFilter);
     }
