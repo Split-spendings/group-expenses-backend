@@ -16,6 +16,8 @@ public interface GroupMembershipService {
 
     GroupInviteCodeDto createGroupInviteCode(Long groupId);
 
+    GroupInviteCodeDto getOrCreateGroupInviteCode(Long groupId);
+
     boolean isAppUserActiveMemberOfGroup(UUID appUserId, Long groupId);
 
     boolean isAdminOfGroup(UUID appUserId, Long groupId);

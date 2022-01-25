@@ -10,6 +10,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.util.Set;
+
 @Mapper(componentModel = "spring", uses = {AppUserMapper.class, GroupMapper.class})
 public interface PayoffMapper {
     PayoffDto payoffToPayoffDto(Payoff payoff);
@@ -28,4 +30,6 @@ public interface PayoffMapper {
     @Mapping(target = "paidForAppUser", source = "paidFor")
     @Mapping(target = "paidToAppUser", source = "paidTo")
     Payoff newPayoffDtoToPayoff(NewPayoffDto newPayoffDto, Group group, AppUser current, AppUser paidFor, AppUser paidTo);
+
+    Set<PayoffDto> payoffSetToPayoffDtoSet(Set<Payoff> payoffSet);
 }

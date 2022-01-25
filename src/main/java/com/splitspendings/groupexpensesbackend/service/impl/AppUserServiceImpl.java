@@ -97,6 +97,12 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    public AppUserDto profileShort() {
+        AppUser synchronisedAppUser = synchroniseWithIdentity();
+        return appUserMapper.appUserToAppUserDto(synchronisedAppUser);
+    }
+
+    @Override
     public AppUserSettingsWithIdDto settings() {
         UUID currentAppUserId = identityService.currentUserID();
         AppUserSettings appUserSettings = appUserSettingsModelById(currentAppUserId);

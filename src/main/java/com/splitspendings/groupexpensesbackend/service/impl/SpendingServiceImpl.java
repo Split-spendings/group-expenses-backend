@@ -138,6 +138,7 @@ public class SpendingServiceImpl implements SpendingService {
 
         Spending spending = spendingMapper.newSpendingDtoToSpending(newSpendingDto);
         spending.setAddedByGroupMembership(addedByGroupMembership);
+        spending.setPaidByGroupMembership(paidByGroupMembership);
 
         if (spending.getCurrency() == null) {
             spending.setCurrency(group.getDefaultCurrency());
@@ -206,6 +207,20 @@ public class SpendingServiceImpl implements SpendingService {
         Spending spending = spendingModelById(spendingId);
         verifyCurrentUserActiveMembershipBySpending(spending);
         return spendingMapper.spendingToSpendingCommentsDto(spending);
+    }
+
+    @Override
+    public void deleteSpendingById(Long id) {
+        Spending spending = spendingModelById(id);
+        Group group = spending.getAddedByGroupMembership().getGroup();
+        Currency currency = spending.getCurrency();
+
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(group.getId());
+
+        spendingRepository.delete(spending);
+        spendingRepository.flush();
+
+        appUserBalanceService.recalculateAppUserBalanceByGroupAndCurrency(group, currency);
     }
 
     /**

@@ -398,24 +398,28 @@ public class DatabaseLoader implements CommandLineRunner {
     private void setUpSpendings() {
         spending1_1 = new Spending();
         spending1_1.setAddedByGroupMembership(groupMembership1_1);
+        spending1_1.setPaidByGroupMembership(groupMembership1_1);
         spending1_1.setCurrency(Currency.EUR);
         spending1_1.setTotalAmount(new BigDecimal("123.50"));
         spending1_1.setTitle("Dummy spending1");
 
         spending4_4_1 = new Spending();
         spending4_4_1.setAddedByGroupMembership(groupMembership4_2);
+        spending4_4_1.setPaidByGroupMembership(groupMembership4_2);
         spending4_4_1.setCurrency(Currency.PLN);
         spending4_4_1.setTotalAmount(new BigDecimal("234.56"));
         spending4_4_1.setTitle("Dummy spending2");
 
         spending4_4_2 = new Spending();
         spending4_4_2.setAddedByGroupMembership(groupMembership4_4);
+        spending4_4_2.setPaidByGroupMembership(groupMembership4_4);
         spending4_4_2.setCurrency(Currency.PLN);
         spending4_4_2.setTotalAmount(new BigDecimal("234.56"));
         spending4_4_2.setTitle("Dummy spending2");
 
         spending4_4_3 = new Spending();
         spending4_4_3.setAddedByGroupMembership(groupMembership4_3);
+        spending4_4_3.setPaidByGroupMembership(groupMembership4_3);
         spending4_4_3.setCurrency(Currency.PLN);
         spending4_4_3.setTotalAmount(new BigDecimal("234.56"));
         spending4_4_3.setTitle("Dummy spending2");
@@ -652,24 +656,28 @@ public class DatabaseLoader implements CommandLineRunner {
         group1 = groupFactory.generate();
         group1.setOwner(appUser1);
         group1.setPersonal(false);
+        group1.setSimplifyDebts(true);
         group1.setInviteOption(InviteOption.ALL_ACTIVE_MEMBERS);
         group1.setDefaultCurrency(Currency.EUR);
 
         group2 = groupFactory.generate();
         group2.setOwner(appUser2);
         group2.setPersonal(true);
+        group2.setSimplifyDebts(true);
         group2.setInviteOption(InviteOption.OWNER_ONLY);
         group2.setDefaultCurrency(Currency.PLN);
 
         group3 = groupFactory.generate();
         group3.setOwner(appUser3);
         group3.setPersonal(false);
+        group3.setSimplifyDebts(true);
         group3.setInviteOption(InviteOption.OWNER_ONLY);
         group3.setDefaultCurrency(Currency.USD);
 
         group4 = groupFactory.generate();
         group4.setOwner(appUser1);
         group4.setPersonal(false);
+        group4.setSimplifyDebts(true);
         group4.setInviteOption(InviteOption.OWNER_ONLY);
         group4.setDefaultCurrency(Currency.UAH);
 

@@ -1,16 +1,18 @@
 package com.splitspendings.groupexpensesbackend.service.impl;
 
-import com.splitspendings.groupexpensesbackend.dto.group.GroupActiveMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupDto;
+import com.splitspendings.groupexpensesbackend.dto.group.GroupMembersDto;
 import com.splitspendings.groupexpensesbackend.dto.group.GroupSpendingsDto;
 import com.splitspendings.groupexpensesbackend.dto.group.NewGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.UpdateGroupDto;
 import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupFilter;
+import com.splitspendings.groupexpensesbackend.dto.group.enums.GroupMembersFilter;
 import com.splitspendings.groupexpensesbackend.dto.group.membership.GroupMembershipDto;
+import com.splitspendings.groupexpensesbackend.dto.payoff.PayoffDto;
 import com.splitspendings.groupexpensesbackend.dto.spending.SpendingShortDto;
-import com.splitspendings.groupexpensesbackend.mapper.AppUserMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMapper;
 import com.splitspendings.groupexpensesbackend.mapper.GroupMembershipMapper;
+import com.splitspendings.groupexpensesbackend.mapper.PayoffMapper;
 import com.splitspendings.groupexpensesbackend.mapper.SpendingMapper;
 import com.splitspendings.groupexpensesbackend.model.AppUser;
 import com.splitspendings.groupexpensesbackend.model.Group;
@@ -18,8 +20,8 @@ import com.splitspendings.groupexpensesbackend.model.GroupMembership;
 import com.splitspendings.groupexpensesbackend.model.Spending;
 import com.splitspendings.groupexpensesbackend.repository.GroupMembershipRepository;
 import com.splitspendings.groupexpensesbackend.repository.GroupRepository;
+import com.splitspendings.groupexpensesbackend.repository.PayoffRepository;
 import com.splitspendings.groupexpensesbackend.repository.SpendingRepository;
-import com.splitspendings.groupexpensesbackend.service.AppUserBalanceService;
 import com.splitspendings.groupexpensesbackend.service.AppUserService;
 import com.splitspendings.groupexpensesbackend.service.DefaultGroupMembershipSettingsService;
 import com.splitspendings.groupexpensesbackend.service.GroupMembershipService;
@@ -29,6 +31,7 @@ import com.splitspendings.groupexpensesbackend.util.LogUtil;
 import com.splitspendings.groupexpensesbackend.util.ValidatorUtil;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
@@ -50,15 +53,15 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final GroupMembershipRepository groupMembershipRepository;
     private final SpendingRepository spendingRepository;
+    private final PayoffRepository payoffRepository;
 
     private final GroupMapper groupMapper;
-    private final AppUserMapper appUserMapper;
     private final GroupMembershipMapper groupMembershipMapper;
     private final SpendingMapper spendingMapper;
+    private final PayoffMapper payoffMapper;
 
     private final IdentityService identityService;
     private final AppUserService appUserService;
-    private final AppUserBalanceService appUserBalanceService;
     private final GroupMembershipService groupMembershipService;
     private final DefaultGroupMembershipSettingsService defaultGroupMembershipSettingsService;
 
@@ -112,6 +115,7 @@ public class GroupServiceImpl implements GroupService {
         AppUser currentAppUser = appUserService.appUserModelById(currentAppUserId);
 
         Group newGroup = groupMapper.newGroupDtoToGroup(newGroupDto);
+        newGroup.setSimplifyDebts(true);
         newGroup.setOwner(currentAppUser);
 
         Group createdGroup = groupRepository.save(newGroup);
@@ -151,15 +155,10 @@ public class GroupServiceImpl implements GroupService {
         ValidatorUtil.validate(validator, updateGroupDto);
 
         Group group = groupModelById(id);
-        boolean recalculateUserBalances = !group.getSimplifyDebts().equals(updateGroupDto.getSimplifyDebts());
 
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
         groupMapper.copyUpdateGroupInfoDtoToGroup(updateGroupDto, group);
         groupRepository.save(group);
-
-        if (recalculateUserBalances){
-            appUserBalanceService.recalculateAppUserBalanceByGroup(group);
-        }
 
         return groupMapper.groupToGroupInfoDto(group);
     }
@@ -196,14 +195,26 @@ public class GroupServiceImpl implements GroupService {
      *         with status code {@link HttpStatus#FORBIDDEN} if current user has no rights to access {@link Group}
      */
     @Override
-    public GroupActiveMembersDto groupActiveMembersById(Long id) {
+    public GroupMembersDto getFilteredGroupMembers(Long id, GroupMembersFilter groupMembersFilter) {
         groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
 
         Group group = groupModelById(id);
+        Set<GroupMembership> groupMembers;
 
-        List<GroupMembership> groupMembers = groupMembershipRepository.getActiveMembersOfGroupWithId(id);
+        switch (groupMembersFilter)
+        {
+            case ALL:
+                groupMembers = group.getGroupMemberships();
+                break;
+            case FORMER:
+                groupMembers = groupMembershipRepository.getMembersOfGroupWithId(id, false);
+                break;
+            case CURRENT:
+            default:
+                groupMembers = groupMembershipRepository.getMembersOfGroupWithId(id, true);
+        }
 
-        return groupMapper.groupToGroupActiveMembersDto(group, groupMembers);
+        return groupMapper.groupToGroupMembersDto(group, groupMembers);
     }
 
     /**
@@ -270,5 +281,12 @@ public class GroupServiceImpl implements GroupService {
         GroupSpendingsDto groupSpendingsDto = groupMapper.groupToGroupSpendingsDto(group);
         groupSpendingsDto.setSpendings(spendingShortDtoList);
         return groupSpendingsDto;
+    }
+
+    @Override
+    public Iterable<PayoffDto> groupPayoffs(Long id) {
+        groupMembershipService.verifyCurrentUserActiveMembershipByGroupId(id);
+
+        return payoffMapper.payoffSetToPayoffDtoSet(payoffRepository.findAllByGroupId(id));
     }
 }

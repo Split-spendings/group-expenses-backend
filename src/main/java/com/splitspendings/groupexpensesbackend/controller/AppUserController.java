@@ -35,6 +35,12 @@ public class AppUserController {
         return appUserService.profile();
     }
 
+    @GetMapping("/current")
+    public AppUserDto profileShort() {
+        return appUserService.profileShort();
+    }
+
+
     @GetMapping("/settings")
     public AppUserSettingsWithIdDto settings() {
         return appUserService.settings();

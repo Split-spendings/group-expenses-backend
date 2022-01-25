@@ -1,9 +1,9 @@
 package com.splitspendings.groupexpensesbackend.model;
 
 import com.splitspendings.groupexpensesbackend.model.enums.Currency;
-import lombok.Getter;
-import lombok.Setter;
-
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -17,9 +17,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "spending")
@@ -56,6 +55,10 @@ public class Spending {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "added_by_group_membership_id", foreignKey = @ForeignKey(name = "fk_spending_added_by_membership"))
     private GroupMembership addedByGroupMembership;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "paid_by_group_membership_id", foreignKey = @ForeignKey(name = "fk_spending_paid_by_membership"))
+    private GroupMembership paidByGroupMembership;
 
     @OneToMany(mappedBy = "spending")
     private Set<SpendingComment> comments;

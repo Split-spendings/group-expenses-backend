@@ -31,6 +31,8 @@ public interface AppUserService {
 
     AppUserFullInfoDto profile();
 
+    AppUserDto profileShort();
+
     AppUserSettingsWithIdDto settings();
 
     AppUserFullInfoWithSettingsDto createAppUser(NewAppUserDto newAppUserDto);
