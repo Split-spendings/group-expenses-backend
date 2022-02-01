@@ -42,4 +42,6 @@ public interface AppUserService {
     AppUserSettingsWithIdDto updateAppUserSettings(UpdateAppUserSettingsDto updateAppUserSettingsDto);
 
     AppUserReceivedGroupInvitesDto appUserReceivedGroupInvites();
+
+    AppUserDto synchroniseAppUser();
 }
