@@ -1,3 +1,4 @@
+/*
 package com.splitspendings.groupexpensesbackend.dataloader;
 
 import com.splitspendings.groupexpensesbackend.dataloader.factory.AppUserFactory;
@@ -773,3 +774,4 @@ public class DatabaseLoader implements CommandLineRunner {
         adminAppUser1.setId(adminsIdMap.get(ID + 1));
     }
 }
+*/

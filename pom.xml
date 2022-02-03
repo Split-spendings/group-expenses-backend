@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.split-spendings</groupId>
     <artifactId>group-expenses-backend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>group-expenses-backend</name>
     <description>Backend implementation for &quot;Application for splitting group expenses&quot; thesis project at PJATK
         by O.Bieliakov and V.Dovhyi
@@ -118,6 +118,19 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.splitspendings.groupexpensesbackend.GroupExpensesBackendApplication</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
